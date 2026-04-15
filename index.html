@@ -150,36 +150,49 @@
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      gap: 14px;
-      padding: 24px;
+      gap: 18px;
+      padding: 32px 24px;
     }
-    .placeholder-icon { font-size: 56px; opacity: 0.15; }
-    .placeholder p {
-      font-size: 14px;
-      color: var(--text-muted);
+    .ph-headline {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text);
       text-align: center;
-      line-height: 1.8;
     }
-    .source-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 10px;
-      margin-top: 8px;
-      max-width: 480px;
+    .ph-url-wrap {
+      display: flex;
+      gap: 8px;
       width: 100%;
+      max-width: 500px;
     }
-    .source-card {
-      background: var(--surface);
+    .ph-url-input {
+      flex: 1;
+      background: var(--bg);
       border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 12px;
-      text-align: center;
-      font-size: 12px;
-      color: var(--text-muted);
-      line-height: 1.5;
+      border-radius: 8px;
+      padding: 10px 14px;
+      color: var(--text);
+      font-size: 14px;
+      outline: none;
+      transition: border-color 0.2s;
     }
-    .source-card .icon { font-size: 22px; margin-bottom: 5px; }
-    .source-card strong { display: block; color: var(--text); font-size: 12px; margin-bottom: 2px; }
+    .ph-url-input::placeholder { color: var(--text-muted); }
+    .ph-url-input:focus { border-color: var(--accent); }
+    .ph-or {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      width: 100%;
+      max-width: 500px;
+      color: var(--text-muted);
+      font-size: 12px;
+    }
+    .ph-or::before, .ph-or::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
 
     /* Google Drive warning banner */
     .gdrive-banner {
@@ -868,12 +881,12 @@
 <!-- Header -->
 <header>
   <div class="logo">Clippin</div>
-  <div class="url-row">
+  <div class="url-row" id="urlRow" style="display:none">
     <input
       type="text"
       class="url-input"
       id="urlInput"
-      placeholder="Dropbox 共有リンクを貼り付け、またはファイルをドロップ"
+      placeholder="Dropbox 共有リンクを貼り付け..."
       autocomplete="off"
     >
     <button class="btn-primary" onclick="loadVideo()">読み込む</button>
@@ -892,20 +905,16 @@
 
     <div class="video-wrap" id="videoWrap">
       <div class="placeholder" id="placeholder">
-        <div class="placeholder-icon">▶</div>
-        <p>動画を読み込む方法を選択してください</p>
-        <div class="source-grid" style="grid-template-columns:repeat(2,1fr)">
-          <div class="source-card">
-            <div class="icon">📦</div>
-            <strong>Dropbox 共有リンク</strong>
-            リンクを上の入力欄に貼り付け<br>タイマー完全同期 ✅
-          </div>
-          <div class="source-card">
-            <div class="icon">📂</div>
-            <strong>ファイルをドロップ</strong>
-            MP4・MOV・WebM など<br>タイマー完全同期 ✅
-          </div>
+        <p class="ph-headline">動画をアップロードしてレビューを始める</p>
+        <div class="ph-url-wrap">
+          <input type="text" class="ph-url-input" id="placeholderUrlInput"
+                 placeholder="Dropbox 共有リンクを貼り付け..."
+                 autocomplete="off"
+                 oninput="document.getElementById('urlInput').value=this.value"
+                 onkeydown="if(event.key==='Enter'&&!event.isComposing)syncAndLoad()">
+          <button class="btn-primary" onclick="syncAndLoad()">読み込む</button>
         </div>
+        <div class="ph-or"><span>または</span></div>
         <div class="upload-zone" id="uploadZone" onclick="document.getElementById('fileInput').click()">
           <div class="upload-icon">⬆</div>
           <div><strong>クリックしてファイルを選択</strong><br>または動画ファイルをここにドロップ</div>
@@ -1171,6 +1180,17 @@
     toast(`✅ ${file.name} を読み込みました`);
   }
 
+  // ─── Placeholder helpers ───────────────────────────────
+  function showUrlRow() {
+    document.getElementById('urlRow').style.display = 'flex';
+  }
+
+  function syncAndLoad() {
+    const ph = document.getElementById('placeholderUrlInput');
+    if (ph) document.getElementById('urlInput').value = ph.value;
+    loadVideo();
+  }
+
   // ─── Load video ────────────────────────────────────────
   function loadVideo() {
     const raw = document.getElementById('urlInput').value.trim();
@@ -1253,6 +1273,7 @@
     iframe.allow = 'autoplay; encrypted-media; picture-in-picture; fullscreen';
     wrap.appendChild(iframe);
     reattachHint(wrap, hint);
+    showUrlRow();
   }
 
   // ── Native <video>: full sync via events ──
@@ -1295,6 +1316,7 @@
     wrap.appendChild(video);
     reattachHint(wrap, hint);
     nativeVideoEl = video;
+    showUrlRow();
   }
 
   // ─── Pins ──────────────────────────────────────────────
