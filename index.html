@@ -789,6 +789,75 @@
     }
     .gdrive-note.show { opacity: 1; pointer-events: auto; }
     .gdrive-note-icon { font-size: 32px; }
+
+    /* ── Mobile ─────────────────────────────────────────── */
+    @media (max-width: 768px) {
+      /* Header: URL入力を2行目に折り返す */
+      header {
+        flex-wrap: wrap;
+        padding: 8px 12px;
+        gap: 8px;
+      }
+      .logo { font-size: 15px; }
+      .url-row { order: 3; width: 100%; }
+      .header-project-name { max-width: 150px; font-size: 11px; margin-left: auto; }
+
+      /* Main: 縦積みに */
+      main {
+        flex-direction: column;
+        overflow-y: auto;
+        overflow-x: hidden;
+      }
+
+      /* 動画: 16:9 固定比率 */
+      .video-col { flex: none; }
+      .video-wrap {
+        flex: none;
+        aspect-ratio: 16 / 9;
+        width: 100%;
+      }
+      .video-wrap video { object-fit: contain; }
+
+      /* プレースホルダー */
+      .placeholder { padding: 16px; gap: 10px; }
+      .placeholder-icon { font-size: 36px; }
+      .source-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
+      .upload-zone { padding: 16px 12px; }
+
+      /* バナー */
+      .file-banner { font-size: 11px; padding: 4px 12px; }
+      .r2-banner   { font-size: 10px; padding: 4px 12px; }
+
+      /* コントロールバー: 折り返し・コンパクト */
+      .controls {
+        flex-wrap: wrap;
+        padding: 8px 12px;
+        gap: 8px;
+      }
+      .timer-val { font-size: 16px; min-width: 52px; }
+      #timerNote { display: none; }
+      .spacer    { display: none; }
+      .btn-pin   { padding: 6px 14px; font-size: 12px; }
+      .btn-share { padding: 6px 12px; font-size: 12px; }
+      .ctrl-btn  { padding: 5px 9px;  font-size: 11px; }
+
+      /* サイドバー: 全幅・縦並び */
+      .sidebar {
+        width: 100%;
+        min-width: 0;
+        border-left: none;
+        border-top: 1px solid var(--border);
+        flex: 1;
+        min-height: 240px;
+      }
+
+      /* ピンカード */
+      .pin-card { padding: 9px 10px; }
+      .pin-actions { opacity: 1; } /* hover不要のため常時表示 */
+
+      /* モーダル */
+      .modal { width: calc(100vw - 24px); padding: 18px; }
+    }
   </style>
 </head>
 <body>
