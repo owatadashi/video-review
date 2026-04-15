@@ -454,6 +454,41 @@
     .reply-cancel-btn { background: var(--border); color: var(--text-muted); }
     .reply-submit-btn { background: var(--accent); color: #fff; }
 
+    /* Project name bar (sidebar) */
+    .project-name-bar {
+      padding: 6px 12px;
+      border-bottom: 1px solid var(--border);
+      font-size: 11px;
+      color: var(--text-muted);
+      display: none;
+      align-items: center;
+      gap: 5px;
+      flex-shrink: 0;
+      min-width: 0;
+    }
+    .project-name-bar strong {
+      color: var(--text);
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    /* Project name modal input */
+    .project-name-input {
+      width: 100%;
+      box-sizing: border-box;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      font-size: 14px;
+      padding: 10px 12px;
+      margin: 12px 0 4px;
+      font-family: inherit;
+    }
+    .project-name-input:focus { outline: none; border-color: var(--accent); }
+    .project-name-input::placeholder { color: var(--text-muted); }
+
     /* ── Modal ── */
     .overlay {
       position: fixed;
@@ -841,6 +876,9 @@
       <span class="sidebar-title">コメント一覧</span>
       <span class="badge" id="badge">0</span>
     </div>
+    <div class="project-name-bar" id="projectNameBar">
+      📁 <strong id="projectNameDisplay"></strong>
+    </div>
     <div class="pins-scroll" id="pinsList">
       <div class="pins-empty">
         <div class="pins-empty-icon">📍</div>
@@ -875,6 +913,21 @@
   </div>
 </div>
 
+<!-- Project name modal -->
+<div class="overlay" id="projectOverlay">
+  <div class="modal">
+    <div class="modal-title">📁 プロジェクトとして保存</div>
+    <input type="text" class="project-name-input" id="projectNameInput"
+           placeholder="例: 商品紹介動画 v1" maxlength="100"
+           onkeydown="if(event.key==='Enter')confirmProjectName();if(event.key==='Escape')closeProjectModal();">
+    <div class="modal-tip">名前をつけると短いURLで共有できます</div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeProjectModal()">キャンセル</button>
+      <button class="btn-primary" onclick="confirmProjectName()">保存して共有URLを取得</button>
+    </div>
+  </div>
+</div>
+
 <!-- Share options modal (local file) -->
 <!-- shareOverlay は現在未使用（将来の拡張用に残す） -->
 
@@ -895,7 +948,7 @@
 
 <script>
   // ─── State ─────────────────────────────────────────────
-  let state = { fileId: '', videoUrl: '', videoType: '', pins: [] };
+  let state = { fileId: '', videoUrl: '', videoType: '', pins: [], projectId: null, projectName: '' };
 
   // ─── Player refs ───────────────────────────────────────
   let nativeVideoEl = null;  // <video> element
@@ -1248,7 +1301,7 @@
       editingPinId = null;
       document.getElementById('overlay').classList.remove('open');
       renderPins();
-      saveHash();
+      saveState();
       toast('✏️ ピンを更新しました');
     } else {
       // 新規追加
@@ -1260,7 +1313,7 @@
       // overlay を直接閉じる（closeModal はタイマー再開も行うが保存後は再開しない）
       document.getElementById('overlay').classList.remove('open');
       renderPins();
-      saveHash();
+      saveState();
       toast('📍 ピンを追加しました');
     }
   }
@@ -1268,7 +1321,7 @@
   function deletePin(id) {
     state.pins = state.pins.filter(p => p.id !== id);
     renderPins();
-    saveHash();
+    saveState();
   }
 
   function seekToPin(time, pinId) {
@@ -1354,7 +1407,7 @@
     if (!pin) return;
     pin.resolved = !pin.resolved;
     renderPins();
-    saveHash();
+    saveState();
   }
 
   // ─── Replies ───────────────────────────────────────────
@@ -1383,7 +1436,7 @@
     pin.replies.push({ id: Date.now(), text });
     replyingPinId = null;
     renderPins();
-    saveHash();
+    saveState();
   }
 
   function deleteReply(pinId, replyId) {
@@ -1391,7 +1444,7 @@
     if (!pin || !pin.replies) return;
     pin.replies = pin.replies.filter(r => r.id !== replyId);
     renderPins();
-    saveHash();
+    saveState();
   }
 
   // ─── URL Hash sharing ──────────────────────────────────
@@ -1439,17 +1492,131 @@
 
   // ─── Share routing ─────────────────────────────────────
   function handleShare() {
-    if (state.videoType === 'file') {
-      // ローカルファイル: R2 アップロードを即開始
-      doCloudUpload();
-    } else {
-      // Dropbox・R2済み・YouTube など既に共有可能な動画: そのままURLをコピー
-      saveHash();
+    // プロジェクト保存済み → URLをコピーするだけ
+    if (state.projectId) {
       writeClipboard(location.href);
       toast('🔗 共有URLをコピーしました');
+      return;
+    }
+    if (!state.videoUrl && !localFile) {
+      toast('❌ 動画を読み込んでください');
+      return;
+    }
+    openProjectModal();
+  }
+
+  // ─── Project modal ─────────────────────────────────────
+  function openProjectModal() {
+    document.getElementById('projectNameInput').value = '';
+    document.getElementById('projectOverlay').classList.add('open');
+    setTimeout(() => document.getElementById('projectNameInput').focus(), 60);
+  }
+
+  function closeProjectModal() {
+    document.getElementById('projectOverlay').classList.remove('open');
+  }
+
+  function confirmProjectName() {
+    const name = document.getElementById('projectNameInput').value.trim();
+    if (!name) { document.getElementById('projectNameInput').focus(); return; }
+    closeProjectModal();
+    if (state.videoType === 'file') {
+      doCloudUpload(name);
+    } else {
+      saveProjectToDB(name);
     }
   }
 
+  // ─── DB への保存 ────────────────────────────────────────
+  async function saveProjectToDB(name) {
+    try {
+      const res = await fetch('/api/projects', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name,
+          videoUrl:  state.videoUrl,
+          videoType: state.videoType,
+          fileId:    state.fileId || '',
+          pins:      state.pins,
+        }),
+      });
+      if (!res.ok) throw new Error((await res.json()).error);
+      const { id } = await res.json();
+      state.projectId   = id;
+      state.projectName = name;
+      history.pushState(null, '', `/project/${id}`);
+      document.title = `${name} - 動画レビュー`;
+      showProjectNameBar(name);
+      writeClipboard(location.href);
+      toast('🔗 プロジェクトを保存しました！共有URLをコピーしました');
+    } catch (e) {
+      console.error('saveProjectToDB error:', e);
+      toast('❌ プロジェクトの保存に失敗しました');
+    }
+  }
+
+  function showProjectNameBar(name) {
+    document.getElementById('projectNameDisplay').textContent = name;
+    document.getElementById('projectNameBar').style.display = 'flex';
+    document.getElementById('shareBtn').textContent = '🔗 URLをコピー';
+  }
+
+  // ─── DB からの読み込み ──────────────────────────────────
+  async function loadProjectFromDB(id) {
+    try {
+      const res = await fetch(`/api/projects/${id}`);
+      if (!res.ok) { toast('❌ プロジェクトが見つかりません'); return; }
+      const data = await res.json();
+
+      state.projectId   = data.id;
+      state.projectName = data.name;
+      state.videoUrl    = data.videoUrl;
+      state.videoType   = data.videoType;
+      state.fileId      = data.fileId || '';
+      state.pins        = data.pins;
+
+      document.title = `${data.name} - 動画レビュー`;
+      showProjectNameBar(data.name);
+
+      if (state.videoType === 'dropbox' && state.videoUrl) {
+        document.getElementById('urlInput').value = state.videoUrl;
+        const directUrl = convertDropboxUrl(state.videoUrl);
+        if (directUrl) renderNativeVideo(directUrl);
+        document.getElementById('timerNote').textContent = '▶ 再生するとタイマーが自動で同期します';
+      } else if (state.videoType === 'gdrive' && state.fileId) {
+        document.getElementById('urlInput').value = state.videoUrl || '';
+        renderGDrive(state.fileId);
+        document.getElementById('gdriveBanner').style.display = 'flex';
+        document.getElementById('timerNote').innerHTML =
+          '⚠ Google Drive はタイマー手動同期が必要です<br><span style="opacity:.7">ズレたら Space / K で調整</span>';
+      } else if ((state.videoType === 'direct' || state.videoType === 'file') && state.videoUrl) {
+        renderNativeVideo(state.videoUrl);
+        document.getElementById('r2Banner').style.display = '';
+      }
+      renderPins();
+    } catch (e) {
+      console.error('loadProjectFromDB error:', e);
+      toast('❌ プロジェクトの読み込みに失敗しました');
+    }
+  }
+
+  // ─── State 保存（DB or URLハッシュ）───────────────────────
+  async function saveState() {
+    if (state.projectId) {
+      try {
+        await fetch(`/api/projects/${state.projectId}/pins`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ pins: state.pins }),
+        });
+      } catch (e) {
+        console.error('saveState error:', e);
+      }
+    } else {
+      saveHash();
+    }
+  }
 
   // ─── コメントテキストコピー（サイドバーボタン用）──────────
   function copyPinsAsText() {
@@ -1473,7 +1640,7 @@
   }
 
   // ─── Cloudflare R2 アップロード（Presigned URL 経由）────────
-  async function doCloudUpload() {
+  async function doCloudUpload(projectName) {
     if (!localFile) { toast('ファイルがありません'); return; }
 
     document.getElementById('uploadTitle').textContent = '☁️ R2 にアップロード中...';
@@ -1538,12 +1705,10 @@
       }
 
       document.getElementById('fileBanner').classList.remove('show');
-      saveHash();
+      document.getElementById('r2Banner').style.display = '';
       setUploadUI(false, 100, '完了');
       await new Promise(r => setTimeout(r, 200));
-      writeClipboard(location.href);
-      toast('🔗 アップロード完了！共有URLをコピーしました');
-      document.getElementById('r2Banner').style.display = '';
+      await saveProjectToDB(projectName);
 
     } catch (err) {
       console.error('[R2 upload] error:', err);
@@ -1638,7 +1803,14 @@
   })();
 
   // ─── Init ──────────────────────────────────────────────
-  loadHash();
+  (function init() {
+    const projectMatch = location.pathname.match(/^\/project\/([a-z0-9]+)$/);
+    if (projectMatch) {
+      loadProjectFromDB(projectMatch[1]);
+    } else {
+      loadHash();
+    }
+  })();
 </script>
 </body>
 </html>
