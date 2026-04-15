@@ -1552,7 +1552,7 @@
       toast('🔗 プロジェクトを保存しました！共有URLをコピーしました');
     } catch (e) {
       console.error('saveProjectToDB error:', e);
-      toast('❌ プロジェクトの保存に失敗しました');
+      toast('❌ 保存失敗: ' + e.message);
     }
   }
 

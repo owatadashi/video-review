@@ -29,12 +29,15 @@ const BUCKET          = process.env.R2_BUCKET_NAME;
 const PUBLIC_BASE_URL = (process.env.R2_PUBLIC_BASE_URL || '').replace(/\/$/, '');
 
 // ─── PostgreSQL ────────────────────────────────────────────
-const isLocalDB = process.env.DATABASE_URL.includes('localhost') ||
-                  process.env.DATABASE_URL.includes('127.0.0.1');
+// Railway 内部ホスト・ローカルは SSL 不要、外部公開URLのみ SSL
+const dbUrl = process.env.DATABASE_URL;
+const needsSsl = !dbUrl.includes('localhost') &&
+                 !dbUrl.includes('127.0.0.1') &&
+                 !dbUrl.includes('.railway.internal');
 
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  ssl: isLocalDB ? false : { rejectUnauthorized: false },
+  connectionString: dbUrl,
+  ssl: needsSsl ? { rejectUnauthorized: false } : false,
 });
 
 async function initDB() {
@@ -226,9 +229,15 @@ app.get('/project/:id', (req, res) => {
 });
 
 // ─── サーバー起動 ───────────────────────────────────────────
-app.listen(PORT, async () => {
-  console.log(`✅ サーバー起動: http://localhost:${PORT}`);
-  console.log(`   バケット: ${BUCKET}`);
-  console.log(`   公開URL設定: ${PUBLIC_BASE_URL || '未設定（署名付きURLを使用）'}`);
-  await initDB().catch(e => console.error('❌ DB init error:', e));
-});
+initDB()
+  .then(() => {
+    app.listen(PORT, () => {
+      console.log(`✅ サーバー起動: http://localhost:${PORT}`);
+      console.log(`   バケット: ${BUCKET}`);
+      console.log(`   公開URL設定: ${PUBLIC_BASE_URL || '未設定（署名付きURLを使用）'}`);
+    });
+  })
+  .catch(err => {
+    console.error('❌ DB 初期化失敗。サーバーを起動できません:', err.message);
+    process.exit(1);
+  });
