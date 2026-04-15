@@ -181,6 +181,28 @@
       color: var(--text);
       text-align: center;
     }
+    .ph-desc {
+      font-size: 13px;
+      color: var(--text-muted);
+      text-align: center;
+      max-width: 420px;
+      line-height: 1.7;
+    }
+    .ph-features {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      font-size: 12px;
+      color: var(--text-muted);
+      text-align: center;
+    }
+    .ph-features li {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
     .ph-url-wrap {
       display: flex;
       gap: 8px;
@@ -956,7 +978,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <div class="video-wrap" id="videoWrap">
       <div class="placeholder" id="placeholder">
         <p class="ph-headline">動画をアップロードしてレビューを始める</p>
-        <div class="ph-url-wrap">
+        <p class="ph-desc">Clippin は、動画の特定の場面にタイムコードでコメントを付けてチームと共有できる動画レビューツールです。</p>
+<div class="ph-url-wrap">
           <input type="text" class="ph-url-input" id="placeholderUrlInput"
                  placeholder="Dropbox 共有リンクを貼り付け..."
                  autocomplete="off"
