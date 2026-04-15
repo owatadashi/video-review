@@ -28,17 +28,17 @@
 
   <style>
     :root {
-      --bg: #0f1117;
-      --surface: #1a1d27;
-      --surface2: #222535;
-      --border: #2a2d3e;
-      --accent: #6c63ff;
-      --accent-hover: #8b84ff;
-      --accent-dim: rgba(108,99,255,0.15);
-      --text: #e0e0e0;
-      --text-muted: #777;
-      --danger: #ff5555;
-      --warn: #f5a623;
+      --bg: #0c0c0b;
+      --surface: #131310;
+      --surface2: #1a1a17;
+      --border: #252520;
+      --accent: #c8a96e;
+      --accent-hover: #d4b87f;
+      --accent-dim: rgba(200,169,110,0.12);
+      --text: #f0ede6;
+      --text-muted: #7a7770;
+      --danger: #b85c4a;
+      --warn: #c49640;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -117,7 +117,7 @@
       flex: 1;
       background: var(--bg);
       border: 1px solid var(--border);
-      border-radius: 8px;
+      border-radius: 0;
       padding: 7px 13px;
       color: var(--text);
       font-size: 13px;
@@ -131,7 +131,7 @@
       background: var(--accent);
       color: #fff;
       border: none;
-      border-radius: 8px;
+      border-radius: 0;
       padding: 7px 16px;
       font-size: 13px;
       font-weight: 600;
@@ -229,7 +229,7 @@
       flex: 1;
       background: var(--bg);
       border: 1px solid var(--border);
-      border-radius: 8px;
+      border-radius: 0;
       padding: 10px 14px;
       color: var(--text);
       font-size: 14px;
@@ -310,7 +310,7 @@
     .ctrl-btn {
       background: var(--surface2);
       border: 1px solid var(--border);
-      border-radius: 7px;
+      border-radius: 0;
       color: var(--text);
       padding: 5px 11px;
       font-size: 12px;
@@ -336,7 +336,7 @@
       background: var(--accent);
       color: #fff;
       border: none;
-      border-radius: 8px;
+      border-radius: 0;
       padding: 7px 18px;
       font-size: 13px;
       font-weight: 600;
@@ -352,7 +352,7 @@
       background: transparent;
       border: 1px solid var(--border);
       color: var(--text-muted);
-      border-radius: 8px;
+      border-radius: 0;
       padding: 7px 14px;
       font-size: 12px;
       cursor: pointer;
@@ -366,7 +366,7 @@
     .kbd {
       font-size: 10px;
       background: var(--border);
-      border-radius: 4px;
+      border-radius: 0;
       padding: 1px 5px;
       color: var(--text-muted);
     }
@@ -400,7 +400,7 @@
     .badge {
       background: var(--accent);
       color: #fff;
-      border-radius: 10px;
+      border-radius: 0;
       padding: 1px 7px;
       font-size: 11px;
       font-weight: 600;
@@ -429,7 +429,7 @@
     .pin-card {
       background: var(--bg);
       border: 1px solid var(--border);
-      border-radius: 10px;
+      border-radius: 0;
       padding: 11px 12px;
       margin-bottom: 7px;
       position: relative;
@@ -474,7 +474,7 @@
       font-size: 13px;
       line-height: 1;
       padding: 3px 5px;
-      border-radius: 4px;
+      border-radius: 0;
       color: var(--text-muted);
       transition: background 0.15s, color 0.15s;
     }
@@ -484,7 +484,7 @@
     /* Resolve button */
     .resolve-btn {
       background: none; border: none; cursor: pointer;
-      font-size: 14px; line-height: 1; padding: 2px 5px; border-radius: 4px;
+      font-size: 14px; line-height: 1; padding: 2px 5px; border-radius: 0;
       color: var(--text-muted); transition: background 0.15s, color 0.15s;
     }
     .resolve-btn:hover { color: #4caf50; background: rgba(76,175,80,0.12); }
@@ -493,7 +493,7 @@
     /* Reply button */
     .reply-btn {
       background: none; border: none; cursor: pointer;
-      font-size: 13px; line-height: 1; padding: 3px 5px; border-radius: 4px;
+      font-size: 13px; line-height: 1; padding: 3px 5px; border-radius: 0;
       color: var(--text-muted); transition: background 0.15s, color 0.15s;
     }
     .reply-btn:hover { color: var(--accent); background: var(--accent-dim); }
@@ -518,7 +518,7 @@
     .pin-reply-del {
       background: none; border: none; cursor: pointer; flex-shrink: 0;
       font-size: 10px; color: var(--text-muted); padding: 1px 4px;
-      border-radius: 3px; opacity: 0; transition: opacity 0.15s, color 0.15s;
+      border-radius: 0; opacity: 0; transition: opacity 0.15s, color 0.15s;
     }
     .pin-reply:hover .pin-reply-del { opacity: 1; }
     .pin-reply-del:hover { color: var(--danger); }
@@ -532,7 +532,7 @@
     .reply-form textarea {
       width: 100%; box-sizing: border-box;
       background: var(--bg); border: 1px solid var(--border);
-      border-radius: 6px; color: var(--text); font-family: inherit;
+      border-radius: 0; color: var(--text); font-family: inherit;
       font-size: 12px; padding: 6px 8px; resize: none;
     }
     .reply-form textarea:focus { outline: none; border-color: var(--accent); }
@@ -540,7 +540,7 @@
       display: flex; justify-content: flex-end; gap: 6px; margin-top: 5px;
     }
     .reply-cancel-btn, .reply-submit-btn {
-      font-size: 11px; padding: 4px 10px; border-radius: 5px;
+      font-size: 11px; padding: 4px 10px; border-radius: 0;
       border: none; cursor: pointer;
     }
     .reply-cancel-btn { background: var(--border); color: var(--text-muted); }
@@ -571,7 +571,7 @@
       box-sizing: border-box;
       background: var(--bg);
       border: 1px solid var(--border);
-      border-radius: 8px;
+      border-radius: 0;
       color: var(--text);
       font-size: 14px;
       padding: 10px 12px;
@@ -597,7 +597,7 @@
     .modal {
       background: var(--surface);
       border: 1px solid var(--border);
-      border-radius: 14px;
+      border-radius: 0;
       padding: 22px;
       width: 400px;
       max-width: calc(100vw - 32px);
@@ -616,7 +616,7 @@
       width: 100%;
       background: var(--bg);
       border: 1px solid var(--border);
-      border-radius: 8px;
+      border-radius: 0;
       padding: 10px 12px;
       color: var(--text);
       font-size: 14px;
@@ -643,7 +643,7 @@
       background: transparent;
       border: 1px solid var(--border);
       color: var(--text-muted);
-      border-radius: 7px;
+      border-radius: 0;
       padding: 7px 14px;
       font-size: 13px;
       cursor: pointer;
@@ -662,7 +662,7 @@
       flex: 1;
       background: var(--bg);
       border: 1px solid var(--accent);
-      border-radius: 8px;
+      border-radius: 0;
       padding: 6px 10px;
       color: var(--accent);
       font-size: 18px;
@@ -675,7 +675,7 @@
     .tc-adj {
       background: var(--surface2);
       border: 1px solid var(--border);
-      border-radius: 6px;
+      border-radius: 0;
       color: var(--text-muted);
       padding: 5px 8px;
       font-size: 11px;
@@ -700,7 +700,7 @@
     .upload-box {
       background: var(--surface);
       border: 1px solid var(--border);
-      border-radius: 16px;
+      border-radius: 0;
       padding: 28px 32px;
       width: 380px;
       max-width: calc(100vw - 32px);
@@ -710,7 +710,7 @@
     .upload-box p  { font-size: 13px; color: var(--text-muted); margin-bottom: 20px; line-height: 1.6; }
     .progress-bar-wrap {
       background: var(--border);
-      border-radius: 99px;
+      border-radius: 0;
       height: 6px;
       overflow: hidden;
       margin-bottom: 10px;
@@ -718,7 +718,7 @@
     .progress-bar {
       height: 100%;
       background: var(--accent);
-      border-radius: 99px;
+      border-radius: 0;
       width: 0%;
       transition: width 0.3s;
     }
@@ -729,7 +729,7 @@
     .share-option {
       background: var(--bg);
       border: 1px solid var(--border);
-      border-radius: 10px;
+      border-radius: 0;
       padding: 14px;
       margin-bottom: 10px;
       cursor: pointer;
@@ -745,7 +745,7 @@
       background: var(--surface2);
       border: 1px solid var(--border);
       color: var(--text-muted);
-      border-radius: 8px;
+      border-radius: 0;
       padding: 8px;
       font-size: 12px;
       cursor: pointer;
@@ -762,7 +762,7 @@
       transform: translateX(-50%) translateY(12px);
       background: var(--surface);
       border: 1px solid var(--border);
-      border-radius: 10px;
+      border-radius: 0;
       padding: 9px 18px;
       font-size: 13px;
       color: var(--text);
@@ -777,13 +777,13 @@
     /* ── Scrollbar ── */
     ::-webkit-scrollbar { width: 5px; }
     ::-webkit-scrollbar-track { background: transparent; }
-    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 0; }
     ::-webkit-scrollbar-thumb:hover { background: #444; }
 
     /* ── File upload area ── */
     .upload-zone {
       border: 2px dashed var(--border);
-      border-radius: 12px;
+      border-radius: 0;
       padding: 28px 20px;
       text-align: center;
       cursor: pointer;
@@ -805,8 +805,8 @@
 
     /* file active banner */
     .file-banner {
-      background: rgba(108,99,255,0.12);
-      border-top: 1px solid rgba(108,99,255,0.3);
+      background: rgba(200,169,110,0.08);
+      border-top: 1px solid rgba(200,169,110,0.25);
       padding: 6px 16px;
       display: none;
       align-items: center;
@@ -834,7 +834,7 @@
       color: #fff;
       font-size: 11px;
       padding: 4px 10px;
-      border-radius: 6px;
+      border-radius: 0;
       pointer-events: none;
       opacity: 0;
       transition: opacity 0.3s;
