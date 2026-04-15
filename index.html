@@ -874,7 +874,26 @@
       .pin-actions { opacity: 1; position: static; margin-top: 6px; justify-content: flex-end; }
 
       /* ── モーダル ── */
-      .modal { width: calc(100vw - 24px); padding: 18px; }
+      .modal {
+        width: calc(100vw - 24px);
+        padding: 16px;
+        overflow: hidden;
+      }
+
+      /* ── タイムコード行 ── */
+      .timecode-row { gap: 4px; }
+      .tc-adj {
+        padding: 6px 5px;
+        font-size: 11px;
+        flex-shrink: 1;
+        min-width: 0;
+      }
+      .tc-input {
+        font-size: 15px;
+        padding: 6px 4px;
+        min-width: 0;
+        letter-spacing: 0;
+      }
     }
   </style>
 </head>
