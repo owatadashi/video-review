@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>動画レビュー</title>
+  <title>Clippin</title>
   <style>
     :root {
       --bg: #0f1117;
@@ -48,6 +48,25 @@
       color: var(--accent);
       white-space: nowrap;
       letter-spacing: -0.3px;
+    }
+
+    .header-project-name {
+      display: none;
+      align-items: center;
+      gap: 6px;
+      margin-left: auto;
+      font-size: 12px;
+      color: var(--text-muted);
+      white-space: nowrap;
+      overflow: hidden;
+      max-width: 280px;
+    }
+    .header-project-name span {
+      color: var(--text);
+      font-weight: 600;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
     }
 
     .url-row {
@@ -779,7 +798,7 @@
 
 <!-- Header -->
 <header>
-  <div class="logo">🎬 動画レビュー</div>
+  <div class="logo">Clippin</div>
   <div class="url-row">
     <input
       type="text"
@@ -790,6 +809,9 @@
     >
     <button class="btn-primary" onclick="loadVideo()">読み込む</button>
     <button class="btn-primary" style="background:var(--surface2);border:1px solid var(--border);color:var(--text)" onclick="document.getElementById('fileInput').click()">📂 ファイル</button>
+  </div>
+  <div class="header-project-name" id="headerProjectName">
+    📁 <span id="headerProjectNameText"></span>
   </div>
 </header>
 
@@ -836,9 +858,7 @@
     </div>
 
     <!-- R2 有効期限バナー -->
-    <div class="r2-banner" id="r2Banner" style="display:none">
-      🕐 閲覧可能期間：アップロードから60日間
-    </div>
+    <div class="r2-banner" id="r2Banner" style="display:none"></div>
 
     <!-- Controls -->
     <div class="controls">
@@ -919,7 +939,7 @@
     <div class="modal-title">📁 プロジェクトとして保存</div>
     <input type="text" class="project-name-input" id="projectNameInput"
            placeholder="例: 商品紹介動画 v1" maxlength="100"
-           onkeydown="if(event.key==='Enter')confirmProjectName();if(event.key==='Escape')closeProjectModal();">
+           onkeydown="if(event.key==='Enter'&&!event.isComposing)confirmProjectName();if(event.key==='Escape'&&!event.isComposing)closeProjectModal();">
     <div class="modal-tip">名前をつけると短いURLで共有できます</div>
     <div class="modal-actions">
       <button class="btn-cancel" onclick="closeProjectModal()">キャンセル</button>
@@ -1483,7 +1503,7 @@
         document.getElementById('urlInput').value = state.videoUrl;
         renderNativeVideo(state.videoUrl);
         if (state.videoType === 'direct') {
-          document.getElementById('r2Banner').style.display = '';
+          showR2Banner(state.projectCreatedAt || new Date());
         }
       }
       renderPins();
@@ -1546,7 +1566,7 @@
       state.projectId   = id;
       state.projectName = name;
       history.pushState(null, '', `/project/${id}`);
-      document.title = `${name} - 動画レビュー`;
+      document.title = `${name} - Clippin`;
       showProjectNameBar(name);
       writeClipboard(location.href);
       toast('🔗 プロジェクトを保存しました！共有URLをコピーしました');
@@ -1557,9 +1577,27 @@
   }
 
   function showProjectNameBar(name) {
+    // サイドバー
     document.getElementById('projectNameDisplay').textContent = name;
     document.getElementById('projectNameBar').style.display = 'flex';
+    // ヘッダー右上
+    document.getElementById('headerProjectNameText').textContent = name;
+    document.getElementById('headerProjectName').style.display = 'flex';
+    // 共有ボタン
     document.getElementById('shareBtn').textContent = '🔗 URLをコピー';
+  }
+
+  function calcExpiryDate(fromDate) {
+    const d = new Date(fromDate);
+    d.setDate(d.getDate() + 60);
+    return d.toLocaleDateString('ja-JP', { year: 'numeric', month: 'long', day: 'numeric' });
+  }
+
+  function showR2Banner(fromDate) {
+    const expiry = calcExpiryDate(fromDate || new Date());
+    const el = document.getElementById('r2Banner');
+    el.textContent = `🕐 閲覧可能期間：${expiry}まで`;
+    el.style.display = '';
   }
 
   // ─── DB からの読み込み ──────────────────────────────────
@@ -1569,14 +1607,15 @@
       if (!res.ok) { toast('❌ プロジェクトが見つかりません'); return; }
       const data = await res.json();
 
-      state.projectId   = data.id;
-      state.projectName = data.name;
-      state.videoUrl    = data.videoUrl;
-      state.videoType   = data.videoType;
-      state.fileId      = data.fileId || '';
-      state.pins        = data.pins;
+      state.projectId        = data.id;
+      state.projectName      = data.name;
+      state.videoUrl         = data.videoUrl;
+      state.videoType        = data.videoType;
+      state.fileId           = data.fileId || '';
+      state.pins             = data.pins;
+      state.projectCreatedAt = data.createdAt ? new Date(data.createdAt) : new Date();
 
-      document.title = `${data.name} - 動画レビュー`;
+      document.title = `${data.name} - Clippin`;
       showProjectNameBar(data.name);
 
       if (state.videoType === 'dropbox' && state.videoUrl) {
@@ -1592,7 +1631,7 @@
           '⚠ Google Drive はタイマー手動同期が必要です<br><span style="opacity:.7">ズレたら Space / K で調整</span>';
       } else if ((state.videoType === 'direct' || state.videoType === 'file') && state.videoUrl) {
         renderNativeVideo(state.videoUrl);
-        document.getElementById('r2Banner').style.display = '';
+        showR2Banner(state.projectCreatedAt || new Date());
       }
       renderPins();
     } catch (e) {
@@ -1624,7 +1663,7 @@
     const filename = document.getElementById('fileNameLabel').textContent
                   || state.videoUrl || '動画';
     const lines = [
-      `【動画レビューコメント】`,
+      `【Clippin レビューコメント】`,
       `動画: ${filename}`,
       `日時: ${new Date().toLocaleString('ja-JP')}`,
       ``,
@@ -1705,7 +1744,7 @@
       }
 
       document.getElementById('fileBanner').classList.remove('show');
-      document.getElementById('r2Banner').style.display = '';
+      showR2Banner(new Date());
       setUploadUI(false, 100, '完了');
       await new Promise(r => setTimeout(r, 200));
       await saveProjectToDB(projectName);

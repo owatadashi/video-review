@@ -185,6 +185,7 @@ app.get('/api/projects/:id', async (req, res) => {
       videoUrl:  proj.rows[0].video_url,
       videoType: proj.rows[0].video_type,
       fileId:    proj.rows[0].file_id,
+      createdAt: proj.rows[0].created_at,
       pins,
     });
   } catch (err) {
