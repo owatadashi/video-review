@@ -875,10 +875,23 @@
       }
       .video-wrap video { object-fit: contain; }
 
+      /* ── プレースホルダー表示中は16:9固定を解除 ── */
+      .video-wrap:has(#placeholder) {
+        aspect-ratio: unset;
+        height: auto;
+      }
+      .video-wrap:has(#placeholder) .placeholder {
+        height: auto;
+      }
+
       /* ── プレースホルダー ── */
-      .placeholder { padding: 20px 16px; gap: 14px; }
+      .placeholder { padding: 20px 16px; gap: 12px; }
       .ph-url-wrap { max-width: 100%; }
-      .upload-zone { padding: 14px 12px; }
+      .upload-zone { padding: 12px; }
+
+      /* ── サイドバー空状態は余白を縮小 ── */
+      .pins-empty { padding: 12px; gap: 6px; min-height: 80px; }
+      .pins-empty-icon { font-size: 24px; }
 
       /* ── バナー ── */
       .file-banner { font-size: 11px; padding: 4px 12px; }
