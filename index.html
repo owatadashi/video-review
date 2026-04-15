@@ -1768,7 +1768,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
   function calcExpiryDate(fromDate) {
     const d = new Date(fromDate);
-    d.setDate(d.getDate() + 60);
+    d.setDate(d.getDate() + 30);
     return d.toLocaleDateString('ja-JP', { year: 'numeric', month: 'long', day: 'numeric' });
   }
 
