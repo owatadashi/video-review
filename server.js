@@ -224,6 +224,11 @@ app.put('/api/projects/:id/pins', async (req, res) => {
   }
 });
 
+// ─── /privacy → privacy.html ──────────────────────────────
+app.get('/privacy', (req, res) => {
+  res.sendFile(path.join(__dirname, 'privacy.html'));
+});
+
 // ─── SPA フォールバック（/project/:id → index.html）────────
 app.get('/project/:id', (req, res) => {
   res.sendFile(path.join(__dirname, 'index.html'));
