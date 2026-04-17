@@ -532,6 +532,15 @@
     }
     .ph-url-input::placeholder { color: var(--text-muted); }
     .ph-url-input:focus { border-color: var(--accent); }
+    .ph-privacy-note {
+      font-size: 11px;
+      color: #7a7770;
+      text-align: center;
+      max-width: 480px;
+      line-height: 1.7;
+      margin-top: 4px;
+    }
+
     .ph-or {
       display: flex;
       align-items: center;
@@ -1369,6 +1378,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
           <div class="upload-icon"><i data-lucide="upload" class="icon-lg"></i></div>
           <div><strong>クリックしてファイルを選択</strong><br>または動画ファイルをここにドロップ</div>
         </div>
+        <p class="ph-privacy-note"><i data-lucide="lock" class="icon" style="opacity:.5"></i> アップロードされた動画はCloudflare R2に保存され、30日後に自動削除されます。開発者が動画を閲覧・利用することはありません。</p>
       </div>
       <div class="sync-hint" id="syncHint">再生と同時にタイマー開始</div>
     </div>
