@@ -1310,7 +1310,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
           </div>
         </div>
         <div class="fv-bottom-bar">
-          <span class="fv-btn">ピンを追加</span>
+          <span class="fv-btn">コメント</span>
           <span class="fv-btn-ghost">共有</span>
         </div>
       </div>
@@ -1389,7 +1389,6 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <div class="controls">
       <div class="timer-wrap">
         <span class="timer-val" id="timerVal">00:00</span>
-        <span class="timer-label">タイマー</span>
       </div>
 
       <button class="ctrl-btn" id="timerToggle" onclick="toggleTimer()"><i data-lucide="play" class="icon"></i> 開始</button>
@@ -1397,14 +1396,12 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
       <div class="sep"></div>
 
-      <span id="timerNote" style="font-size:11px; color:var(--text-muted); line-height:1.5">
-        再生ボタンを押すと動画とタイマーが同時に開始
-      </span>
+      <span id="timerNote" style="display:none"></span>
 
       <div class="spacer"></div>
 
       <button class="btn-pin" onclick="openModal()">
-        <i data-lucide="map-pin" class="icon"></i> ピンを追加
+        <i data-lucide="map-pin" class="icon"></i> コメント
         <span class="kbd">P</span>
       </button>
 
@@ -1440,7 +1437,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <!-- Pin Modal -->
 <div class="overlay" id="overlay">
   <div class="modal">
-    <div class="modal-title" id="modalTitle"><i data-lucide="map-pin" class="icon"></i> ピンを追加</div>
+    <div class="modal-title" id="modalTitle"><i data-lucide="map-pin" class="icon"></i> コメントを追加</div>
     <div class="timecode-row">
       <button class="tc-adj" onclick="adjustTimecode(-5)">−5s</button>
       <button class="tc-adj" onclick="adjustTimecode(-1)">−1s</button>
@@ -1809,13 +1806,13 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       if (!pin) return;
       capturedSec = pin.time;
       document.getElementById('commentInput').value = pin.comment;
-      document.getElementById('modalTitle').innerHTML = '<i data-lucide="pencil" class="icon"></i> ピンを編集';
+      document.getElementById('modalTitle').innerHTML = '<i data-lucide="pencil" class="icon"></i> コメントを編集';
       lucide.createIcons({ els: document.getElementById('modalTitle').querySelectorAll('[data-lucide]') });
     } else {
       // 新規モード
       capturedSec = currentSec();
       document.getElementById('commentInput').value = '';
-      document.getElementById('modalTitle').innerHTML = '<i data-lucide="map-pin" class="icon"></i> ピンを追加';
+      document.getElementById('modalTitle').innerHTML = '<i data-lucide="map-pin" class="icon"></i> コメントを追加';
       lucide.createIcons({ els: document.getElementById('modalTitle').querySelectorAll('[data-lucide]') });
     }
 
@@ -1879,7 +1876,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       document.getElementById('overlay').classList.remove('open');
       renderPins();
       saveState();
-      toast('ピンを追加しました');
+      toast('コメントしました');
     }
   }
 
