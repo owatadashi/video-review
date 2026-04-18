@@ -2224,8 +2224,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     document.getElementById('headerProjectName').style.display = 'flex';
     // 共有ボタン
     const shareBtn = document.getElementById('shareBtn');
-    const shareLabel = window.innerWidth <= 768 ? 'コピー' : 'URLをコピー';
-    shareBtn.innerHTML = `<i data-lucide="link-2" class="icon"></i> ${shareLabel}`;
+    shareBtn.innerHTML = '<i data-lucide="share-2" class="icon"></i> 共有';
     lucide.createIcons({ els: shareBtn.querySelectorAll('[data-lucide]') });
   }
 
