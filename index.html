@@ -806,6 +806,67 @@
     .pin-card.resolved .pin-time { color: var(--text-muted); }
     .pin-card.resolved .pin-comment { text-decoration: line-through; color: var(--text-muted); }
 
+    .pin-meta {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 5px;
+    }
+    .pin-author {
+      font-size: 11px;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    /* ── Filter tabs ── */
+    .filter-tabs {
+      display: flex;
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+    .filter-tab {
+      flex: 1;
+      background: none;
+      border: none;
+      border-bottom: 2px solid transparent;
+      color: var(--text-muted);
+      font-size: 11px;
+      padding: 7px 4px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .filter-tab:hover { color: var(--text); }
+    .filter-tab.active {
+      color: var(--accent);
+      border-bottom-color: var(--accent);
+    }
+
+    /* ── Speed select ── */
+    .speed-select {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      font-size: 11px;
+      padding: 5px 4px;
+      cursor: pointer;
+      outline: none;
+      flex-shrink: 0;
+    }
+    .speed-select:hover { border-color: var(--accent); color: var(--text); }
+
+    /* ── Author input in modal ── */
+    .author-input {
+      width: 100%;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-size: 13px;
+      padding: 8px 10px;
+      outline: none;
+      margin-bottom: 8px;
+    }
+    .author-input:focus { border-color: var(--accent); }
+
     /* Replies list */
     .pin-replies {
       margin-top: 8px;
@@ -1544,6 +1605,13 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
       <div class="spacer"></div>
 
+      <select class="speed-select" id="speedSelect" onchange="changeSpeed(this.value)" title="再生速度">
+        <option value="0.5">0.5x</option>
+        <option value="1" selected>1x</option>
+        <option value="1.5">1.5x</option>
+        <option value="2">2x</option>
+      </select>
+
       <button class="btn-pin" onclick="openModal()">
         <i data-lucide="map-pin" class="icon"></i> コメント
         <span class="kbd">P</span>
@@ -1561,6 +1629,11 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <div class="sidebar-head">
       <span class="sidebar-title">コメント一覧</span>
       <span class="badge" id="badge">0</span>
+    </div>
+    <div class="filter-tabs">
+      <button class="filter-tab active" id="filterAll"        onclick="setFilter('all')">すべて</button>
+      <button class="filter-tab"        id="filterUnresolved" onclick="setFilter('unresolved')">未解決</button>
+      <button class="filter-tab"        id="filterResolved"   onclick="setFilter('resolved')">解決済</button>
     </div>
     <div class="project-name-bar" id="projectNameBar">
       <i data-lucide="folder" class="icon"></i> <strong id="projectNameDisplay"></strong>
@@ -1591,6 +1664,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       <button class="tc-adj" onclick="adjustTimecode(+1)">+1s</button>
       <button class="tc-adj" onclick="adjustTimecode(+5)">+5s</button>
     </div>
+    <input type="text" class="author-input" id="authorInput" placeholder="名前（省略可）" maxlength="30"
+           onkeydown="if(event.key==='Enter'&&!event.isComposing){event.preventDefault();document.getElementById('commentInput').focus();}">
     <textarea id="commentInput" placeholder="修正指示・フィードバックを入力..."></textarea>
     <div class="modal-tip">Ctrl + Enter で保存　／　Esc でキャンセル</div>
     <div class="modal-actions">
@@ -1928,6 +2003,9 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     wrap.appendChild(video);
     reattachHint(wrap, hint);
     nativeVideoEl = video;
+    // 速度セレクタを1xにリセット
+    const sel = document.getElementById('speedSelect');
+    if (sel) { sel.value = '1'; video.playbackRate = 1; }
     showUrlRow();
   }
 
@@ -1992,6 +2070,15 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       setTimerBtn(false);
     }
 
+    // 名前を localStorage から復元（新規のみ、編集時は既存データを使う）
+    const savedAuthor = localStorage.getItem('clippin_author') || '';
+    if (editingPinId !== null) {
+      const pin = state.pins.find(p => p.id === editingPinId);
+      document.getElementById('authorInput').value = pin?.author || savedAuthor;
+    } else {
+      document.getElementById('authorInput').value = savedAuthor;
+    }
+
     setTcInput(capturedSec);
     document.getElementById('overlay').classList.add('open');
     setTimeout(() => document.getElementById('commentInput').focus(), 60);
@@ -2012,14 +2099,16 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     const s = parseTimecode(raw);
     if (s !== null) capturedSec = Math.max(0, s);
 
-    const text = document.getElementById('commentInput').value.trim();
+    const text   = document.getElementById('commentInput').value.trim();
+    const author = document.getElementById('authorInput').value.trim();
     if (!text) { document.getElementById('commentInput').focus(); return; }
+    if (author) localStorage.setItem('clippin_author', author);
 
     if (editingPinId !== null) {
       // 編集: 既存ピンを上書き
       const idx = state.pins.findIndex(p => p.id === editingPinId);
       if (idx !== -1) {
-        state.pins[idx] = { ...state.pins[idx], time: capturedSec, comment: text };
+        state.pins[idx] = { ...state.pins[idx], time: capturedSec, comment: text, author };
         state.pins.sort((a, b) => a.time - b.time);
         activePinId = editingPinId;
       }
@@ -2030,7 +2119,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       toast('ピンを更新しました');
     } else {
       // 新規追加
-      const pin = { id: Date.now(), time: capturedSec, comment: text };
+      const pin = { id: Date.now(), time: capturedSec, comment: text, author };
       state.pins.push(pin);
       state.pins.sort((a, b) => a.time - b.time);
       activePinId = pin.id;
@@ -2065,6 +2154,17 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     }
   }
 
+  let pinFilter = 'all';
+
+  function setFilter(f) {
+    pinFilter = f;
+    ['all','unresolved','resolved'].forEach(k => {
+      const el = document.getElementById('filter' + k.charAt(0).toUpperCase() + k.slice(1));
+      if (el) el.classList.toggle('active', k === f);
+    });
+    renderPins();
+  }
+
   function renderPins() {
     const list = document.getElementById('pinsList');
     const unresolved = state.pins.filter(p => !p.resolved).length;
@@ -2072,16 +2172,26 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       unresolved < state.pins.length
         ? `${unresolved}/${state.pins.length}`
         : state.pins.length;
-    if (state.pins.length === 0) {
+
+    const visible = state.pins.filter(p =>
+      pinFilter === 'unresolved' ? !p.resolved :
+      pinFilter === 'resolved'   ?  p.resolved : true
+    );
+
+    if (visible.length === 0) {
+      const msg = state.pins.length === 0
+        ? 'タイムコード付きのコメントが<br>ここに表示されます'
+        : pinFilter === 'unresolved' ? '未解決のコメントはありません' : '解決済のコメントはありません';
       list.innerHTML = `
         <div class="pins-empty">
           <div class="pins-empty-icon"><i data-lucide="map-pin" class="icon-lg"></i></div>
-          <div>タイムコード付きのコメントが<br>ここに表示されます</div>
+          <div>${msg}</div>
         </div>`;
       lucide.createIcons({ els: list.querySelectorAll('[data-lucide]') });
+      renderPinMarkers();
       return;
     }
-    list.innerHTML = state.pins.map(p => {
+    list.innerHTML = visible.map(p => {
       const replies = p.replies || [];
       const repliesHtml = replies.length ? `
         <div class="pin-replies">
@@ -2107,7 +2217,10 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       return `
         <div class="pin-card${p.id === activePinId ? ' active' : ''}${p.resolved ? ' resolved' : ''}"
              onclick="seekToPin(${p.time}, ${p.id})">
-          <div class="pin-time">⏱ ${esc(fmtTime(p.time))}</div>
+          <div class="pin-meta">
+            <span class="pin-time">⏱ ${esc(fmtTime(p.time))}</span>
+            ${p.author ? `<span class="pin-author">${esc(p.author)}</span>` : ''}
+          </div>
           <div class="pin-comment">${esc(p.comment).replace(/\n/g, '<br>')}</div>
           ${repliesHtml}
           ${replyFormHtml}
@@ -2368,6 +2481,11 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     }
   }
 
+  // ─── 再生速度 ───────────────────────────────────────────
+  function changeSpeed(val) {
+    if (nativeVideoEl) nativeVideoEl.playbackRate = parseFloat(val);
+  }
+
   // ─── Pin timeline ──────────────────────────────────────
   function initPinTimeline() {
     const wrap = document.getElementById('ptTrackWrap');
@@ -2620,6 +2738,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       if (e.code === 'Space') { e.preventDefault(); toggleTimer(); return; }
       if (e.key === 'k' || e.key === 'K') { toggleTimer(); return; }
       if (e.key === 'p' || e.key === 'P') { openModal(); return; }
+      if (e.key === 'ArrowLeft'  && nativeVideoEl) { e.preventDefault(); nativeVideoEl.currentTime = Math.max(0, nativeVideoEl.currentTime - 5); return; }
+      if (e.key === 'ArrowRight' && nativeVideoEl) { e.preventDefault(); nativeVideoEl.currentTime = Math.min(nativeVideoEl.duration || 0, nativeVideoEl.currentTime + 5); return; }
     }
   });
 
