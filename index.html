@@ -1389,6 +1389,7 @@
       .sep         { height: 16px; flex-shrink: 0; }
       .spacer      { flex: 1; min-width: 0; } /* スペーサーは残す */
       .ctrl-btn    { padding: 6px 8px; font-size: 11px; flex-shrink: 0; }
+      .ctrl-label  { display: none; }
       .btn-pin     { padding: 7px 10px; font-size: 12px; flex-shrink: 0; }
       .btn-share   { padding: 7px 10px; font-size: 12px; flex-shrink: 0; }
       .kbd         { display: none; } /* キーボードショートカット表示を非表示 */
@@ -1596,8 +1597,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <span class="timer-val" id="timerVal">00:00</span>
       </div>
 
-      <button class="ctrl-btn" id="timerToggle" onclick="toggleTimer()"><i data-lucide="play" class="icon"></i> 開始</button>
-      <button class="ctrl-btn" onclick="resetTimer()"><i data-lucide="rotate-ccw" class="icon"></i> リセット</button>
+      <button class="ctrl-btn" id="timerToggle" onclick="toggleTimer()"><i data-lucide="play" class="icon"></i><span class="ctrl-label"> 開始</span></button>
+      <button class="ctrl-btn" onclick="resetTimer()"><i data-lucide="rotate-ccw" class="icon"></i><span class="ctrl-label"> リセット</span></button>
 
       <div class="sep"></div>
 
@@ -1754,8 +1755,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   function setTimerBtn(running) {
     const btn = document.getElementById('timerToggle');
     btn.innerHTML = running
-      ? '<i data-lucide="pause" class="icon"></i> 一時停止'
-      : '<i data-lucide="play" class="icon"></i> 開始';
+      ? '<i data-lucide="pause" class="icon"></i><span class="ctrl-label"> 一時停止</span>'
+      : '<i data-lucide="play" class="icon"></i><span class="ctrl-label"> 開始</span>';
     lucide.createIcons({ els: btn.querySelectorAll('[data-lucide]') });
     btn.classList.toggle('running', running);
     timerRunning = running;
