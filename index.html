@@ -1723,6 +1723,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
   // ─── Placeholder helpers ───────────────────────────────
   function showUrlRow() {
+    // 共有プロジェクトページでは URL 入力列を表示しない
+    if (state.projectId) return;
     document.getElementById('urlRow').style.display = 'flex';
   }
 
