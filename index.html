@@ -1053,9 +1053,53 @@
       font-size: 12px;
       cursor: pointer;
       transition: all 0.15s;
-      margin-bottom: 8px;
+      margin-bottom: 4px;
     }
     .btn-copy-text:hover { border-color: var(--accent); color: var(--text); }
+
+    /* ── Import modal ── */
+    #importOverlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.7);
+      z-index: 200;
+      align-items: center;
+      justify-content: center;
+    }
+    #importOverlay.open { display: flex; }
+    #importOverlay .modal {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      padding: 24px;
+      width: min(480px, 92vw);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    #importOverlay .modal h3 {
+      font-size: 14px;
+      font-weight: 700;
+      margin: 0;
+    }
+    #importOverlay .modal p {
+      font-size: 12px;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+    #importTextarea {
+      width: 100%;
+      height: 200px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-family: monospace;
+      font-size: 12px;
+      padding: 10px;
+      resize: vertical;
+      outline: none;
+    }
+    #importTextarea:focus { border-color: var(--accent); }
 
     /* ── Toast ── */
     .toast {
@@ -1442,6 +1486,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     </div>
     <div style="padding:8px;border-top:1px solid var(--border);flex-shrink:0">
       <button class="btn-copy-text" onclick="copyPinsAsText()"><i data-lucide="clipboard" class="icon"></i> コメントをテキストでコピー</button>
+      <button class="btn-copy-text" onclick="openImportModal()" style="margin-bottom:0"><i data-lucide="file-input" class="icon"></i> テキストからインポート</button>
     </div>
   </div>
 
@@ -1479,6 +1524,20 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <div class="modal-actions">
       <button class="btn-cancel" onclick="closeProjectModal()">キャンセル</button>
       <button class="btn-primary" onclick="confirmProjectName()">保存して共有URLを取得</button>
+    </div>
+  </div>
+</div>
+
+<!-- Import from text modal -->
+<div id="importOverlay">
+  <div class="modal">
+    <h3><i data-lucide="file-input" class="icon"></i> テキストからインポート</h3>
+    <p>以下の形式のテキストを貼り付けると、タイムコードに合わせてコメントが追加されます。<br>
+       例）<code style="color:var(--accent)">00:32　テロップのフォントを変えてください</code></p>
+    <textarea id="importTextarea" placeholder="ここにテキストを貼り付けてください..."></textarea>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeImportModal()">キャンセル</button>
+      <button class="btn-primary" onclick="confirmImport()">インポート</button>
     </div>
   </div>
 </div>
@@ -2235,6 +2294,58 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     ];
     writeClipboard(lines.join('\n'));
     toast('コメント一覧をコピーしました');
+  }
+
+  // ─── テキストからインポート ────────────────────────────────
+  function openImportModal() {
+    document.getElementById('importTextarea').value = '';
+    document.getElementById('importOverlay').classList.add('open');
+    setTimeout(() => document.getElementById('importTextarea').focus(), 60);
+  }
+
+  function closeImportModal() {
+    document.getElementById('importOverlay').classList.remove('open');
+  }
+
+  function confirmImport() {
+    const text = document.getElementById('importTextarea').value;
+    if (!text.trim()) { toast('テキストを貼り付けてください'); return; }
+
+    const lines = text.split('\n');
+    const newPins = [];
+    let lastPin = null;
+    let idBase = Date.now();
+
+    for (const line of lines) {
+      // タイムコード行: "00:32　コメント" or "00:32 コメント" or "1:15:30 コメント"
+      const pinMatch = line.match(/^(\d{1,2}:\d{2}(?::\d{2})?)[\s\u3000]+(.+)/);
+      if (pinMatch) {
+        const sec = parseTimecode(pinMatch[1]);
+        if (sec === null) continue;
+        const rawComment = pinMatch[2].trim();
+        const resolved   = rawComment.startsWith('【修正済】');
+        const comment    = rawComment.replace(/^【修正済】\s*/, '');
+        lastPin = { id: idBase++, time: sec, comment, resolved, replies: [] };
+        newPins.push(lastPin);
+        continue;
+      }
+      // 返信行: "  ↳ テキスト"
+      const replyMatch = line.match(/^\s*↳\s*(.+)/);
+      if (replyMatch && lastPin) {
+        lastPin.replies.push({ id: idBase++, text: replyMatch[1].trim() });
+      }
+    }
+
+    if (newPins.length === 0) {
+      toast('タイムコード付きのコメントが見つかりませんでした');
+      return;
+    }
+
+    state.pins = [...state.pins, ...newPins].sort((a, b) => a.time - b.time);
+    renderPins();
+    saveState();
+    closeImportModal();
+    toast(`${newPins.length}件のコメントをインポートしました`);
   }
 
   // ─── Cloudflare R2 アップロード（Presigned URL 経由）────────
