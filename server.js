@@ -92,9 +92,10 @@ app.get('/api/presign', async (req, res) => {
     const uploadUrl = await getSignedUrl(
       r2,
       new PutObjectCommand({
-        Bucket:      BUCKET,
-        Key:         key,
-        ContentType: type || 'video/mp4',
+        Bucket:        BUCKET,
+        Key:           key,
+        ContentType:   type || 'video/mp4',
+        CacheControl:  'public, max-age=2592000', // 30日間ブラウザ・CDNキャッシュ
       }),
       { expiresIn: 3600 }
     );

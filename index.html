@@ -1378,7 +1378,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
           <div class="upload-icon"><i data-lucide="upload" class="icon-lg"></i></div>
           <div><strong>クリックしてファイルを選択</strong><br>または動画ファイルをここにドロップ</div>
         </div>
-        <p class="ph-privacy-note"><i data-lucide="lock" class="icon" style="opacity:.5"></i> 動画はアップロード前にブラウザ内で暗号化されます。開発者を含む第三者は内容を見ることができません。30日後に自動削除されます。</p>
+        <p class="ph-privacy-note"><i data-lucide="lock" class="icon" style="opacity:.5"></i> アップロードされた動画はCloudflare R2に保存されます。共有URLを知っている方のみ再生できます。30日後に自動削除されます。</p>
       </div>
       <div class="sync-hint" id="syncHint">再生と同時にタイマー開始</div>
     </div>
@@ -1503,7 +1503,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
 <script>
   // ─── State ─────────────────────────────────────────────
-  let state = { fileId: '', videoUrl: '', videoType: '', pins: [], projectId: null, projectName: '', encKeyB64: '', encIvB64: '' };
+  let state = { fileId: '', videoUrl: '', videoType: '', pins: [], projectId: null, projectName: '' };
 
   // ─── Player refs ───────────────────────────────────────
   let nativeVideoEl = null;  // <video> element
@@ -2121,8 +2121,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       const { id } = await res.json();
       state.projectId   = id;
       state.projectName = name;
-      const keyHash = state.encKeyB64 ? `#key=${state.encKeyB64}.${state.encIvB64}` : '';
-      history.pushState(null, '', `/project/${id}${keyHash}`);
+      history.pushState(null, '', `/project/${id}`);
       document.title = `${name} - Clippin`;
       showProjectNameBar(name);
       writeClipboard(location.href);
@@ -2190,48 +2189,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         document.getElementById('timerNote').innerHTML =
           '⚠ Google Drive はタイマー手動同期が必要です<br><span style="opacity:.7">ズレたら Space / K で調整</span>';
       } else if ((state.videoType === 'direct' || state.videoType === 'file') && state.videoUrl) {
-        const hashMatch = location.hash.match(/^#key=([A-Za-z0-9_-]+)\.([A-Za-z0-9_-]+)$/);
-        if (hashMatch) {
-          // 暗号化動画：フェッチして復号してから再生
-          const [, keyB64, ivB64] = hashMatch;
-          document.getElementById('uploadTitle').textContent = '動画を読み込み中...';
-          setUploadUI(true, 0, '動画を取得中...');
-          try {
-            const resp = await fetch(state.videoUrl);
-            if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
-
-            // ストリームで読み込みながら進捗を表示（0〜70%）
-            const contentLength = Number(resp.headers.get('Content-Length')) || 0;
-            const reader = resp.body.getReader();
-            const chunks = [];
-            let received = 0;
-            while (true) {
-              const { done, value } = await reader.read();
-              if (done) break;
-              chunks.push(value);
-              received += value.length;
-              const pct = contentLength > 0 ? Math.round(received / contentLength * 70) : 10;
-              const mb  = (received / 1024 / 1024).toFixed(1);
-              const tot = contentLength > 0 ? ` / ${(contentLength / 1024 / 1024).toFixed(1)}MB` : '';
-              setUploadUI(true, pct, `動画を取得中... ${mb}MB${tot}`);
-            }
-            // チャンクを結合
-            const combined = new Uint8Array(received);
-            let offset = 0;
-            for (const chunk of chunks) { combined.set(chunk, offset); offset += chunk.length; }
-
-            setUploadUI(true, 80, '復号化中...');
-            const blob    = await decryptVideo(combined.buffer, keyB64, ivB64);
-            const blobUrl = URL.createObjectURL(blob);
-            renderNativeVideo(blobUrl);
-            setUploadUI(false, 100, '完了');
-          } catch (e) {
-            setUploadUI(false, 0, '');
-            toast('動画の復号に失敗しました: ' + e.message);
-          }
-        } else {
-          renderNativeVideo(state.videoUrl);
-        }
+        renderNativeVideo(state.videoUrl);
         showR2Banner(state.projectCreatedAt || new Date());
       }
       renderPins();
@@ -2279,47 +2237,12 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     toast('コメント一覧をコピーしました');
   }
 
-  // ─── 暗号化ヘルパー（AES-GCM 256-bit）─────────────────────
-  function b64uEncode(buf) {
-    return btoa(String.fromCharCode(...new Uint8Array(buf)))
-      .replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
-  }
-
-  function b64uDecode(str) {
-    const pad = str.length % 4 === 0 ? '' : '='.repeat(4 - str.length % 4);
-    return Uint8Array.from(
-      atob(str.replace(/-/g, '+').replace(/_/g, '/') + pad),
-      c => c.charCodeAt(0)
-    );
-  }
-
-  async function encryptVideo(file) {
-    const iv     = crypto.getRandomValues(new Uint8Array(12));
-    const key    = await crypto.subtle.generateKey({ name: 'AES-GCM', length: 256 }, true, ['encrypt', 'decrypt']);
-    const buf    = await file.arrayBuffer();
-    const enc    = await crypto.subtle.encrypt({ name: 'AES-GCM', iv }, key, buf);
-    const rawKey = await crypto.subtle.exportKey('raw', key);
-    return {
-      blob:   new Blob([enc], { type: 'application/octet-stream' }),
-      keyB64: b64uEncode(rawKey),
-      ivB64:  b64uEncode(iv),
-    };
-  }
-
-  async function decryptVideo(encryptedBuf, keyB64, ivB64) {
-    const rawKey = b64uDecode(keyB64);
-    const iv     = b64uDecode(ivB64);
-    const key    = await crypto.subtle.importKey('raw', rawKey, { name: 'AES-GCM' }, false, ['decrypt']);
-    const dec    = await crypto.subtle.decrypt({ name: 'AES-GCM', iv }, key, encryptedBuf);
-    return new Blob([dec], { type: 'video/mp4' });
-  }
-
   // ─── Cloudflare R2 アップロード（Presigned URL 経由）────────
   async function doCloudUpload(projectName) {
     if (!localFile) { toast('ファイルがありません'); return; }
 
     document.getElementById('uploadTitle').textContent = 'R2 にアップロード中...';
-    setUploadUI(true, 0, 'ブラウザ内で暗号化中...');
+    setUploadUI(true, 0, 'Presigned URL を取得中...');
 
     try {
       // file:// で直接開いている場合はサーバーAPIが使えない
@@ -2327,13 +2250,9 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         throw new Error('サーバー経由で開いてください（npm start → http://localhost:3000）');
       }
 
-      // ① クライアントサイド暗号化（AES-GCM 256-bit）
-      const { blob: encBlob, keyB64, ivB64 } = await encryptVideo(localFile);
-      setUploadUI(true, 2, 'Presigned URL を取得中...');
-
-      // ② Presigned URL を取得（暗号済みデータは octet-stream で送る）
+      // ① Presigned URL を取得
       const presignRes = await fetch(
-        `/api/presign?filename=${encodeURIComponent(localFile.name + '.enc')}&type=application%2Foctet-stream`
+        `/api/presign?filename=${encodeURIComponent(localFile.name)}&type=${encodeURIComponent(localFile.type || 'video/mp4')}`
       );
       if (!presignRes.ok) {
         const err = await presignRes.json().catch(() => ({}));
@@ -2341,15 +2260,15 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       }
       const { uploadUrl, publicUrl } = await presignRes.json();
 
-      // ③ 暗号化済み Blob を R2 に PUT（XHR でプログレス取得）
+      // ② R2 に直接 PUT（XHR でプログレス取得）
       const videoUrl = await new Promise((resolve, reject) => {
         const xhr = new XMLHttpRequest();
         xhr.open('PUT', uploadUrl);
-        xhr.setRequestHeader('Content-Type', 'application/octet-stream');
+        xhr.setRequestHeader('Content-Type', localFile.type || 'video/mp4');
 
         xhr.upload.addEventListener('progress', e => {
           if (e.lengthComputable) {
-            const pct    = Math.round(e.loaded / e.total * 93) + 5;
+            const pct    = Math.round(e.loaded / e.total * 95) + 3;
             const loaded = (e.loaded / 1024 / 1024).toFixed(1);
             const total  = (e.total  / 1024 / 1024).toFixed(1);
             setUploadUI(true, pct, `アップロード中... ${loaded}MB / ${total}MB`);
@@ -2361,19 +2280,26 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             : reject(new Error(`R2 PUT HTTP ${xhr.status}`));
         });
         xhr.addEventListener('error', () => reject(new Error('ネットワークエラー（CORSまたはR2設定を確認）')));
-        xhr.send(encBlob);
+        xhr.send(localFile);
       });
 
       setUploadUI(true, 99, '共有リンクを生成中...');
 
-      // ④ state を更新（暗号化キーを保持、ローカル再生は objectUrl を維持）
+      // ③ state を更新して動画を R2 URL に切り替え
+      if (state.objectUrl) { URL.revokeObjectURL(state.objectUrl); state.objectUrl = ''; }
       state.videoType = 'direct';
       state.videoUrl  = videoUrl;
       state.fileId    = '';
-      state.encKeyB64 = keyB64;
-      state.encIvB64  = ivB64;
       localFile       = null;
-      // objectUrl は現在の再生セッションを継続するため revoke しない
+
+      if (nativeVideoEl) {
+        const resumeTime = nativeVideoEl.currentTime;
+        nativeVideoEl.src = videoUrl;
+        nativeVideoEl.load();
+        nativeVideoEl.addEventListener('loadedmetadata', () => {
+          nativeVideoEl.currentTime = resumeTime;
+        }, { once: true });
+      }
 
       document.getElementById('fileBanner').classList.remove('show');
       showR2Banner(new Date());
