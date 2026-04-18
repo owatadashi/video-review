@@ -1277,8 +1277,9 @@
       .btn-share   { padding: 7px 10px; font-size: 12px; flex-shrink: 0; }
       .kbd         { display: none; } /* キーボードショートカット表示を非表示 */
 
-      /* ── モバイル: body スクロールに切り替え ── */
-      body { overflow-y: auto; }
+      /* ── モバイル: body スクロールに切り替え・横スクロール禁止 ── */
+      html { overflow-x: hidden; }
+      body { overflow-y: auto; overflow-x: hidden; }
       #app {
         height: auto;
         min-height: 100dvh;
@@ -1287,6 +1288,14 @@
       main {
         flex: none;
         overflow: visible;
+      }
+
+      /* ── 動画エリア: 上部に固定 ── */
+      .video-col {
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        flex: none;
       }
 
       /* ── サイドバー: 全幅・動画の下・自然な高さ ── */
@@ -2213,7 +2222,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     document.getElementById('headerProjectName').style.display = 'flex';
     // 共有ボタン
     const shareBtn = document.getElementById('shareBtn');
-    shareBtn.innerHTML = '<i data-lucide="link-2" class="icon"></i> URLをコピー';
+    const shareLabel = window.innerWidth <= 768 ? 'コピー' : 'URLをコピー';
+    shareBtn.innerHTML = `<i data-lucide="link-2" class="icon"></i> ${shareLabel}`;
     lucide.createIcons({ els: shareBtn.querySelectorAll('[data-lucide]') });
   }
 
