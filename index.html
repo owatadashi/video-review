@@ -1277,17 +1277,30 @@
       .btn-share   { padding: 7px 10px; font-size: 12px; flex-shrink: 0; }
       .kbd         { display: none; } /* キーボードショートカット表示を非表示 */
 
-      /* ── サイドバー: 全幅・動画の下 ── */
+      /* ── モバイル: body スクロールに切り替え ── */
+      body { overflow-y: auto; }
+      #app {
+        height: auto;
+        min-height: 100dvh;
+        overflow: visible;
+      }
+      main {
+        flex: none;
+        overflow: visible;
+      }
+
+      /* ── サイドバー: 全幅・動画の下・自然な高さ ── */
       .sidebar {
         width: 100%;
         min-width: 0;
         border-left: none;
         border-top: 1px solid var(--border);
-        flex: 1;
-        min-height: 200px;
+        flex: none;
+        min-height: 0;
+        overflow: visible;
       }
       .sidebar-head { padding: 8px 12px; }
-      .pins-scroll  { padding: 6px; }
+      .pins-scroll  { padding: 6px; flex: none; overflow: visible; height: auto; }
 
       /* ── ピンカード: アクションボタン常時表示 ── */
       .pin-card    { padding: 8px 10px; margin-bottom: 5px; }
