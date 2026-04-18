@@ -377,6 +377,40 @@ app.post('/api/projects/:id/versions', async (req, res) => {
   }
 });
 
+// ─── DELETE /api/projects/:id/versions/:versionId ─────────
+app.delete('/api/projects/:id/versions/:versionId', async (req, res) => {
+  const { id, versionId } = req.params;
+  try {
+    // 最低1つはバージョンが残ることを確認
+    const countRes = await pool.query(
+      'SELECT COUNT(*) FROM project_versions WHERE project_id = $1',
+      [id]
+    );
+    if (parseInt(countRes.rows[0].count) <= 1) {
+      return res.status(400).json({ error: '最後のバージョンは削除できません' });
+    }
+
+    // 対象バージョンがこのプロジェクトのものか確認
+    const vRes = await pool.query(
+      'SELECT id FROM project_versions WHERE id = $1 AND project_id = $2',
+      [versionId, id]
+    );
+    if (vRes.rows.length === 0) {
+      return res.status(404).json({ error: 'バージョンが見つかりません' });
+    }
+
+    // ピンを先に削除（replies は CASCADE で連鎖削除）
+    await pool.query('DELETE FROM pins WHERE version_id = $1', [versionId]);
+    await pool.query('DELETE FROM project_versions WHERE id = $1', [versionId]);
+
+    console.log(`[version] deleted versionId=${versionId} project=${id}`);
+    res.json({ ok: true });
+  } catch (err) {
+    console.error('[version] delete error:', err);
+    res.status(500).json({ error: 'バージョンの削除に失敗しました: ' + err.message });
+  }
+});
+
 // ─── /privacy → privacy.html ──────────────────────────────
 app.get('/privacy', (req, res) => {
   res.sendFile(path.join(__dirname, 'privacy.html'));

@@ -1250,6 +1250,42 @@
       flex-shrink: 0;
       overflow-x: auto;
     }
+    /* 各バージョンのラベル＋削除ボタンのラッパー */
+    .version-tab-wrap {
+      display: flex;
+      align-items: stretch;
+      border-bottom: 2px solid transparent;
+      flex-shrink: 0;
+      transition: border-color 0.15s;
+    }
+    .version-tab-wrap.active { border-bottom-color: var(--accent); }
+    .version-tab-label {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-size: 11px;
+      padding: 7px 6px 7px 12px;
+      cursor: pointer;
+      transition: color 0.15s;
+      font-family: inherit;
+    }
+    .version-tab-wrap.active .version-tab-label { color: var(--accent); }
+    .version-tab-label:hover { color: var(--text); }
+    /* 削除ボタン */
+    .version-tab-del {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 11px;
+      padding: 7px 8px 7px 2px;
+      opacity: 0;
+      transition: opacity 0.15s, color 0.15s;
+      line-height: 1;
+    }
+    .version-tab-wrap:hover .version-tab-del { opacity: 1; }
+    .version-tab-del:hover { color: var(--danger); }
+    /* "+ 追加" ボタン */
     .version-tab {
       flex-shrink: 0;
       background: none;
@@ -1262,17 +1298,15 @@
       transition: all 0.15s;
       font-family: inherit;
     }
-    .version-tab:hover { color: var(--text); }
-    .version-tab.active {
-      color: var(--accent);
-      border-bottom-color: var(--accent);
-    }
     .version-tab.version-add {
       color: var(--accent);
       font-weight: 600;
       margin-left: auto;
     }
     .version-tab.version-add:hover { background: var(--accent-dim); }
+    @media (max-width: 768px) {
+      .version-tab-del { opacity: 1; }
+    }
 
     /* ── Read-only banner ── */
     .readonly-banner {
@@ -1859,6 +1893,21 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <div class="modal-actions">
       <button class="btn-cancel" onclick="closeOffsetModal()">キャンセル</button>
       <button class="btn-primary" onclick="applyOffset()">適用する</button>
+    </div>
+  </div>
+</div>
+
+<!-- Delete version confirmation modal -->
+<div class="overlay" id="deleteVersionOverlay">
+  <div class="modal">
+    <div class="modal-title" style="color:var(--danger)"><i data-lucide="trash-2" class="icon"></i> バージョンを削除</div>
+    <p id="deleteVersionMsg" style="font-size:13px;color:var(--text-muted);margin:10px 0 8px;line-height:1.7"></p>
+    <p style="font-size:12px;color:var(--danger);font-weight:600;line-height:1.7">
+      ⚠ この操作は元に戻せません。<br>このバージョンのコメントもすべて削除されます。
+    </p>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeDeleteVersionModal()">キャンセル</button>
+      <button class="btn-primary" style="background:var(--danger);border-color:var(--danger)" onclick="confirmDeleteVersion()">削除する</button>
     </div>
   </div>
 </div>
@@ -2690,11 +2739,12 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       return;
     }
     el.style.display = 'flex';
+    const canDelete = state.versions.length > 1;
     el.innerHTML = state.versions.map(v => `
-      <button class="version-tab${v.id === state.currentVersionId ? ' active' : ''}"
-              onclick="switchVersion(${v.id})">
-        v${v.versionNum}
-      </button>`).join('') + `
+      <div class="version-tab-wrap${v.id === state.currentVersionId ? ' active' : ''}">
+        <button class="version-tab-label" onclick="switchVersion(${v.id})">v${v.versionNum}</button>
+        ${canDelete ? `<button class="version-tab-del" onclick="openDeleteVersionModal(${v.id},${v.versionNum})" title="v${v.versionNum}を削除">✕</button>` : ''}
+      </div>`).join('') + `
       <button class="version-tab version-add" onclick="openNewVersionModal()"
               ${state.isLatestVersion ? '' : 'style="display:none"'}>
         + 追加
@@ -2880,6 +2930,57 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     } catch (e) {
       console.error('createNewVersion error:', e);
       toast('バージョン作成失敗: ' + e.message);
+    }
+  }
+
+  // ─── バージョン削除 ─────────────────────────────────────
+  let _deleteVersionId = null;
+  let _deleteVersionNum = null;
+
+  function openDeleteVersionModal(versionId, versionNum) {
+    _deleteVersionId = versionId;
+    _deleteVersionNum = versionNum;
+    document.getElementById('deleteVersionMsg').textContent =
+      `v${versionNum} を削除しようとしています。`;
+    document.getElementById('deleteVersionOverlay').classList.add('open');
+    lucide.createIcons({ els: document.getElementById('deleteVersionOverlay').querySelectorAll('[data-lucide]') });
+  }
+
+  function closeDeleteVersionModal() {
+    document.getElementById('deleteVersionOverlay').classList.remove('open');
+    _deleteVersionId = null;
+    _deleteVersionNum = null;
+  }
+
+  async function confirmDeleteVersion() {
+    if (!_deleteVersionId) return;
+    const versionId  = _deleteVersionId;
+    const versionNum = _deleteVersionNum;
+    closeDeleteVersionModal();
+
+    try {
+      const res = await fetch(`/api/projects/${state.projectId}/versions/${versionId}`, {
+        method: 'DELETE',
+      });
+      if (!res.ok) throw new Error((await res.json()).error);
+
+      state.versions = state.versions.filter(v => v.id !== versionId);
+
+      if (state.currentVersionId === versionId) {
+        // 削除したのが表示中のバージョン → 最新に切り替え
+        const latest = state.versions[state.versions.length - 1];
+        if (latest) await switchVersion(latest.id);
+      } else {
+        // 表示中は変わらないが isLatestVersion を再計算
+        const maxId = Math.max(...state.versions.map(v => v.id));
+        state.isLatestVersion = state.currentVersionId === maxId;
+        renderVersionTabs();
+        updateReadOnlyUI();
+      }
+      toast(`v${versionNum} を削除しました`);
+    } catch (e) {
+      console.error('confirmDeleteVersion error:', e);
+      toast('削除失敗: ' + e.message);
     }
   }
 
@@ -3159,6 +3260,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       if (pinModalOpen) { closeModal(); return; }
       if (document.getElementById('newVersionOverlay').classList.contains('open')) { closeNewVersionModal(); return; }
       if (document.getElementById('offsetOverlay').classList.contains('open')) { closeOffsetModal(); return; }
+      if (document.getElementById('deleteVersionOverlay').classList.contains('open')) { closeDeleteVersionModal(); return; }
     }
     if (e.key === 'Enter' && e.ctrlKey && pinModalOpen) { savePin(); return; }
     if (!inField && !pinModalOpen) {
@@ -3192,6 +3294,10 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   document.getElementById('offsetOverlay')
     .addEventListener('click', e => {
       if (e.target === document.getElementById('offsetOverlay')) closeOffsetModal();
+    });
+  document.getElementById('deleteVersionOverlay')
+    .addEventListener('click', e => {
+      if (e.target === document.getElementById('deleteVersionOverlay')) closeDeleteVersionModal();
     });
   // 新バージョンURL入力で Enter
   document.getElementById('newVersionUrl')
