@@ -2788,14 +2788,15 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
   async function confirmNewVersion() {
     const urlVal = document.getElementById('newVersionUrl').value.trim();
-    if (!urlVal && !_newVersionFile) {
+    const fileToUpload = _newVersionFile; // closeNewVersionModal がリセットする前に保持
+    if (!urlVal && !fileToUpload) {
       toast('動画URLを入力するかファイルを選択してください');
       return;
     }
     closeNewVersionModal();
 
-    if (_newVersionFile) {
-      await doNewVersionUpload(_newVersionFile);
+    if (fileToUpload) {
+      await doNewVersionUpload(fileToUpload);
     } else {
       const type = detectType(urlVal);
       let videoUrl = urlVal, videoType = type, fileId = '';
