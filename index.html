@@ -2194,13 +2194,34 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         if (hashMatch) {
           // 暗号化動画：フェッチして復号してから再生
           const [, keyB64, ivB64] = hashMatch;
+          document.getElementById('uploadTitle').textContent = '動画を読み込み中...';
           setUploadUI(true, 0, '動画を取得中...');
           try {
             const resp = await fetch(state.videoUrl);
             if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
-            setUploadUI(true, 50, '復号化中...');
-            const buf     = await resp.arrayBuffer();
-            const blob    = await decryptVideo(buf, keyB64, ivB64);
+
+            // ストリームで読み込みながら進捗を表示（0〜70%）
+            const contentLength = Number(resp.headers.get('Content-Length')) || 0;
+            const reader = resp.body.getReader();
+            const chunks = [];
+            let received = 0;
+            while (true) {
+              const { done, value } = await reader.read();
+              if (done) break;
+              chunks.push(value);
+              received += value.length;
+              const pct = contentLength > 0 ? Math.round(received / contentLength * 70) : 10;
+              const mb  = (received / 1024 / 1024).toFixed(1);
+              const tot = contentLength > 0 ? ` / ${(contentLength / 1024 / 1024).toFixed(1)}MB` : '';
+              setUploadUI(true, pct, `動画を取得中... ${mb}MB${tot}`);
+            }
+            // チャンクを結合
+            const combined = new Uint8Array(received);
+            let offset = 0;
+            for (const chunk of chunks) { combined.set(chunk, offset); offset += chunk.length; }
+
+            setUploadUI(true, 80, '復号化中...');
+            const blob    = await decryptVideo(combined.buffer, keyB64, ivB64);
             const blobUrl = URL.createObjectURL(blob);
             renderNativeVideo(blobUrl);
             setUploadUI(false, 100, '完了');
