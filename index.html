@@ -1101,6 +1101,61 @@
     }
     #importTextarea:focus { border-color: var(--accent); }
 
+    /* ── Pin timeline ── */
+    .pin-timeline {
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      padding: 0 16px;
+      flex-shrink: 0;
+      cursor: pointer;
+    }
+    .pt-track-wrap {
+      padding: 11px 0;
+    }
+    .pt-track {
+      height: 3px;
+      background: var(--border);
+      border-radius: 2px;
+      position: relative;
+    }
+    .pt-progress {
+      position: absolute;
+      top: 0; left: 0; bottom: 0;
+      background: var(--accent);
+      border-radius: 2px;
+      pointer-events: none;
+    }
+    .pt-head {
+      position: absolute;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      width: 11px;
+      height: 11px;
+      background: #fff;
+      border-radius: 50%;
+      pointer-events: none;
+      box-shadow: 0 0 0 2px var(--accent);
+      transition: transform 0.05s;
+    }
+    .pt-marker {
+      position: absolute;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      width: 8px;
+      height: 8px;
+      background: var(--accent);
+      border-radius: 50%;
+      cursor: pointer;
+      transition: transform 0.12s;
+      z-index: 2;
+    }
+    .pt-marker.resolved {
+      background: var(--text-muted);
+    }
+    .pt-marker:hover {
+      transform: translate(-50%, -50%) scale(1.8);
+    }
+
     /* ── Toast ── */
     .toast {
       position: fixed;
@@ -1463,6 +1518,16 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
     <!-- R2 有効期限バナー -->
     <div class="r2-banner" id="r2Banner" style="display:none"></div>
+
+    <!-- Pin timeline bar -->
+    <div class="pin-timeline" id="pinTimeline" style="display:none">
+      <div class="pt-track-wrap" id="ptTrackWrap">
+        <div class="pt-track" id="ptTrack">
+          <div class="pt-progress" id="ptProgress" style="width:0%"></div>
+          <div class="pt-head" id="ptHead" style="left:0%"></div>
+        </div>
+      </div>
+    </div>
 
     <!-- Controls -->
     <div class="controls">
@@ -1847,6 +1912,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       clearInterval(timerInterval);
       setTimerBtn(false);
     });
+    video.addEventListener('timeupdate', () => updatePinTimeline());
+    video.addEventListener('loadedmetadata', () => renderPinMarkers());
     video.addEventListener('error', () => {
       const code = video.error?.code;
       const isDropbox = state.videoType === 'dropbox';
@@ -2058,6 +2125,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
           </div>
         </div>`;
     }).join('');
+    lucide.createIcons({ els: list.querySelectorAll('[data-lucide]') });
+    renderPinMarkers();
   }
 
   // ─── Resolved toggle ───────────────────────────────────
@@ -2299,6 +2368,63 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     }
   }
 
+  // ─── Pin timeline ──────────────────────────────────────
+  function initPinTimeline() {
+    const wrap = document.getElementById('ptTrackWrap');
+    if (!wrap) return;
+
+    function seekFromEvent(clientX) {
+      if (!nativeVideoEl || !nativeVideoEl.duration) return;
+      const track = document.getElementById('ptTrack');
+      const rect  = track.getBoundingClientRect();
+      const pct   = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
+      nativeVideoEl.currentTime = pct * nativeVideoEl.duration;
+    }
+
+    let dragging = false;
+    wrap.addEventListener('mousedown', e => { dragging = true; seekFromEvent(e.clientX); });
+    document.addEventListener('mousemove', e => { if (dragging) seekFromEvent(e.clientX); });
+    document.addEventListener('mouseup', () => { dragging = false; });
+
+    wrap.addEventListener('touchstart', e => { e.preventDefault(); seekFromEvent(e.touches[0].clientX); }, { passive: false });
+    wrap.addEventListener('touchmove',  e => { e.preventDefault(); seekFromEvent(e.touches[0].clientX); }, { passive: false });
+  }
+
+  function updatePinTimeline() {
+    if (!nativeVideoEl || !nativeVideoEl.duration) return;
+    const pct = (nativeVideoEl.currentTime / nativeVideoEl.duration) * 100;
+    document.getElementById('ptProgress').style.width  = pct + '%';
+    document.getElementById('ptHead').style.left       = pct + '%';
+  }
+
+  function renderPinMarkers() {
+    const track    = document.getElementById('ptTrack');
+    const timeline = document.getElementById('pinTimeline');
+    if (!track || !nativeVideoEl || !nativeVideoEl.duration) return;
+
+    // 既存マーカーを削除
+    track.querySelectorAll('.pt-marker').forEach(m => m.remove());
+
+    const dur = nativeVideoEl.duration;
+    state.pins.forEach(pin => {
+      const pct    = Math.min(99.5, (pin.time / dur) * 100);
+      const marker = document.createElement('div');
+      marker.className = 'pt-marker' + (pin.resolved ? ' resolved' : '');
+      marker.style.left = pct + '%';
+      marker.title = `${fmtTime(pin.time)}　${pin.comment}`;
+      marker.addEventListener('click', e => {
+        e.stopPropagation();
+        if (nativeVideoEl) nativeVideoEl.currentTime = pin.time;
+        // サイドバーの対応コメントにスクロール
+        const el = document.getElementById('pin-' + pin.id);
+        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      });
+      track.appendChild(marker);
+    });
+
+    timeline.style.display = '';
+  }
+
   // ─── コメントテキストコピー（サイドバーボタン用）──────────
   function copyPinsAsText() {
     if (state.pins.length === 0) { toast('ピンがありません'); return; }
@@ -2534,6 +2660,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     document.addEventListener('drop', () => zone.classList.remove('drag-over'));
 
     lucide.createIcons();
+    initPinTimeline();
 
     // ─── FV 表示制御 ─────────────────────────────────────
     if (location.pathname === '/') {
