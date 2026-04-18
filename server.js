@@ -29,7 +29,6 @@ const BUCKET          = process.env.R2_BUCKET_NAME;
 const PUBLIC_BASE_URL = (process.env.R2_PUBLIC_BASE_URL || '').replace(/\/$/, '');
 
 // ─── PostgreSQL ────────────────────────────────────────────
-// Railway 内部ホスト・ローカルは SSL 不要、外部公開URLのみ SSL
 const dbUrl = process.env.DATABASE_URL;
 const needsSsl = !dbUrl.includes('localhost') &&
                  !dbUrl.includes('127.0.0.1') &&
@@ -41,6 +40,7 @@ const pool = new Pool({
 });
 
 async function initDB() {
+  // ── テーブル作成 ──
   await pool.query(`
     CREATE TABLE IF NOT EXISTS projects (
       id         VARCHAR(12)      PRIMARY KEY,
@@ -51,13 +51,23 @@ async function initDB() {
       created_at TIMESTAMPTZ      NOT NULL DEFAULT NOW(),
       updated_at TIMESTAMPTZ      NOT NULL DEFAULT NOW()
     );
+    CREATE TABLE IF NOT EXISTS project_versions (
+      id          SERIAL          PRIMARY KEY,
+      project_id  VARCHAR(12)     NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
+      version_num INTEGER         NOT NULL,
+      video_url   TEXT            NOT NULL DEFAULT '',
+      video_type  TEXT            NOT NULL DEFAULT 'direct',
+      file_id     TEXT            NOT NULL DEFAULT '',
+      created_at  TIMESTAMPTZ     NOT NULL DEFAULT NOW(),
+      UNIQUE (project_id, version_num)
+    );
     CREATE TABLE IF NOT EXISTS pins (
-      id         BIGINT           PRIMARY KEY,
-      project_id VARCHAR(12)      NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
-      time_sec   DOUBLE PRECISION NOT NULL,
-      comment    TEXT             NOT NULL,
-      resolved   BOOLEAN          NOT NULL DEFAULT FALSE,
-      created_at TIMESTAMPTZ      NOT NULL DEFAULT NOW()
+      id          BIGINT           PRIMARY KEY,
+      project_id  VARCHAR(12)      NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
+      time_sec    DOUBLE PRECISION NOT NULL,
+      comment     TEXT             NOT NULL,
+      resolved    BOOLEAN          NOT NULL DEFAULT FALSE,
+      created_at  TIMESTAMPTZ      NOT NULL DEFAULT NOW()
     );
     CREATE TABLE IF NOT EXISTS replies (
       id         BIGINT           PRIMARY KEY,
@@ -66,11 +76,36 @@ async function initDB() {
       created_at TIMESTAMPTZ      NOT NULL DEFAULT NOW()
     );
   `);
+
+  // ── マイグレーション: 既存 pins テーブルに新カラムを追加 ──
+  await pool.query(`
+    ALTER TABLE pins ADD COLUMN IF NOT EXISTS version_id INTEGER REFERENCES project_versions(id) ON DELETE SET NULL;
+    ALTER TABLE pins ADD COLUMN IF NOT EXISTS author TEXT NOT NULL DEFAULT '';
+  `);
+
+  // ── マイグレーション: バージョンを持たないプロジェクトに v1 を作成 ──
+  await pool.query(`
+    INSERT INTO project_versions (project_id, version_num, video_url, video_type, file_id, created_at)
+    SELECT id, 1, video_url, video_type, file_id, created_at
+    FROM projects
+    WHERE id NOT IN (SELECT DISTINCT project_id FROM project_versions)
+    ON CONFLICT DO NOTHING;
+  `);
+
+  // ── マイグレーション: version_id が NULL のピンを v1 に紐付け ──
+  await pool.query(`
+    UPDATE pins SET version_id = (
+      SELECT pv.id FROM project_versions pv
+      WHERE pv.project_id = pins.project_id AND pv.version_num = 1
+    )
+    WHERE version_id IS NULL;
+  `);
+
   console.log('✅ DB テーブル確認済');
 }
 
 function generateId() {
-  return randomBytes(5).toString('hex'); // 10文字の16進数
+  return randomBytes(5).toString('hex');
 }
 
 // ─── Express ───────────────────────────────────────────────
@@ -95,7 +130,7 @@ app.get('/api/presign', async (req, res) => {
         Bucket:        BUCKET,
         Key:           key,
         ContentType:   type || 'video/mp4',
-        CacheControl:  'public, max-age=2592000', // 30日間ブラウザ・CDNキャッシュ
+        CacheControl:  'public, max-age=2592000',
       }),
       { expiresIn: 3600 }
     );
@@ -131,10 +166,17 @@ app.post('/api/projects', async (req, res) => {
       [id, name.trim(), videoUrl || '', videoType || 'direct', fileId || '']
     );
 
+    // v1 を作成
+    const vRes = await pool.query(
+      'INSERT INTO project_versions (project_id, version_num, video_url, video_type, file_id) VALUES ($1, $2, $3, $4, $5) RETURNING id',
+      [id, 1, videoUrl || '', videoType || 'direct', fileId || '']
+    );
+    const versionId = vRes.rows[0].id;
+
     for (const pin of (pins || [])) {
       await pool.query(
-        'INSERT INTO pins (id, project_id, time_sec, comment, resolved) VALUES ($1, $2, $3, $4, $5)',
-        [pin.id, id, pin.time, pin.comment, pin.resolved || false]
+        'INSERT INTO pins (id, project_id, version_id, time_sec, comment, author, resolved) VALUES ($1, $2, $3, $4, $5, $6, $7)',
+        [pin.id, id, versionId, pin.time, pin.comment, pin.author || '', pin.resolved || false]
       );
       for (const reply of (pin.replies || [])) {
         await pool.query(
@@ -145,7 +187,7 @@ app.post('/api/projects', async (req, res) => {
     }
 
     console.log(`[project] created id=${id} name="${name.trim()}"`);
-    res.json({ id });
+    res.json({ id, versionId, versionNum: 1 });
   } catch (err) {
     console.error('[project] create error:', err);
     res.status(500).json({ error: 'プロジェクトの作成に失敗しました: ' + err.message });
@@ -153,40 +195,91 @@ app.post('/api/projects', async (req, res) => {
 });
 
 // ─── GET /api/projects/:id ─────────────────────────────────
+// ?v=N でバージョン番号指定（省略時は最新版）
 app.get('/api/projects/:id', async (req, res) => {
   try {
     const { id } = req.params;
+    const vParam = req.query.v ? parseInt(req.query.v) : null;
+
     const proj = await pool.query('SELECT * FROM projects WHERE id = $1', [id]);
     if (proj.rows.length === 0) return res.status(404).json({ error: 'プロジェクトが見つかりません' });
 
-    const pinsRes = await pool.query(
-      'SELECT * FROM pins WHERE project_id = $1 ORDER BY time_sec',
+    // 全バージョン取得
+    const versionsRes = await pool.query(
+      'SELECT * FROM project_versions WHERE project_id = $1 ORDER BY version_num',
       [id]
     );
-    const repliesRes = await pool.query(
-      `SELECT r.* FROM replies r
-         JOIN pins p ON r.pin_id = p.id
-        WHERE p.project_id = $1`,
-      [id]
-    );
+    const versions = versionsRes.rows;
 
-    const pins = pinsRes.rows.map(pin => ({
+    // 対象バージョンを決定（指定なし or 存在しない場合は最新）
+    let currentVersion = null;
+    if (vParam && versions.length > 0) {
+      currentVersion = versions.find(v => v.version_num === vParam) || null;
+    }
+    if (!currentVersion && versions.length > 0) {
+      currentVersion = versions[versions.length - 1]; // 最新
+    }
+
+    const maxVersionId = versions.length > 0 ? Math.max(...versions.map(v => v.id)) : null;
+    const isLatestVersion = !currentVersion || currentVersion.id === maxVersionId;
+
+    // 対象バージョンのピン取得
+    let pinsRows = [];
+    if (currentVersion) {
+      const pinsRes = await pool.query(
+        'SELECT * FROM pins WHERE version_id = $1 ORDER BY time_sec',
+        [currentVersion.id]
+      );
+      pinsRows = pinsRes.rows;
+    } else {
+      // バージョンなし（旧データ）: project_id で全取得
+      const pinsRes = await pool.query(
+        'SELECT * FROM pins WHERE project_id = $1 ORDER BY time_sec',
+        [id]
+      );
+      pinsRows = pinsRes.rows;
+    }
+
+    // 返信取得
+    let replies = [];
+    if (pinsRows.length > 0) {
+      const pinIds = pinsRows.map(p => p.id);
+      const repliesRes = await pool.query(
+        'SELECT r.* FROM replies r WHERE r.pin_id = ANY($1)',
+        [pinIds]
+      );
+      replies = repliesRes.rows;
+    }
+
+    const pins = pinsRows.map(pin => ({
       id:       Number(pin.id),
       time:     pin.time_sec,
       comment:  pin.comment,
+      author:   pin.author || '',
       resolved: pin.resolved,
-      replies:  repliesRes.rows
+      replies:  replies
         .filter(r => Number(r.pin_id) === Number(pin.id))
         .map(r => ({ id: Number(r.id), text: r.text })),
     }));
 
     res.json({
-      id:        proj.rows[0].id,
-      name:      proj.rows[0].name,
-      videoUrl:  proj.rows[0].video_url,
-      videoType: proj.rows[0].video_type,
-      fileId:    proj.rows[0].file_id,
-      createdAt: proj.rows[0].created_at,
+      id:               proj.rows[0].id,
+      name:             proj.rows[0].name,
+      videoUrl:         currentVersion?.video_url  || proj.rows[0].video_url,
+      videoType:        currentVersion?.video_type || proj.rows[0].video_type,
+      fileId:           currentVersion?.file_id    || proj.rows[0].file_id || '',
+      createdAt:        proj.rows[0].created_at,
+      currentVersionId:  currentVersion?.id || null,
+      currentVersionNum: currentVersion?.version_num || 1,
+      isLatestVersion,
+      versions: versions.map(v => ({
+        id:         v.id,
+        versionNum: v.version_num,
+        videoUrl:   v.video_url,
+        videoType:  v.video_type,
+        fileId:     v.file_id || '',
+        createdAt:  v.created_at,
+      })),
       pins,
     });
   } catch (err) {
@@ -198,16 +291,21 @@ app.get('/api/projects/:id', async (req, res) => {
 // ─── PUT /api/projects/:id/pins ────────────────────────────
 app.put('/api/projects/:id/pins', async (req, res) => {
   const { id } = req.params;
-  const { pins } = req.body;
+  const { pins, versionId } = req.body;
 
   try {
-    // 既存ピンを全削除（replies は CASCADE で連鎖削除）
-    await pool.query('DELETE FROM pins WHERE project_id = $1', [id]);
+    if (versionId) {
+      // 指定バージョンのピンのみ削除（replies は CASCADE で連鎖削除）
+      await pool.query('DELETE FROM pins WHERE version_id = $1', [versionId]);
+    } else {
+      // バージョン未指定: プロジェクト全ピン削除（旧データ互換）
+      await pool.query('DELETE FROM pins WHERE project_id = $1', [id]);
+    }
 
     for (const pin of (pins || [])) {
       await pool.query(
-        'INSERT INTO pins (id, project_id, time_sec, comment, resolved) VALUES ($1, $2, $3, $4, $5)',
-        [pin.id, id, pin.time, pin.comment, pin.resolved || false]
+        'INSERT INTO pins (id, project_id, version_id, time_sec, comment, author, resolved) VALUES ($1, $2, $3, $4, $5, $6, $7)',
+        [pin.id, id, versionId || null, pin.time, pin.comment, pin.author || '', pin.resolved || false]
       );
       for (const reply of (pin.replies || [])) {
         await pool.query(
@@ -222,6 +320,60 @@ app.put('/api/projects/:id/pins', async (req, res) => {
   } catch (err) {
     console.error('[project] update pins error:', err);
     res.status(500).json({ error: 'ピンの保存に失敗しました: ' + err.message });
+  }
+});
+
+// ─── POST /api/projects/:id/versions ──────────────────────
+// 新バージョン作成（前バージョンのコメントをコピー）
+app.post('/api/projects/:id/versions', async (req, res) => {
+  const { id } = req.params;
+  const { videoUrl, videoType, fileId, copyFromVersionId } = req.body;
+
+  try {
+    // 最新バージョン番号を取得
+    const maxRes = await pool.query(
+      'SELECT COALESCE(MAX(version_num), 0) AS max_num FROM project_versions WHERE project_id = $1',
+      [id]
+    );
+    const newVersionNum = Number(maxRes.rows[0].max_num) + 1;
+
+    // 新バージョン作成
+    const vRes = await pool.query(
+      'INSERT INTO project_versions (project_id, version_num, video_url, video_type, file_id) VALUES ($1, $2, $3, $4, $5) RETURNING id',
+      [id, newVersionNum, videoUrl || '', videoType || 'direct', fileId || '']
+    );
+    const newVersionId = vRes.rows[0].id;
+
+    // 前バージョンからコメントをコピー
+    if (copyFromVersionId) {
+      const srcPins = await pool.query(
+        'SELECT * FROM pins WHERE version_id = $1 ORDER BY time_sec',
+        [copyFromVersionId]
+      );
+
+      for (const pin of srcPins.rows) {
+        const newPinId = Date.now() * 1000 + Math.floor(Math.random() * 1000);
+        await pool.query(
+          'INSERT INTO pins (id, project_id, version_id, time_sec, comment, author, resolved) VALUES ($1, $2, $3, $4, $5, $6, $7)',
+          [newPinId, id, newVersionId, pin.time_sec, pin.comment, pin.author || '', pin.resolved]
+        );
+
+        const srcReplies = await pool.query('SELECT * FROM replies WHERE pin_id = $1', [pin.id]);
+        for (const reply of srcReplies.rows) {
+          const newReplyId = Date.now() * 1000 + Math.floor(Math.random() * 1000);
+          await pool.query(
+            'INSERT INTO replies (id, pin_id, text) VALUES ($1, $2, $3)',
+            [newReplyId, newPinId, reply.text]
+          );
+        }
+      }
+    }
+
+    console.log(`[version] created project=${id} v${newVersionNum} id=${newVersionId}`);
+    res.json({ versionId: newVersionId, versionNum: newVersionNum });
+  } catch (err) {
+    console.error('[version] create error:', err);
+    res.status(500).json({ error: 'バージョンの作成に失敗しました: ' + err.message });
   }
 });
 

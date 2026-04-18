@@ -1243,6 +1243,104 @@
     ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 0; }
     ::-webkit-scrollbar-thumb:hover { background: #444; }
 
+    /* ── Version tabs ── */
+    .version-tabs {
+      display: flex;
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+      overflow-x: auto;
+    }
+    .version-tab {
+      flex-shrink: 0;
+      background: none;
+      border: none;
+      border-bottom: 2px solid transparent;
+      color: var(--text-muted);
+      font-size: 11px;
+      padding: 7px 12px;
+      cursor: pointer;
+      transition: all 0.15s;
+      font-family: inherit;
+    }
+    .version-tab:hover { color: var(--text); }
+    .version-tab.active {
+      color: var(--accent);
+      border-bottom-color: var(--accent);
+    }
+    .version-tab.version-add {
+      color: var(--accent);
+      font-weight: 600;
+      margin-left: auto;
+    }
+    .version-tab.version-add:hover { background: var(--accent-dim); }
+
+    /* ── Read-only banner ── */
+    .readonly-banner {
+      background: rgba(122,119,112,0.08);
+      border-bottom: 1px solid var(--border);
+      padding: 5px 14px;
+      font-size: 11px;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+
+    /* ── Offset input in modal ── */
+    .offset-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      margin-bottom: 12px;
+    }
+    .offset-input {
+      flex: 1;
+      background: var(--bg);
+      border: 1px solid var(--accent);
+      border-radius: 0;
+      padding: 6px 10px;
+      color: var(--accent);
+      font-size: 22px;
+      font-weight: 700;
+      text-align: center;
+      outline: none;
+    }
+
+    /* ── New version modal ── */
+    .nv-input-row {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+    .nv-url-input {
+      flex: 1;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      border-radius: 0;
+      padding: 8px 12px;
+      color: var(--text);
+      font-size: 13px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .nv-url-input::placeholder { color: var(--text-muted); }
+    .nv-url-input:focus { border-color: var(--accent); }
+    .nv-or {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 11px;
+      color: var(--text-muted);
+      margin: 6px 0;
+    }
+    .nv-or::before, .nv-or::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+
     /* ── File upload area ── */
     .upload-zone {
       border: 2px dashed var(--border);
@@ -1431,6 +1529,10 @@
       /* ── ピンカード: アクションボタン常時表示 ── */
       .pin-card    { padding: 8px 10px; margin-bottom: 5px; }
       .pin-actions { opacity: 1; position: static; margin-top: 6px; justify-content: flex-end; }
+
+      /* ── バージョンタブ ── */
+      .version-tabs { overflow-x: auto; }
+      .version-tab  { font-size: 12px; padding: 7px 10px; }
 
       /* ── モーダル ── */
       .modal {
@@ -1639,6 +1741,12 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <div class="project-name-bar" id="projectNameBar">
       <i data-lucide="folder" class="icon"></i> <strong id="projectNameDisplay"></strong>
     </div>
+    <!-- Version tabs -->
+    <div class="version-tabs" id="versionTabs" style="display:none"></div>
+    <!-- Read-only banner -->
+    <div class="readonly-banner" id="readonlyBanner" style="display:none">
+      <i data-lucide="lock" class="icon"></i> 過去のバージョンは読み取り専用
+    </div>
     <div class="pins-scroll" id="pinsList">
       <div class="pins-empty">
         <div class="pins-empty-icon"><i data-lucide="map-pin" class="icon-lg"></i></div>
@@ -1647,7 +1755,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     </div>
     <div style="padding:8px;border-top:1px solid var(--border);flex-shrink:0">
       <button class="btn-copy-text" onclick="copyPinsAsText()"><i data-lucide="clipboard" class="icon"></i> コメントをテキストでコピー</button>
-      <button class="btn-copy-text" onclick="openImportModal()" style="margin-bottom:0"><i data-lucide="file-input" class="icon"></i> テキストからインポート</button>
+      <button class="btn-copy-text" onclick="openImportModal()"><i data-lucide="file-input" class="icon"></i> テキストからインポート</button>
+      <button class="btn-copy-text" id="btnOffset" onclick="openOffsetModal()" style="display:none;margin-bottom:0"><i data-lucide="clock" class="icon"></i> タイムコードを一括調整</button>
     </div>
   </div>
 
@@ -1705,6 +1814,55 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   </div>
 </div>
 
+<!-- New version modal -->
+<div class="overlay" id="newVersionOverlay">
+  <div class="modal">
+    <div class="modal-title"><i data-lucide="layers" class="icon"></i> 新しいバージョンを追加</div>
+    <p style="font-size:12px;color:var(--text-muted);margin:6px 0 14px;line-height:1.7">
+      前バージョンのコメントをコピーして新バージョンを作成します。<br>新しい動画を指定してください。
+    </p>
+    <div class="nv-input-row">
+      <input type="text" class="nv-url-input" id="newVersionUrl"
+             placeholder="Dropbox 共有リンクを貼り付け...">
+    </div>
+    <div class="nv-or"><span>または</span></div>
+    <button class="btn-cancel" style="width:100%;text-align:center"
+            onclick="document.getElementById('newVersionFileInput').click()">
+      <i data-lucide="upload" class="icon"></i> ファイルを選択
+    </button>
+    <input type="file" id="newVersionFileInput" accept="video/*" style="display:none"
+           onchange="onNewVersionFileSelected(this.files[0])">
+    <div id="newVersionFileLabel" style="font-size:12px;color:var(--accent);margin-top:6px;display:none"></div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeNewVersionModal()">キャンセル</button>
+      <button class="btn-primary" onclick="confirmNewVersion()">バージョンを追加</button>
+    </div>
+  </div>
+</div>
+
+<!-- Offset modal -->
+<div class="overlay" id="offsetOverlay">
+  <div class="modal">
+    <div class="modal-title"><i data-lucide="clock" class="icon"></i> タイムコードを一括調整</div>
+    <p style="font-size:12px;color:var(--text-muted);margin:6px 0 14px;line-height:1.7">
+      このバージョンの全コメントのタイムコードを一括でずらします。<br>
+      カット追加で動画が長くなった場合などに活用してください。
+    </p>
+    <div class="offset-row">
+      <button class="tc-adj" onclick="changeOffsetInput(-10)">−10s</button>
+      <button class="tc-adj" onclick="changeOffsetInput(-5)">−5s</button>
+      <input type="number" class="offset-input" id="offsetInput" value="0">
+      <button class="tc-adj" onclick="changeOffsetInput(+5)">+5s</button>
+      <button class="tc-adj" onclick="changeOffsetInput(+10)">+10s</button>
+    </div>
+    <div class="modal-tip">例: +5 で全コメントを5秒後ろにずらします。マイナスで前にずらします。</div>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeOffsetModal()">キャンセル</button>
+      <button class="btn-primary" onclick="applyOffset()">適用する</button>
+    </div>
+  </div>
+</div>
+
 <!-- Share options modal (local file) -->
 <!-- shareOverlay は現在未使用（将来の拡張用に残す） -->
 
@@ -1725,7 +1883,11 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
 <script>
   // ─── State ─────────────────────────────────────────────
-  let state = { fileId: '', videoUrl: '', videoType: '', pins: [], projectId: null, projectName: '' };
+  let state = {
+    fileId: '', videoUrl: '', videoType: '', pins: [],
+    projectId: null, projectName: '',
+    versions: [], currentVersionId: null, currentVersionNum: 1, isLatestVersion: true,
+  };
 
   // ─── Player refs ───────────────────────────────────────
   let nativeVideoEl = null;  // <video> element
@@ -2040,6 +2202,11 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   }
 
   function openModal(pinId) {
+    // 過去バージョンは読み取り専用
+    if (!state.isLatestVersion) {
+      toast('過去のバージョンは読み取り専用です');
+      return;
+    }
     editingPinId = pinId ?? null;
 
     if (editingPinId !== null) {
@@ -2225,6 +2392,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
           <div class="pin-comment">${esc(p.comment).replace(/\n/g, '<br>')}</div>
           ${repliesHtml}
           ${replyFormHtml}
+          ${state.isLatestVersion ? `
           <div class="pin-actions">
             <button class="resolve-btn${p.resolved ? ' resolved' : ''}"
               onclick="event.stopPropagation();toggleResolved(${p.id})"
@@ -2236,7 +2404,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
               onclick="event.stopPropagation();openModal(${p.id})" title="編集">✎</button>
             <button class="del-btn"
               onclick="event.stopPropagation();deletePin(${p.id})" title="削除">✕</button>
-          </div>
+          </div>` : ''}
         </div>`;
     }).join('');
     lucide.createIcons({ els: list.querySelectorAll('[data-lucide]') });
@@ -2384,12 +2552,22 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         }),
       });
       if (!res.ok) throw new Error((await res.json()).error);
-      const { id } = await res.json();
-      state.projectId   = id;
-      state.projectName = name;
-      history.pushState(null, '', `/project/${id}`);
+      const data = await res.json();
+      state.projectId         = data.id;
+      state.projectName       = name;
+      state.currentVersionId  = data.versionId || null;
+      state.currentVersionNum = data.versionNum || 1;
+      state.isLatestVersion   = true;
+      state.versions = [{
+        id: data.versionId, versionNum: data.versionNum || 1,
+        videoUrl: state.videoUrl, videoType: state.videoType,
+        fileId: state.fileId || '', createdAt: new Date().toISOString(),
+      }];
+      history.pushState(null, '', `/project/${data.id}`);
       document.title = `${name} - Clippin`;
       showProjectNameBar(name);
+      renderVersionTabs();
+      updateReadOnlyUI();
       writeClipboard(location.href);
       toast('プロジェクトを保存しました！共有URLをコピーしました');
     } catch (e) {
@@ -2426,42 +2604,59 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   }
 
   // ─── DB からの読み込み ──────────────────────────────────
-  async function loadProjectFromDB(id) {
+  async function loadProjectFromDB(id, targetVersionId) {
     try {
       const res = await fetch(`/api/projects/${id}`);
       if (!res.ok) { toast('プロジェクトが見つかりません'); return; }
       const data = await res.json();
 
-      state.projectId        = data.id;
-      state.projectName      = data.name;
-      state.videoUrl         = data.videoUrl;
-      state.videoType        = data.videoType;
-      state.fileId           = data.fileId || '';
-      state.pins             = data.pins;
-      state.projectCreatedAt = data.createdAt ? new Date(data.createdAt) : new Date();
+      state.projectId         = data.id;
+      state.projectName       = data.name;
+      state.videoUrl          = data.videoUrl;
+      state.videoType         = data.videoType;
+      state.fileId            = data.fileId || '';
+      state.pins              = data.pins;
+      state.projectCreatedAt  = data.createdAt ? new Date(data.createdAt) : new Date();
+      state.versions          = data.versions || [];
+      state.currentVersionId  = targetVersionId || data.currentVersionId || null;
+      state.currentVersionNum = data.currentVersionNum || 1;
+      state.isLatestVersion   = data.isLatestVersion !== false;
 
       document.title = `${data.name} - Clippin`;
       showProjectNameBar(data.name);
-
-      if (state.videoType === 'dropbox' && state.videoUrl) {
-        document.getElementById('urlInput').value = state.videoUrl;
-        const directUrl = convertDropboxUrl(state.videoUrl);
-        if (directUrl) renderNativeVideo(directUrl);
-        document.getElementById('timerNote').textContent = '再生するとタイマーが自動で同期します';
-      } else if (state.videoType === 'gdrive' && state.fileId) {
-        document.getElementById('urlInput').value = state.videoUrl || '';
-        renderGDrive(state.fileId);
-        document.getElementById('gdriveBanner').style.display = 'flex';
-        document.getElementById('timerNote').innerHTML =
-          '⚠ Google Drive はタイマー手動同期が必要です<br><span style="opacity:.7">ズレたら Space / K で調整</span>';
-      } else if ((state.videoType === 'direct' || state.videoType === 'file') && state.videoUrl) {
-        renderNativeVideo(state.videoUrl);
-        showR2Banner(state.projectCreatedAt || new Date());
-      }
+      loadVideoForState();
+      renderVersionTabs();
+      updateReadOnlyUI();
       renderPins();
     } catch (e) {
       console.error('loadProjectFromDB error:', e);
       toast('プロジェクトの読み込みに失敗しました');
+    }
+  }
+
+  // ─── 動画をstateに従って読み込む ────────────────────────
+  function loadVideoForState() {
+    nativeVideoEl = null;
+    clearInterval(timerInterval);
+    setTimerBtn(false);
+    updateTimerDisplay(0);
+    document.getElementById('gdriveBanner').style.display = 'none';
+    document.getElementById('fileBanner').classList.remove('show');
+
+    if (state.videoType === 'dropbox' && state.videoUrl) {
+      document.getElementById('urlInput').value = state.videoUrl;
+      const directUrl = convertDropboxUrl(state.videoUrl);
+      if (directUrl) renderNativeVideo(directUrl);
+      document.getElementById('timerNote').textContent = '再生するとタイマーが自動で同期します';
+    } else if (state.videoType === 'gdrive' && state.fileId) {
+      document.getElementById('urlInput').value = state.videoUrl || '';
+      renderGDrive(state.fileId);
+      document.getElementById('gdriveBanner').style.display = 'flex';
+      document.getElementById('timerNote').innerHTML =
+        '⚠ Google Drive はタイマー手動同期が必要です<br><span style="opacity:.7">ズレたら Space / K で調整</span>';
+    } else if ((state.videoType === 'direct' || state.videoType === 'file') && state.videoUrl) {
+      renderNativeVideo(state.videoUrl);
+      showR2Banner(state.projectCreatedAt || new Date());
     }
   }
 
@@ -2472,7 +2667,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         await fetch(`/api/projects/${state.projectId}/pins`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ pins: state.pins }),
+          body: JSON.stringify({ pins: state.pins, versionId: state.currentVersionId }),
         });
       } catch (e) {
         console.error('saveState error:', e);
@@ -2485,6 +2680,234 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   // ─── 再生速度 ───────────────────────────────────────────
   function changeSpeed(val) {
     if (nativeVideoEl) nativeVideoEl.playbackRate = parseFloat(val);
+  }
+
+  // ─── バージョン管理 ─────────────────────────────────────
+  function renderVersionTabs() {
+    const el = document.getElementById('versionTabs');
+    if (!state.versions || state.versions.length === 0) {
+      el.style.display = 'none';
+      return;
+    }
+    el.style.display = 'flex';
+    el.innerHTML = state.versions.map(v => `
+      <button class="version-tab${v.id === state.currentVersionId ? ' active' : ''}"
+              onclick="switchVersion(${v.id})">
+        v${v.versionNum}
+      </button>`).join('') + `
+      <button class="version-tab version-add" onclick="openNewVersionModal()"
+              ${state.isLatestVersion ? '' : 'style="display:none"'}>
+        + 追加
+      </button>`;
+  }
+
+  async function switchVersion(versionId) {
+    if (versionId === state.currentVersionId) return;
+    const version = state.versions.find(v => v.id === versionId);
+    if (!version) return;
+
+    try {
+      const res = await fetch(`/api/projects/${state.projectId}?v=${version.versionNum}`);
+      if (!res.ok) { toast('バージョンの読み込みに失敗しました'); return; }
+      const data = await res.json();
+
+      const prevVideoUrl  = state.videoUrl;
+      const prevVideoType = state.videoType;
+      const prevFileId    = state.fileId;
+
+      state.currentVersionId  = versionId;
+      state.currentVersionNum = version.versionNum;
+      const maxVersionId = Math.max(...state.versions.map(v => v.id));
+      state.isLatestVersion = versionId === maxVersionId;
+      state.pins     = data.pins;
+      state.videoUrl  = data.videoUrl;
+      state.videoType = data.videoType;
+      state.fileId    = data.fileId || '';
+
+      // 動画が変わった場合のみ再読み込み
+      if (data.videoUrl !== prevVideoUrl || data.videoType !== prevVideoType || data.fileId !== prevFileId) {
+        loadVideoForState();
+      }
+
+      renderVersionTabs();
+      updateReadOnlyUI();
+      renderPins();
+    } catch (e) {
+      console.error('switchVersion error:', e);
+      toast('バージョンの切り替えに失敗しました');
+    }
+  }
+
+  function updateReadOnlyUI() {
+    const readonly = !state.isLatestVersion;
+    // コメントボタンの有効/無効
+    const pinBtn = document.querySelector('.btn-pin');
+    if (pinBtn) {
+      pinBtn.disabled = readonly;
+      pinBtn.style.opacity = readonly ? '0.4' : '';
+      pinBtn.title = readonly ? '過去のバージョンは読み取り専用です' : '';
+    }
+    // オフセットボタン: プロジェクト保存済み & 最新バージョンのみ表示
+    const offsetBtn = document.getElementById('btnOffset');
+    if (offsetBtn) offsetBtn.style.display = state.projectId && !readonly ? '' : 'none';
+    // 読み取り専用バナー
+    const banner = document.getElementById('readonlyBanner');
+    if (banner) {
+      banner.style.display = readonly ? '' : 'none';
+      if (readonly) lucide.createIcons({ els: banner.querySelectorAll('[data-lucide]') });
+    }
+  }
+
+  // ─── 新バージョンモーダル ────────────────────────────────
+  let _newVersionFile = null;
+
+  function openNewVersionModal() {
+    if (!state.projectId) { toast('先にプロジェクトを保存してください'); return; }
+    _newVersionFile = null;
+    document.getElementById('newVersionUrl').value = '';
+    document.getElementById('newVersionFileInput').value = '';
+    document.getElementById('newVersionFileLabel').style.display = 'none';
+    document.getElementById('newVersionOverlay').classList.add('open');
+    lucide.createIcons({ els: document.getElementById('newVersionOverlay').querySelectorAll('[data-lucide]') });
+    setTimeout(() => document.getElementById('newVersionUrl').focus(), 60);
+  }
+
+  function closeNewVersionModal() {
+    document.getElementById('newVersionOverlay').classList.remove('open');
+    _newVersionFile = null;
+  }
+
+  function onNewVersionFileSelected(file) {
+    if (!file) return;
+    _newVersionFile = file;
+    const lbl = document.getElementById('newVersionFileLabel');
+    lbl.textContent = file.name;
+    lbl.style.display = '';
+    document.getElementById('newVersionUrl').value = '';
+  }
+
+  async function confirmNewVersion() {
+    const urlVal = document.getElementById('newVersionUrl').value.trim();
+    if (!urlVal && !_newVersionFile) {
+      toast('動画URLを入力するかファイルを選択してください');
+      return;
+    }
+    closeNewVersionModal();
+
+    if (_newVersionFile) {
+      await doNewVersionUpload(_newVersionFile);
+    } else {
+      const type = detectType(urlVal);
+      let videoUrl = urlVal, videoType = type, fileId = '';
+      if (type === 'dropbox') {
+        videoUrl = urlVal; // 元 URL を保存
+        videoType = 'dropbox';
+      } else if (type === 'gdrive') {
+        fileId = extractGDriveId(urlVal) || '';
+        videoType = 'gdrive';
+      }
+      await createNewVersion({ videoUrl, videoType, fileId });
+    }
+  }
+
+  async function doNewVersionUpload(file) {
+    document.getElementById('uploadTitle').textContent = '新バージョンをアップロード中...';
+    setUploadUI(true, 0, 'Presigned URL を取得中...');
+    try {
+      const presignRes = await fetch(
+        `/api/presign?filename=${encodeURIComponent(file.name)}&type=${encodeURIComponent(file.type || 'video/mp4')}`
+      );
+      if (!presignRes.ok) throw new Error('presign に失敗しました');
+      const { uploadUrl, publicUrl } = await presignRes.json();
+
+      const videoUrl = await new Promise((resolve, reject) => {
+        const xhr = new XMLHttpRequest();
+        xhr.open('PUT', uploadUrl);
+        xhr.setRequestHeader('Content-Type', file.type || 'video/mp4');
+        xhr.upload.addEventListener('progress', e => {
+          if (e.lengthComputable) {
+            const pct = Math.round(e.loaded / e.total * 95) + 3;
+            setUploadUI(true, pct, `アップロード中... ${(e.loaded/1024/1024).toFixed(1)}MB / ${(e.total/1024/1024).toFixed(1)}MB`);
+          }
+        });
+        xhr.addEventListener('load', () => xhr.status >= 200 && xhr.status < 300 ? resolve(publicUrl) : reject(new Error(`HTTP ${xhr.status}`)));
+        xhr.addEventListener('error', () => reject(new Error('ネットワークエラー')));
+        xhr.send(file);
+      });
+
+      setUploadUI(false, 100, '完了');
+      await createNewVersion({ videoUrl, videoType: 'direct', fileId: '' });
+    } catch (err) {
+      setUploadUI(false, 0, '');
+      toast(`アップロード失敗: ${err.message}`);
+    }
+  }
+
+  async function createNewVersion({ videoUrl, videoType, fileId }) {
+    try {
+      const res = await fetch(`/api/projects/${state.projectId}/versions`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          videoUrl, videoType, fileId: fileId || '',
+          copyFromVersionId: state.currentVersionId,
+        }),
+      });
+      if (!res.ok) throw new Error((await res.json()).error);
+      const { versionId, versionNum } = await res.json();
+
+      // プロジェクトを再取得してから新バージョンに切り替え
+      const projRes = await fetch(`/api/projects/${state.projectId}?v=${versionNum}`);
+      if (!projRes.ok) { toast('バージョン作成完了（再読み込みしてください）'); return; }
+      const projData = await projRes.json();
+      state.versions = projData.versions || [];
+
+      // 動画情報を新バージョンのものに更新
+      state.videoUrl  = videoUrl;
+      state.videoType = videoType;
+      state.fileId    = fileId || '';
+      state.currentVersionId  = versionId;
+      state.currentVersionNum = versionNum;
+      state.isLatestVersion   = true;
+      state.pins = projData.pins; // 新バージョンのピン（コピーされたもの）
+
+      loadVideoForState();
+      renderVersionTabs();
+      updateReadOnlyUI();
+      renderPins();
+      toast(`v${versionNum} を作成しました`);
+    } catch (e) {
+      console.error('createNewVersion error:', e);
+      toast('バージョン作成失敗: ' + e.message);
+    }
+  }
+
+  // ─── オフセットモーダル ──────────────────────────────────
+  function openOffsetModal() {
+    document.getElementById('offsetInput').value = '0';
+    document.getElementById('offsetOverlay').classList.add('open');
+    lucide.createIcons({ els: document.getElementById('offsetOverlay').querySelectorAll('[data-lucide]') });
+    setTimeout(() => document.getElementById('offsetInput').focus(), 60);
+  }
+
+  function closeOffsetModal() {
+    document.getElementById('offsetOverlay').classList.remove('open');
+  }
+
+  function changeOffsetInput(delta) {
+    const el = document.getElementById('offsetInput');
+    el.value = (parseInt(el.value) || 0) + delta;
+  }
+
+  function applyOffset() {
+    const delta = parseInt(document.getElementById('offsetInput').value) || 0;
+    if (delta === 0) { closeOffsetModal(); return; }
+    state.pins = state.pins.map(p => ({ ...p, time: Math.max(0, p.time + delta) }));
+    state.pins.sort((a, b) => a.time - b.time);
+    closeOffsetModal();
+    renderPins();
+    saveState();
+    toast(`タイムコードを ${delta > 0 ? '+' : ''}${delta}秒 調整しました`);
   }
 
   // ─── Pin timeline ──────────────────────────────────────
@@ -2733,6 +3156,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
     if (e.key === 'Escape') {
       if (pinModalOpen) { closeModal(); return; }
+      if (document.getElementById('newVersionOverlay').classList.contains('open')) { closeNewVersionModal(); return; }
+      if (document.getElementById('offsetOverlay').classList.contains('open')) { closeOffsetModal(); return; }
     }
     if (e.key === 'Enter' && e.ctrlKey && pinModalOpen) { savePin(); return; }
     if (!inField && !pinModalOpen) {
@@ -2758,6 +3183,20 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   document.getElementById('overlay')
     .addEventListener('click', e => {
       if (e.target === document.getElementById('overlay')) closeModal();
+    });
+  document.getElementById('newVersionOverlay')
+    .addEventListener('click', e => {
+      if (e.target === document.getElementById('newVersionOverlay')) closeNewVersionModal();
+    });
+  document.getElementById('offsetOverlay')
+    .addEventListener('click', e => {
+      if (e.target === document.getElementById('offsetOverlay')) closeOffsetModal();
+    });
+  // 新バージョンURL入力で Enter
+  document.getElementById('newVersionUrl')
+    .addEventListener('keydown', e => {
+      if (e.key === 'Enter' && !e.isComposing) confirmNewVersion();
+      if (e.key === 'Escape') closeNewVersionModal();
     });
   // ─── Drag & Drop ───────────────────────────────────────
   (function setupDnD() {
