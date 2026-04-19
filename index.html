@@ -1326,14 +1326,16 @@
       padding: 8px;
       border-bottom: 1px solid var(--border);
       flex-shrink: 0;
+      display: flex;
+      gap: 6px;
     }
     .btn-comment-add {
-      width: 100%;
+      flex: 1;
       background: var(--accent);
       color: #fff;
       border: none;
       border-radius: 0;
-      padding: 8px 14px;
+      padding: 8px 12px;
       font-size: 13px;
       font-weight: 600;
       cursor: pointer;
@@ -1342,13 +1344,38 @@
       align-items: center;
       gap: 6px;
       font-family: inherit;
+      white-space: nowrap;
     }
     .btn-comment-add:hover { background: var(--accent-hover); }
     .btn-comment-add:disabled { opacity: 0.4; cursor: not-allowed; }
     .btn-comment-add .kbd { margin-left: auto; }
+    .btn-sidebar-share {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      color: var(--text-muted);
+      border-radius: 0;
+      padding: 8px 14px;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.15s;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-family: inherit;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .btn-sidebar-share:hover { border-color: var(--accent); color: var(--text); }
 
     /* ── Skip buttons ── */
     .ctrl-skip { font-size: 11px; font-weight: 700; letter-spacing: 0; }
+
+    /* ── Playback buttons group ── */
+    .playback-btns {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
 
     /* ── Read-only banner ── */
     .readonly-banner {
@@ -1550,30 +1577,39 @@
       .file-banner { font-size: 11px; padding: 4px 12px; }
       .r2-banner   { font-size: 10px; padding: 4px 12px; }
 
-      /* ── コントロールバー: 1行に収める ── */
+      /* ── コントロールバー: 再生ボタン群を中央に ── */
       .controls {
         flex-wrap: nowrap;
         padding: 7px 12px;
         gap: 8px;
+        position: relative;   /* playback-btns の絶対配置基準 */
       }
       .timer-wrap  { gap: 2px; flex-shrink: 0; }
       .timer-val   { font-size: 15px; min-width: 44px; letter-spacing: 0; }
       .timer-label { display: none; }
       #timerNote   { display: none; }
-      .sep         { height: 16px; flex-shrink: 0; }
+      .sep         { display: none; }    /* モバイルでは非表示 */
       .spacer      { flex: 1; min-width: 0; }
       .ctrl-btn    { padding: 7px 8px; font-size: 13px; flex-shrink: 0; }
       .ctrl-label  { display: none; }
       .ctrl-skip   { font-size: 11px; padding: 7px 8px; }
-      .btn-share   { padding: 7px 10px; font-size: 12px; flex-shrink: 0; }
       .kbd         { display: none; }
+
+      /* 再生ボタン群を絶対配置で中央に */
+      .playback-btns {
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+        gap: 10px;
+      }
 
       /* ── バージョンバー ── */
       .version-tab-label { font-size: 12px; padding: 7px 8px; }
       .version-tab       { font-size: 12px; padding: 7px 10px; }
 
-      /* ── コメント追加ボタン ── */
-      .btn-comment-add { font-size: 12px; padding: 7px 12px; }
+      /* ── コメント追加・共有ボタン ── */
+      .btn-comment-add   { font-size: 12px; padding: 7px 10px; }
+      .btn-sidebar-share { font-size: 12px; padding: 7px 10px; }
 
       /* ── モバイル: body スクロールに切り替え・横スクロール禁止 ── */
       html { overflow-x: hidden; }
@@ -1787,9 +1823,11 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
       <div class="sep"></div>
 
-      <button class="ctrl-btn ctrl-skip" onclick="seekRelative(-5)" title="5秒戻す">−5s</button>
-      <button class="ctrl-btn" id="timerToggle" onclick="toggleTimer()"><i data-lucide="play" class="icon"></i><span class="ctrl-label"> 開始</span></button>
-      <button class="ctrl-btn ctrl-skip" onclick="seekRelative(5)" title="5秒進む">+5s</button>
+      <div class="playback-btns">
+        <button class="ctrl-btn ctrl-skip" onclick="seekRelative(-5)" title="5秒戻す">−5s</button>
+        <button class="ctrl-btn" id="timerToggle" onclick="toggleTimer()"><i data-lucide="play" class="icon"></i><span class="ctrl-label"> 開始</span></button>
+        <button class="ctrl-btn ctrl-skip" onclick="seekRelative(5)" title="5秒進む">+5s</button>
+      </div>
 
       <div class="spacer"></div>
 
@@ -1799,10 +1837,6 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <option value="1.5">1.5x</option>
         <option value="2">2x</option>
       </select>
-
-      <button class="btn-share" id="shareBtn" onclick="handleShare()">
-        <i data-lucide="share-2" class="icon"></i> 共有
-      </button>
 
       <span id="timerNote" style="display:none"></span>
     </div>
@@ -1815,11 +1849,14 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       <span class="sidebar-title">コメント一覧</span>
       <span class="badge" id="badge">0</span>
     </div>
-    <!-- Comment add button -->
+    <!-- Comment add / Share bar -->
     <div class="comment-add-bar">
       <button class="btn-comment-add" id="btnCommentAdd" onclick="openModal()">
         <i data-lucide="map-pin" class="icon"></i> コメントを追加
         <span class="kbd">P</span>
+      </button>
+      <button class="btn-sidebar-share" id="shareBtn" onclick="handleShare()">
+        <i data-lucide="share-2" class="icon"></i> 共有
       </button>
     </div>
     <!-- Read-only banner -->
