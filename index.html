@@ -1308,6 +1308,48 @@
       .version-tab-del { opacity: 1; }
     }
 
+    /* ── Version bar (動画上の帯) ── */
+    .version-bar {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      display: none;
+      align-items: center;
+      padding: 0 8px;
+      flex-shrink: 0;
+      overflow-x: auto;
+      gap: 0;
+    }
+    .version-bar.show { display: flex; }
+
+    /* ── Comment add bar (サイドバー上部) ── */
+    .comment-add-bar {
+      padding: 8px;
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+    .btn-comment-add {
+      width: 100%;
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 0;
+      padding: 8px 14px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-family: inherit;
+    }
+    .btn-comment-add:hover { background: var(--accent-hover); }
+    .btn-comment-add:disabled { opacity: 0.4; cursor: not-allowed; }
+    .btn-comment-add .kbd { margin-left: auto; }
+
+    /* ── Skip buttons ── */
+    .ctrl-skip { font-size: 11px; font-weight: 700; letter-spacing: 0; }
+
     /* ── Read-only banner ── */
     .readonly-banner {
       background: rgba(122,119,112,0.08);
@@ -1510,21 +1552,28 @@
 
       /* ── コントロールバー: 1行に収める ── */
       .controls {
-        flex-wrap: nowrap;     /* 折り返し禁止 */
+        flex-wrap: nowrap;
         padding: 7px 12px;
-        gap: 10px;
+        gap: 8px;
       }
       .timer-wrap  { gap: 2px; flex-shrink: 0; }
       .timer-val   { font-size: 15px; min-width: 44px; letter-spacing: 0; }
       .timer-label { display: none; }
       #timerNote   { display: none; }
       .sep         { height: 16px; flex-shrink: 0; }
-      .spacer      { flex: 1; min-width: 0; } /* スペーサーは残す */
-      .ctrl-btn    { padding: 7px 10px; font-size: 13px; flex-shrink: 0; }
+      .spacer      { flex: 1; min-width: 0; }
+      .ctrl-btn    { padding: 7px 8px; font-size: 13px; flex-shrink: 0; }
       .ctrl-label  { display: none; }
-      .btn-pin     { padding: 7px 10px; font-size: 12px; flex-shrink: 0; }
+      .ctrl-skip   { font-size: 11px; padding: 7px 8px; }
       .btn-share   { padding: 7px 10px; font-size: 12px; flex-shrink: 0; }
-      .kbd         { display: none; } /* キーボードショートカット表示を非表示 */
+      .kbd         { display: none; }
+
+      /* ── バージョンバー ── */
+      .version-tab-label { font-size: 12px; padding: 7px 8px; }
+      .version-tab       { font-size: 12px; padding: 7px 10px; }
+
+      /* ── コメント追加ボタン ── */
+      .btn-comment-add { font-size: 12px; padding: 7px 12px; }
 
       /* ── モバイル: body スクロールに切り替え・横スクロール禁止 ── */
       html { overflow-x: hidden; }
@@ -1680,6 +1729,9 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   <!-- Video column -->
   <div class="video-col">
 
+    <!-- Version bar (動画上帯) -->
+    <div class="version-bar" id="versionBar"></div>
+
     <div class="video-wrap" id="videoWrap">
       <div class="placeholder" id="placeholder">
         <p class="ph-headline">動画をアップロードしてレビューを始める</p>
@@ -1733,12 +1785,11 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <span class="timer-val" id="timerVal">00:00</span>
       </div>
 
-      <button class="ctrl-btn" id="timerToggle" onclick="toggleTimer()"><i data-lucide="play" class="icon"></i><span class="ctrl-label"> 開始</span></button>
-      <button class="ctrl-btn" onclick="resetTimer()"><i data-lucide="rotate-ccw" class="icon"></i><span class="ctrl-label"> リセット</span></button>
-
       <div class="sep"></div>
 
-      <span id="timerNote" style="display:none"></span>
+      <button class="ctrl-btn ctrl-skip" onclick="seekRelative(-5)" title="5秒戻す">−5s</button>
+      <button class="ctrl-btn" id="timerToggle" onclick="toggleTimer()"><i data-lucide="play" class="icon"></i><span class="ctrl-label"> 開始</span></button>
+      <button class="ctrl-btn ctrl-skip" onclick="seekRelative(5)" title="5秒進む">+5s</button>
 
       <div class="spacer"></div>
 
@@ -1749,14 +1800,11 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <option value="2">2x</option>
       </select>
 
-      <button class="btn-pin" onclick="openModal()">
-        <i data-lucide="map-pin" class="icon"></i> コメント
-        <span class="kbd">P</span>
-      </button>
-
       <button class="btn-share" id="shareBtn" onclick="handleShare()">
         <i data-lucide="share-2" class="icon"></i> 共有
       </button>
+
+      <span id="timerNote" style="display:none"></span>
     </div>
 
   </div>
@@ -1767,6 +1815,17 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       <span class="sidebar-title">コメント一覧</span>
       <span class="badge" id="badge">0</span>
     </div>
+    <!-- Comment add button -->
+    <div class="comment-add-bar">
+      <button class="btn-comment-add" id="btnCommentAdd" onclick="openModal()">
+        <i data-lucide="map-pin" class="icon"></i> コメントを追加
+        <span class="kbd">P</span>
+      </button>
+    </div>
+    <!-- Read-only banner -->
+    <div class="readonly-banner" id="readonlyBanner" style="display:none">
+      <i data-lucide="lock" class="icon"></i> 過去のバージョンは読み取り専用
+    </div>
     <div class="filter-tabs">
       <button class="filter-tab active" id="filterAll"        onclick="setFilter('all')">すべて</button>
       <button class="filter-tab"        id="filterUnresolved" onclick="setFilter('unresolved')">未解決</button>
@@ -1774,12 +1833,6 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     </div>
     <div class="project-name-bar" id="projectNameBar">
       <i data-lucide="folder" class="icon"></i> <strong id="projectNameDisplay"></strong>
-    </div>
-    <!-- Version tabs -->
-    <div class="version-tabs" id="versionTabs" style="display:none"></div>
-    <!-- Read-only banner -->
-    <div class="readonly-banner" id="readonlyBanner" style="display:none">
-      <i data-lucide="lock" class="icon"></i> 過去のバージョンは読み取り専用
     </div>
     <div class="pins-scroll" id="pinsList">
       <div class="pins-empty">
@@ -2726,6 +2779,15 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     }
   }
 
+  // ─── 5秒スキップ ────────────────────────────────────────
+  function seekRelative(delta) {
+    if (nativeVideoEl) {
+      nativeVideoEl.currentTime = Math.max(0, Math.min(nativeVideoEl.duration || 0, nativeVideoEl.currentTime + delta));
+    } else {
+      updateTimerDisplay(Math.max(0, timerSec + delta));
+    }
+  }
+
   // ─── 再生速度 ───────────────────────────────────────────
   function changeSpeed(val) {
     if (nativeVideoEl) nativeVideoEl.playbackRate = parseFloat(val);
@@ -2733,12 +2795,12 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
   // ─── バージョン管理 ─────────────────────────────────────
   function renderVersionTabs() {
-    const el = document.getElementById('versionTabs');
+    const el = document.getElementById('versionBar');
     if (!state.versions || state.versions.length === 0) {
-      el.style.display = 'none';
+      el.classList.remove('show');
       return;
     }
-    el.style.display = 'flex';
+    el.classList.add('show');
     const canDelete = state.versions.length > 1;
     el.innerHTML = state.versions.map(v => `
       <div class="version-tab-wrap${v.id === state.currentVersionId ? ' active' : ''}">
@@ -2790,12 +2852,11 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
   function updateReadOnlyUI() {
     const readonly = !state.isLatestVersion;
-    // コメントボタンの有効/無効
-    const pinBtn = document.querySelector('.btn-pin');
-    if (pinBtn) {
-      pinBtn.disabled = readonly;
-      pinBtn.style.opacity = readonly ? '0.4' : '';
-      pinBtn.title = readonly ? '過去のバージョンは読み取り専用です' : '';
+    // サイドバーのコメント追加ボタン
+    const commentAddBtn = document.getElementById('btnCommentAdd');
+    if (commentAddBtn) {
+      commentAddBtn.disabled = readonly;
+      commentAddBtn.title = readonly ? '過去のバージョンは読み取り専用です' : '';
     }
     // オフセットボタン: プロジェクト保存済み & 最新バージョンのみ表示
     const offsetBtn = document.getElementById('btnOffset');
