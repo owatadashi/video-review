@@ -1020,6 +1020,46 @@
     }
     .btn-cancel:hover { background: var(--border); color: var(--text); }
 
+    /* ── Frame Annotation ── */
+    .annotation-btn {
+      display: flex; align-items: center; gap: 6px;
+      background: transparent; border: 1px dashed var(--border);
+      border-radius: 8px; color: var(--text-muted);
+      font-size: 12px; padding: 8px 12px; cursor: pointer;
+      width: 100%; margin-top: 8px; transition: all 0.15s;
+    }
+    .annotation-btn:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-dim); }
+    .annotation-btn.has-annotation { border-style: solid; border-color: var(--accent); color: var(--accent); background: var(--accent-dim); }
+    .annotation-preview-wrap { margin-top: 8px; position: relative; display: none; }
+    .annotation-preview-wrap.show { display: block; }
+    .annotation-preview-img { width: 100%; border-radius: 6px; border: 1px solid var(--border); display: block; }
+    .annotation-preview-clear {
+      position: absolute; top: 6px; right: 6px;
+      background: rgba(0,0,0,0.6); color: #fff; border: none;
+      border-radius: 4px; font-size: 11px; padding: 3px 8px; cursor: pointer;
+    }
+    #annotationOverlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,0.88); z-index: 300;
+      align-items: center; justify-content: center;
+    }
+    #annotationOverlay.open { display: flex; }
+    .annotation-modal {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 12px; padding: 16px;
+      width: min(700px, 95vw); display: flex; flex-direction: column; gap: 12px;
+    }
+    .annotation-modal-header {
+      display: flex; align-items: center; justify-content: space-between;
+      font-size: 14px; font-weight: 600;
+    }
+    .annotation-hint { font-size: 12px; color: var(--text-muted); font-weight: 400; }
+    .annotation-canvas-wrap { position: relative; cursor: crosshair; border-radius: 6px; overflow: hidden; line-height: 0; }
+    #annotationCanvas { display: block; max-width: 100%; border-radius: 6px; }
+    .annotation-modal-actions { display: flex; gap: 8px; justify-content: flex-end; }
+    .pin-annotation { margin-top: 8px; border-radius: 6px; overflow: hidden; border: 1px solid var(--border); }
+    .pin-annotation img { display: block; width: 100%; }
+
     /* timecode editor row */
     .timecode-row {
       display: flex;
@@ -1957,10 +1997,36 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <input type="text" class="author-input" id="authorInput" placeholder="名前（省略可）" maxlength="30"
            onkeydown="if(event.key==='Enter'&&!event.isComposing){event.preventDefault();document.getElementById('commentInput').focus();}">
     <textarea id="commentInput" placeholder="修正指示・フィードバックを入力..."></textarea>
+    <button class="annotation-btn" id="annotationBtn" onclick="openAnnotation()" type="button">
+      <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>
+      フレームに赤枠を追加
+    </button>
+    <div class="annotation-preview-wrap" id="annotationPreviewWrap">
+      <img class="annotation-preview-img" id="annotationPreviewImg" src="" alt="annotation">
+      <button class="annotation-preview-clear" onclick="clearPendingAnnotation()">✕ 削除</button>
+    </div>
     <div class="modal-tip">Ctrl + Enter で保存　／　Esc でキャンセル</div>
     <div class="modal-actions">
       <button class="btn-cancel" onclick="closeModal()">キャンセル</button>
       <button class="btn-primary" onclick="savePin()">保存する</button>
+    </div>
+  </div>
+</div>
+
+<!-- Annotation Modal -->
+<div id="annotationOverlay">
+  <div class="annotation-modal">
+    <div class="annotation-modal-header">
+      <span>赤枠を追加</span>
+      <span class="annotation-hint">ドラッグして枠を描いてください</span>
+    </div>
+    <div class="annotation-canvas-wrap" id="annotationCanvasWrap">
+      <canvas id="annotationCanvas"></canvas>
+    </div>
+    <div class="annotation-modal-actions">
+      <button class="btn-cancel" onclick="clearAnnotationRect()">やり直し</button>
+      <button class="btn-cancel" onclick="cancelAnnotation()">キャンセル</button>
+      <button class="btn-primary" onclick="confirmAnnotation()">確定</button>
     </div>
   </div>
 </div>
@@ -2404,6 +2470,17 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       if (!pin) return;
       capturedSec = pin.time;
       document.getElementById('commentInput').value = pin.comment;
+      // アノテーション復元
+      if (pin.annotation) {
+        pendingAnnotation = pin.annotation;
+        document.getElementById('annotationPreviewImg').src = pin.annotation;
+        document.getElementById('annotationPreviewWrap').classList.add('show');
+        const btn = document.getElementById('annotationBtn');
+        btn.classList.add('has-annotation');
+        btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="3" width="18" height="18" rx="2"/></svg> 赤枠を再編集';
+      } else {
+        clearPendingAnnotation();
+      }
       document.getElementById('modalTitle').innerHTML = '<i data-lucide="pencil" class="icon"></i> コメントを編集';
       lucide.createIcons({ els: document.getElementById('modalTitle').querySelectorAll('[data-lucide]') });
     } else {
@@ -2412,6 +2489,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       document.getElementById('commentInput').value = '';
       document.getElementById('modalTitle').innerHTML = '<i data-lucide="map-pin" class="icon"></i> コメントを追加';
       lucide.createIcons({ els: document.getElementById('modalTitle').querySelectorAll('[data-lucide]') });
+      clearPendingAnnotation();
     }
 
     // ネイティブ動画: ピン追加時に自動ポーズして currentTime を正確に取得
@@ -2443,11 +2521,109 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
   function closeModal() {
     editingPinId = null;
+    clearPendingAnnotation();
     document.getElementById('overlay').classList.remove('open');
     // Google Drive: openModal で自動停止したタイマーを再開
     if (state.videoType === 'gdrive' && !timerRunning) {
       toggleTimer();
     }
+  }
+
+  // ─── Frame Annotation ──────────────────────────────────
+  let pendingAnnotation = null;
+  let annotFrameCanvas = null;
+  let annotRect = null;
+  let annotDrawing = false;
+  let annotStart = { x: 0, y: 0 };
+
+  function openAnnotation() {
+    if (!nativeVideoEl) {
+      toast('アップロードした動画のみ対応しています');
+      return;
+    }
+    const video = nativeVideoEl;
+    const cvs = document.createElement('canvas');
+    cvs.width  = video.videoWidth  || 640;
+    cvs.height = video.videoHeight || 360;
+    cvs.getContext('2d').drawImage(video, 0, 0, cvs.width, cvs.height);
+    annotFrameCanvas = cvs;
+    annotRect = null;
+
+    const annotCvs = document.getElementById('annotationCanvas');
+    annotCvs.width  = cvs.width;
+    annotCvs.height = cvs.height;
+    const maxW = Math.min(660, window.innerWidth * 0.9 - 32);
+    const scale = maxW / cvs.width;
+    annotCvs.style.width  = Math.round(cvs.width  * scale) + 'px';
+    annotCvs.style.height = Math.round(cvs.height * scale) + 'px';
+    drawAnnotFrame();
+
+    // マウス・タッチイベント（一度だけ登録）
+    const wrap = document.getElementById('annotationCanvasWrap');
+    wrap.onmousedown  = e => { annotDrawing = true; annotRect = null; annotStart = getAnnotPos(e); };
+    wrap.onmousemove  = e => { if (!annotDrawing) return; updateAnnotRect(e); drawAnnotFrame(); };
+    wrap.onmouseup    = e => { if (!annotDrawing) return; annotDrawing = false; updateAnnotRect(e); if (annotRect && (annotRect.w < 5 || annotRect.h < 5)) annotRect = null; drawAnnotFrame(); };
+    wrap.ontouchstart = e => { e.preventDefault(); annotDrawing = true; annotRect = null; annotStart = getAnnotPos(e); };
+    wrap.ontouchmove  = e => { e.preventDefault(); if (!annotDrawing) return; updateAnnotRect(e); drawAnnotFrame(); };
+    wrap.ontouchend   = e => { if (!annotDrawing) return; annotDrawing = false; if (annotRect && (annotRect.w < 5 || annotRect.h < 5)) annotRect = null; drawAnnotFrame(); };
+
+    document.getElementById('annotationOverlay').classList.add('open');
+  }
+
+  function getAnnotPos(e) {
+    const cvs = document.getElementById('annotationCanvas');
+    const r = cvs.getBoundingClientRect();
+    const cx = e.touches ? e.touches[0].clientX : e.clientX;
+    const cy = e.touches ? e.touches[0].clientY : e.clientY;
+    return { x: (cx - r.left) * (cvs.width / r.width), y: (cy - r.top) * (cvs.height / r.height) };
+  }
+
+  function updateAnnotRect(e) {
+    const pos = getAnnotPos(e);
+    annotRect = {
+      x: Math.min(annotStart.x, pos.x), y: Math.min(annotStart.y, pos.y),
+      w: Math.abs(pos.x - annotStart.x), h: Math.abs(pos.y - annotStart.y)
+    };
+  }
+
+  function drawAnnotFrame() {
+    const cvs = document.getElementById('annotationCanvas');
+    const ctx = cvs.getContext('2d');
+    ctx.drawImage(annotFrameCanvas, 0, 0);
+    if (annotRect) {
+      ctx.strokeStyle = '#ef4444';
+      ctx.lineWidth   = Math.max(2, cvs.width / 180);
+      ctx.strokeRect(annotRect.x, annotRect.y, annotRect.w, annotRect.h);
+    }
+  }
+
+  function clearAnnotationRect() {
+    annotRect = null;
+    drawAnnotFrame();
+  }
+
+  function cancelAnnotation() {
+    annotDrawing = false;
+    document.getElementById('annotationOverlay').classList.remove('open');
+  }
+
+  function confirmAnnotation() {
+    pendingAnnotation = document.getElementById('annotationCanvas').toDataURL('image/jpeg', 0.85);
+    document.getElementById('annotationPreviewImg').src = pendingAnnotation;
+    document.getElementById('annotationPreviewWrap').classList.add('show');
+    const btn = document.getElementById('annotationBtn');
+    btn.classList.add('has-annotation');
+    btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="3" width="18" height="18" rx="2"/></svg> 赤枠を再編集';
+    document.getElementById('annotationOverlay').classList.remove('open');
+  }
+
+  function clearPendingAnnotation() {
+    pendingAnnotation = null;
+    document.getElementById('annotationPreviewWrap').classList.remove('show');
+    document.getElementById('annotationPreviewImg').src = '';
+    const btn = document.getElementById('annotationBtn');
+    btn.classList.remove('has-annotation');
+    btn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="3" y="3" width="18" height="18" rx="2"/></svg> フレームに赤枠を追加';
   }
 
   function savePin() {
@@ -2465,18 +2641,23 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       // 編集: 既存ピンを上書き
       const idx = state.pins.findIndex(p => p.id === editingPinId);
       if (idx !== -1) {
-        state.pins[idx] = { ...state.pins[idx], time: capturedSec, comment: text, author };
+        const existing = state.pins[idx];
+        state.pins[idx] = { ...existing, time: capturedSec, comment: text, author,
+          annotation: pendingAnnotation !== null ? pendingAnnotation : (existing.annotation || undefined) };
         state.pins.sort((a, b) => a.time - b.time);
         activePinId = editingPinId;
       }
       editingPinId = null;
+      pendingAnnotation = null;
       document.getElementById('overlay').classList.remove('open');
       renderPins();
       saveState();
       toast('ピンを更新しました');
     } else {
       // 新規追加
-      const pin = { id: Date.now(), time: capturedSec, comment: text, author };
+      const pin = { id: Date.now(), time: capturedSec, comment: text, author,
+        ...(pendingAnnotation ? { annotation: pendingAnnotation } : {}) };
+      pendingAnnotation = null;
       state.pins.push(pin);
       state.pins.sort((a, b) => a.time - b.time);
       activePinId = pin.id;
@@ -2579,6 +2760,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
             ${p.author ? `<span class="pin-author">${esc(p.author)}</span>` : ''}
           </div>
           <div class="pin-comment">${esc(p.comment).replace(/\n/g, '<br>')}</div>
+          ${p.annotation ? `<div class="pin-annotation"><img src="${p.annotation}" alt="annotation"></div>` : ''}
           ${repliesHtml}
           ${replyFormHtml}
           ${state.isLatestVersion ? `
