@@ -5,6 +5,7 @@ const { S3Client, PutObjectCommand, GetObjectCommand } = require('@aws-sdk/clien
 const { getSignedUrl } = require('@aws-sdk/s3-request-presigner');
 const { Pool }   = require('pg');
 const path       = require('path');
+const fs         = require('fs');
 const { randomUUID, randomBytes } = require('crypto');
 
 // ─── 起動時バリデーション ───────────────────────────────────
@@ -416,9 +417,21 @@ app.get('/privacy', (req, res) => {
   res.sendFile(path.join(__dirname, 'privacy.html'));
 });
 
-// ─── SPA フォールバック（/project/:id → index.html）────────
-app.get('/project/:id', (req, res) => {
-  res.sendFile(path.join(__dirname, 'index.html'));
+// ─── SPA フォールバック（/project/:id → index.html + 動的タイトル）────────
+app.get('/project/:id', async (req, res) => {
+  try {
+    const result = await pool.query('SELECT name FROM projects WHERE id = $1', [req.params.id]);
+    if (!result.rows.length) return res.sendFile(path.join(__dirname, 'index.html'));
+    const name = result.rows[0].name.replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+    let html = fs.readFileSync(path.join(__dirname, 'index.html'), 'utf8');
+    html = html
+      .replace(/(<title>)[^<]*(<\/title>)/, `$1${name} - Clippin$2`)
+      .replace(/(<meta property="og:title" content=")[^"]*(")/,    `$1${name} - Clippin$2`)
+      .replace(/(<meta name="twitter:title" content=")[^"]*(")/,   `$1${name} - Clippin$2`);
+    res.send(html);
+  } catch (e) {
+    res.sendFile(path.join(__dirname, 'index.html'));
+  }
 });
 
 // ─── サーバー起動 ───────────────────────────────────────────

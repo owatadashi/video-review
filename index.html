@@ -1248,23 +1248,72 @@
       transform: translateX(-50%) translateY(12px);
       background: var(--surface);
       border: 1px solid var(--border);
-      border-radius: 0;
-      padding: 9px 18px;
+      border-radius: 8px;
+      padding: 10px 18px;
       font-size: 13px;
       color: var(--text);
       z-index: 999;
       opacity: 0;
       transition: opacity 0.25s, transform 0.25s;
       pointer-events: none;
-      white-space: nowrap;
+      text-align: center;
+      max-width: 320px;
+      width: max-content;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.08);
     }
     .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+    .toast-hint { display: block; font-size: 11px; color: var(--text-muted); margin-top: 3px; }
 
     /* ── Scrollbar ── */
     ::-webkit-scrollbar { width: 5px; }
     ::-webkit-scrollbar-track { background: transparent; }
     ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 0; }
     ::-webkit-scrollbar-thumb:hover { background: #b8b8c0; }
+
+    /* ── Compare ── */
+    .btn-compare {
+      background: none;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--text-muted);
+      font-size: 11px;
+      padding: 3px 10px;
+      cursor: pointer;
+      transition: all 0.15s;
+      display: none;
+      font-family: inherit;
+    }
+    .btn-compare:hover { border-color: var(--accent); color: var(--accent); }
+    .btn-compare.active { background: var(--accent-dim); border-color: var(--accent); color: var(--accent); }
+    .compare-panel {
+      display: none;
+      flex-direction: column;
+      flex: 1;
+      overflow: hidden;
+      min-height: 0;
+    }
+    .compare-panel.show { display: flex; }
+    .compare-header {
+      padding: 8px 14px;
+      font-size: 11px;
+      color: var(--text-muted);
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+    .compare-scroll { flex: 1; overflow-y: auto; padding: 8px; }
+    .compare-tag {
+      font-size: 10px;
+      font-weight: 700;
+      padding: 1px 6px;
+      border-radius: 3px;
+      margin-left: auto;
+      flex-shrink: 0;
+    }
+    .compare-tag.added   { background: var(--accent-dim); color: var(--accent); }
+    .compare-tag.removed { background: rgba(192,57,43,0.08); color: var(--danger); }
+    .pin-card.compare-added  { border-color: var(--accent); }
+    .pin-card.compare-removed { opacity: 0.55; }
+    .pin-card.compare-removed .pin-comment { text-decoration: line-through; color: var(--text-muted); }
 
     /* ── Version tabs ── */
     .version-tabs {
@@ -1868,6 +1917,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   <div class="sidebar">
     <div class="sidebar-head">
       <span class="sidebar-title">コメント一覧</span>
+      <button class="btn-compare" id="compareBtn" onclick="toggleCompare()">比較</button>
       <span class="badge" id="badge">0</span>
     </div>
     <!-- Comment add / Share bar -->
@@ -1891,6 +1941,10 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     </div>
     <div class="project-name-bar" id="projectNameBar">
       <i data-lucide="folder" class="icon"></i> <strong id="projectNameDisplay"></strong>
+    </div>
+    <div class="compare-panel" id="comparePanel">
+      <div class="compare-header" id="compareHeader"></div>
+      <div class="compare-scroll" id="compareList"></div>
     </div>
     <div class="pins-scroll" id="pinsList">
       <div class="pins-empty">
@@ -2665,7 +2719,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     // プロジェクト保存済み → URLをコピーするだけ
     if (state.projectId) {
       writeClipboard(location.href);
-      toast('共有URLをコピーしました');
+      toast('共有URLをコピーしました', 'リンクを開くだけで、誰でもコメントを確認できます');
       return;
     }
     if (!state.videoUrl && !localFile) {
@@ -2729,7 +2783,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       renderVersionTabs();
       updateReadOnlyUI();
       writeClipboard(location.href);
-      toast('プロジェクトを保存しました！共有URLをコピーしました');
+      toast('プロジェクトを保存しました！', '共有URLをコピーしました — リンクで誰でも確認できます');
     } catch (e) {
       console.error('saveProjectToDB error:', e);
       toast('保存失敗: ' + e.message);
@@ -2859,6 +2913,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       return;
     }
     el.classList.add('show');
+    const compareBtn = document.getElementById('compareBtn');
+    if (compareBtn) compareBtn.style.display = state.versions.length >= 2 ? '' : 'none';
     const canDelete = state.versions.length > 1;
     el.innerHTML = state.versions.map(v => `
       <div class="version-tab-wrap${v.id === state.currentVersionId ? ' active' : ''}">
@@ -3363,11 +3419,85 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       .replace(/&/g,'&amp;').replace(/</g,'&lt;')
       .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
   }
-  function toast(msg) {
+  function toast(msg, hint) {
     const el = document.getElementById('toast');
-    el.textContent = msg;
+    el.innerHTML = hint
+      ? `${esc(msg)}<span class="toast-hint">${esc(hint)}</span>`
+      : esc(msg);
     el.classList.add('show');
-    setTimeout(() => el.classList.remove('show'), 2600);
+    setTimeout(() => el.classList.remove('show'), hint ? 3800 : 2600);
+  }
+
+  // ── バージョン比較 ──────────────────────────────────────────
+  let compareActive = false;
+
+  function toggleCompare() {
+    compareActive = !compareActive;
+    const btn       = document.getElementById('compareBtn');
+    const panel     = document.getElementById('comparePanel');
+    const pinsList  = document.getElementById('pinsList');
+    const filterRow = document.querySelector('.filter-tabs');
+    btn.classList.toggle('active', compareActive);
+    if (compareActive) {
+      panel.classList.add('show');
+      pinsList.style.display   = 'none';
+      filterRow.style.display  = 'none';
+      loadCompareData();
+    } else {
+      panel.classList.remove('show');
+      pinsList.style.display  = '';
+      filterRow.style.display = '';
+    }
+  }
+
+  async function loadCompareData() {
+    const versions = [...state.versions].sort((a, b) => a.versionNum - b.versionNum);
+    const header   = document.getElementById('compareHeader');
+    if (versions.length < 2) {
+      header.textContent = 'バージョンが1つしかありません';
+      document.getElementById('compareList').innerHTML = '';
+      return;
+    }
+    const vA = versions[versions.length - 2];
+    const vB = versions[versions.length - 1];
+    header.textContent = `v${vA.versionNum} → v${vB.versionNum} の差分`;
+    try {
+      const [resA, resB] = await Promise.all([
+        fetch(`/api/projects/${state.projectId}?v=${vA.versionNum}`),
+        fetch(`/api/projects/${state.projectId}?v=${vB.versionNum}`),
+      ]);
+      renderCompare((await resA.json()).pins, (await resB.json()).pins);
+    } catch(e) {
+      header.textContent = '読み込みに失敗しました';
+    }
+  }
+
+  function renderCompare(pinsA, pinsB) {
+    const matched = new Set();
+    const result  = [];
+    for (const pb of pinsB) {
+      const match = pinsA.find(pa => !matched.has(pa.id) && Math.abs(pa.time_sec - pb.time_sec) < 1.0);
+      if (match) { matched.add(match.id); result.push({ type: 'same',    pin: pb }); }
+      else                                  result.push({ type: 'added',   pin: pb });
+    }
+    for (const pa of pinsA) {
+      if (!matched.has(pa.id)) result.push({ type: 'removed', pin: pa });
+    }
+    result.sort((a, b) => a.pin.time_sec - b.pin.time_sec);
+
+    const list = document.getElementById('compareList');
+    if (!result.length) {
+      list.innerHTML = '<div style="padding:24px;text-align:center;color:var(--text-muted);font-size:13px">差分はありません</div>';
+      return;
+    }
+    list.innerHTML = result.filter(r => r.type !== 'same').map(({ type, pin }) => `
+      <div class="pin-card compare-${type}" style="cursor:default">
+        <div class="pin-meta">
+          <span class="pin-time">${fmtTime(pin.time_sec)}</span>
+          <span class="compare-tag ${type}">${type === 'added' ? '追加' : '削除'}</span>
+        </div>
+        <div class="pin-comment">${esc(pin.comment).replace(/\n/g,'<br>')}</div>
+      </div>`).join('') || '<div style="padding:24px;text-align:center;color:var(--text-muted);font-size:13px">差分はありません</div>';
   }
 
   // ─── Keyboard shortcuts ────────────────────────────────
