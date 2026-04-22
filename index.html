@@ -68,7 +68,9 @@
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Hiragino Sans', sans-serif;
     }
     body.has-fv {
-      overflow-y: auto;
+      overflow-y: scroll;
+      scroll-snap-type: y mandatory;
+      height: 100dvh;
     }
     body.has-fv header {
       position: fixed;
@@ -82,6 +84,8 @@
     }
     body.has-fv #app {
       padding-top: 46px;
+      scroll-snap-align: start;
+      scroll-snap-stop: always;
     }
 
     #app {
@@ -94,11 +98,13 @@
     /* ── FV ── */
     #fv {
       display: none;
-      height: 100vh;
+      height: 100dvh;
       position: relative;
       overflow: hidden;
       align-items: center;
       justify-content: center;
+      scroll-snap-align: start;
+      scroll-snap-stop: always;
     }
     #fv.show { display: flex; }
 
@@ -324,27 +330,22 @@
 
     @media (max-width: 768px) {
       #fv {
-        height: auto;
-        min-height: 100dvh;
-        overflow: visible;
-        align-items: flex-start;
-        padding-bottom: 40px;
+        height: 100dvh;
+        overflow: hidden;
+        align-items: center;
+        justify-content: center;
       }
       .fv-inner {
         flex-direction: column;
         align-items: stretch;
-        padding: 20px 24px 0;
-        gap: 24px;
-        justify-content: flex-start;
+        padding: 60px 28px 32px;
+        gap: 20px;
+        justify-content: center;
       }
       .fv-text { text-align: left; width: 100%; }
-      .fv-catchcopy { font-size: clamp(22px, 6vw, 30px); margin-bottom: 12px; }
+      .fv-catchcopy { font-size: clamp(24px, 6vw, 32px); margin-bottom: 12px; }
       .fv-desc { font-size: 13px; margin-bottom: 20px; }
-      .fv-mockup-wrap { width: 100%; flex: none; }
-      .fv-mockup { max-width: 100%; width: 100%; }
-      .fv-comments { padding: 8px 14px; }
-      .fv-comment:nth-child(n+2) { display: none; }
-      .fv-video-area { height: 90px; }
+      .fv-mockup-wrap { display: none; }
     }
 
     /* ── Icons ── */
@@ -2914,7 +2915,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     }
     el.classList.add('show');
     const compareBtn = document.getElementById('compareBtn');
-    if (compareBtn) compareBtn.style.display = state.versions.length >= 2 ? '' : 'none';
+    if (compareBtn) compareBtn.style.display = state.versions.length >= 2 ? 'inline-block' : 'none';
     const canDelete = state.versions.length > 1;
     el.innerHTML = state.versions.map(v => `
       <div class="version-tab-wrap${v.id === state.currentVersionId ? ' active' : ''}">
