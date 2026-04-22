@@ -1987,12 +1987,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   <div class="modal">
     <div class="modal-title" id="modalTitle"><i data-lucide="map-pin" class="icon"></i> コメントを追加</div>
     <div class="timecode-row">
-      <button class="tc-adj" onclick="adjustTimecode(-5)">−5s</button>
-      <button class="tc-adj" onclick="adjustTimecode(-1)">−1s</button>
       <input type="text" class="tc-input" id="tcInput" value="00:00"
              oninput="onTcInput(this.value)">
-      <button class="tc-adj" onclick="adjustTimecode(+1)">+1s</button>
-      <button class="tc-adj" onclick="adjustTimecode(+5)">+5s</button>
     </div>
     <input type="text" class="author-input" id="authorInput" placeholder="名前（省略可）" maxlength="30"
            onkeydown="if(event.key==='Enter'&&!event.isComposing){event.preventDefault();document.getElementById('commentInput').focus();}">
