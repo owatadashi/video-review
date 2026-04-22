@@ -1042,21 +1042,29 @@
       display: none; position: fixed; inset: 0;
       background: rgba(0,0,0,0.88); z-index: 300;
       align-items: center; justify-content: center;
+      padding: 12px;
     }
     #annotationOverlay.open { display: flex; }
     .annotation-modal {
       background: var(--surface); border: 1px solid var(--border);
-      border-radius: 12px; padding: 16px;
-      width: min(700px, 95vw); display: flex; flex-direction: column; gap: 12px;
+      border-radius: 12px; padding: 14px;
+      width: min(700px, 100%);
+      max-height: calc(100dvh - 24px);
+      display: flex; flex-direction: column; gap: 10px;
+      overflow: hidden;
     }
     .annotation-modal-header {
       display: flex; align-items: center; justify-content: space-between;
-      font-size: 14px; font-weight: 600;
+      font-size: 14px; font-weight: 600; flex-shrink: 0;
     }
     .annotation-hint { font-size: 12px; color: var(--text-muted); font-weight: 400; }
-    .annotation-canvas-wrap { position: relative; cursor: crosshair; border-radius: 6px; overflow: hidden; line-height: 0; }
-    #annotationCanvas { display: block; max-width: 100%; border-radius: 6px; }
-    .annotation-modal-actions { display: flex; gap: 8px; justify-content: flex-end; }
+    .annotation-canvas-wrap {
+      position: relative; cursor: crosshair; border-radius: 6px;
+      overflow: hidden; line-height: 0;
+      flex: 1; min-height: 0; display: flex; align-items: center; justify-content: center;
+    }
+    #annotationCanvas { display: block; max-width: 100%; max-height: 100%; border-radius: 6px; object-fit: contain; }
+    .annotation-modal-actions { display: flex; gap: 8px; justify-content: flex-end; flex-shrink: 0; }
     .pin-annotation { margin-top: 8px; border-radius: 6px; overflow: hidden; border: 1px solid var(--border); }
     .pin-annotation img { display: block; width: 100%; }
 
@@ -2548,8 +2556,10 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     const annotCvs = document.getElementById('annotationCanvas');
     annotCvs.width  = cvs.width;
     annotCvs.height = cvs.height;
-    const maxW = Math.min(660, window.innerWidth * 0.9 - 32);
-    const scale = maxW / cvs.width;
+    // ヘッダー・ボタン・パディング分を引いた最大サイズに収める
+    const maxW = Math.min(660, window.innerWidth  - 56);
+    const maxH = Math.min(window.innerHeight - 160, window.innerHeight * 0.65);
+    const scale = Math.min(maxW / cvs.width, maxH / cvs.height);
     annotCvs.style.width  = Math.round(cvs.width  * scale) + 'px';
     annotCvs.style.height = Math.round(cvs.height * scale) + 'px';
     drawAnnotFrame();
