@@ -3668,6 +3668,11 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     const inField = ['INPUT','TEXTAREA'].includes(document.activeElement.tagName);
     const pinModalOpen = document.getElementById('overlay').classList.contains('open');
 
+    const annotModalOpen = document.getElementById('annotationOverlay').classList.contains('open');
+    if (annotModalOpen) {
+      if (e.key === 'Enter') { e.preventDefault(); confirmAnnotation(); return; }
+      if (e.key === 'Escape') { cancelAnnotation(); return; }
+    }
     if (e.key === 'Escape') {
       if (pinModalOpen) { closeModal(); return; }
       if (document.getElementById('newVersionOverlay').classList.contains('open')) { closeNewVersionModal(); return; }
