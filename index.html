@@ -113,7 +113,7 @@
       display: flex;
       align-items: center;
       gap: 72px;
-      padding: 0 72px;
+      padding: 24px 72px;
       max-width: 1200px;
       width: 100%;
     }
@@ -156,6 +156,7 @@
       background: var(--accent);
       color: #ffffff;
       border: none;
+      border-radius: 6px;
       padding: 11px 28px;
       font-size: 13px;
       font-weight: 700;
@@ -321,15 +322,23 @@
     }
 
     @media (max-width: 768px) {
-      .fv-inner {
-        flex-direction: column-reverse;
-        padding: 32px 20px;
-        gap: 36px;
-        justify-content: center;
+      #fv {
+        height: auto;
+        min-height: 100dvh;
+        overflow: visible;
+        align-items: flex-start;
+        padding-bottom: 48px;
       }
-      .fv-text { text-align: center; }
-      .fv-line { margin: 0 auto 20px; }
+      .fv-inner {
+        flex-direction: column;
+        padding: 28px 24px 0;
+        gap: 32px;
+        justify-content: flex-start;
+      }
+      .fv-text { text-align: left; }
+      .fv-catchcopy { font-size: clamp(22px, 6vw, 32px); }
       .fv-mockup-wrap { width: 100%; }
+      .fv-mockup { max-width: 100%; }
     }
 
     /* ── Icons ── */
@@ -1699,7 +1708,6 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       <p class="fv-catchcopy">動画に<span>付箋を挟む</span>ように、<br>指示を届ける。</p>
       <p class="fv-desc">動画の特定の場面にタイムコードでコメントを付けて、<br>チームと共有できる動画レビューツール。<br>ログイン不要。リンクで手軽に共有。</p>
       <div class="fv-line"></div>
-      <p class="fv-brand">Clippin</p>
       <button class="fv-cta" onclick="document.getElementById('app').scrollIntoView({behavior:'smooth'})">使ってみる ↓</button>
     </div>
     <div class="fv-mockup-wrap">
