@@ -536,25 +536,6 @@
       justify-content: center;
       gap: 6px;
     }
-    .ph-url-wrap {
-      display: flex;
-      gap: 8px;
-      width: 100%;
-      max-width: 500px;
-    }
-    .ph-url-input {
-      flex: 1;
-      background: var(--bg);
-      border: 1px solid var(--border);
-      border-radius: 0;
-      padding: 10px 14px;
-      color: var(--text);
-      font-size: 14px;
-      outline: none;
-      transition: border-color 0.2s;
-    }
-    .ph-url-input::placeholder { color: var(--text-muted); }
-    .ph-url-input:focus { border-color: var(--accent); }
     .ph-privacy-note {
       font-size: 11px;
       color: #7a7770;
@@ -564,21 +545,6 @@
       margin-top: 4px;
     }
 
-    .ph-or {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      width: 100%;
-      max-width: 500px;
-      color: var(--text-muted);
-      font-size: 12px;
-    }
-    .ph-or::before, .ph-or::after {
-      content: '';
-      flex: 1;
-      height: 1px;
-      background: var(--border);
-    }
 
     /* Google Drive warning banner */
     .gdrive-banner {
@@ -1520,25 +1486,38 @@
     /* ── File upload area ── */
     .upload-zone {
       border: 2px dashed var(--border);
-      border-radius: 0;
-      padding: 28px 20px;
+      border-radius: 12px;
+      padding: 52px 32px;
       text-align: center;
       cursor: pointer;
       transition: border-color 0.2s, background 0.2s;
-      color: var(--text-muted);
-      font-size: 13px;
-      line-height: 1.7;
-      margin-top: 16px;
       max-width: 480px;
       width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
     }
     .upload-zone:hover, .upload-zone.drag-over {
       border-color: var(--accent);
       background: var(--accent-dim);
+    }
+    .upload-zone .upload-icon { margin-bottom: 8px; opacity: 0.4; }
+    .upload-zone-title {
+      font-size: 15px;
+      font-weight: 600;
       color: var(--text);
     }
-    .upload-zone .upload-icon { font-size: 28px; margin-bottom: 6px; }
-    .upload-zone strong { color: var(--accent); }
+    .upload-zone-sub {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+    .upload-zone-formats {
+      font-size: 11px;
+      color: var(--text-muted);
+      opacity: 0.6;
+      margin-top: 4px;
+    }
 
     /* file active banner */
     .file-banner {
@@ -1639,8 +1618,7 @@
 
       /* ── プレースホルダー ── */
       .placeholder { padding: 20px 16px; gap: 12px; }
-      .ph-url-wrap { max-width: 100%; }
-      .upload-zone { padding: 12px; }
+      .upload-zone { padding: 32px 20px; }
 
       /* ── サイドバー空状態は余白を縮小 ── */
       .pins-empty { padding: 12px; gap: 6px; min-height: 80px; }
@@ -1817,15 +1795,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <header>
   <a class="logo" href="/" style="text-decoration:none">Clippin</a>
   <div class="url-row" id="urlRow" style="display:none">
-    <input
-      type="text"
-      class="url-input"
-      id="urlInput"
-      placeholder="Dropbox 共有リンクを貼り付け..."
-      autocomplete="off"
-    >
-    <button class="btn-primary" onclick="loadVideo()">読み込む</button>
-    <button class="btn-primary" style="background:var(--surface2);border:1px solid var(--border);color:var(--text)" onclick="document.getElementById('fileInput').click()"><i data-lucide="folder-open" class="icon"></i> ファイル</button>
+    <button class="btn-primary" style="background:var(--surface2);border:1px solid var(--border);color:var(--text)" onclick="document.getElementById('fileInput').click()"><i data-lucide="folder-open" class="icon"></i> ファイルを変更</button>
   </div>
   <div class="header-project-name" id="headerProjectName">
     <i data-lucide="folder" class="icon"></i> <span id="headerProjectNameText"></span>
@@ -1843,18 +1813,11 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
     <div class="video-wrap" id="videoWrap">
       <div class="placeholder" id="placeholder">
-<div class="ph-url-wrap">
-          <input type="text" class="ph-url-input" id="placeholderUrlInput"
-                 placeholder="Dropbox 共有リンクを貼り付け..."
-                 autocomplete="off"
-                 oninput="document.getElementById('urlInput').value=this.value"
-                 onkeydown="if(event.key==='Enter'&&!event.isComposing)syncAndLoad()">
-          <button class="btn-primary" onclick="syncAndLoad()">読み込む</button>
-        </div>
-        <div class="ph-or"><span>または</span></div>
         <div class="upload-zone" id="uploadZone" onclick="document.getElementById('fileInput').click()">
-          <div class="upload-icon"><i data-lucide="upload" class="icon-lg"></i></div>
-          <div><strong>クリックしてファイルを選択</strong><br>または動画ファイルをここにドロップ</div>
+          <div class="upload-icon"><i data-lucide="upload-cloud" class="icon-lg"></i></div>
+          <p class="upload-zone-title">クリックしてファイルを選択</p>
+          <p class="upload-zone-sub">または動画をここにドロップ</p>
+          <p class="upload-zone-formats">MP4 · MOV · WebM · AVI など</p>
         </div>
         <p class="ph-privacy-note"><i data-lucide="lock" class="icon" style="opacity:.5"></i> アップロードされた動画はCloudflare R2に保存されます。共有URLを知っている方のみ再生できます。30日後に自動削除されます。</p>
       </div>
@@ -2244,12 +2207,6 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     // 共有プロジェクトページでは URL 入力列を表示しない
     if (state.projectId) return;
     document.getElementById('urlRow').style.display = 'flex';
-  }
-
-  function syncAndLoad() {
-    const ph = document.getElementById('placeholderUrlInput');
-    if (ph) document.getElementById('urlInput').value = ph.value;
-    loadVideo();
   }
 
   // ─── Load video ────────────────────────────────────────
