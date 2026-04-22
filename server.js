@@ -82,6 +82,7 @@ async function initDB() {
   await pool.query(`
     ALTER TABLE pins ADD COLUMN IF NOT EXISTS version_id INTEGER REFERENCES project_versions(id) ON DELETE SET NULL;
     ALTER TABLE pins ADD COLUMN IF NOT EXISTS author TEXT NOT NULL DEFAULT '';
+    ALTER TABLE pins ADD COLUMN IF NOT EXISTS annotation TEXT;
   `);
 
   // ── マイグレーション: バージョンを持たないプロジェクトに v1 を作成 ──
@@ -113,7 +114,7 @@ function generateId() {
 const app  = express();
 const PORT = process.env.PORT || 3000;
 
-app.use(express.json());
+app.use(express.json({ limit: '20mb' }));
 app.use(express.static(path.join(__dirname)));
 
 // ─── GET /api/presign ──────────────────────────────────────
@@ -176,8 +177,8 @@ app.post('/api/projects', async (req, res) => {
 
     for (const pin of (pins || [])) {
       await pool.query(
-        'INSERT INTO pins (id, project_id, version_id, time_sec, comment, author, resolved) VALUES ($1, $2, $3, $4, $5, $6, $7)',
-        [pin.id, id, versionId, pin.time, pin.comment, pin.author || '', pin.resolved || false]
+        'INSERT INTO pins (id, project_id, version_id, time_sec, comment, author, resolved, annotation) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)',
+        [pin.id, id, versionId, pin.time, pin.comment, pin.author || '', pin.resolved || false, pin.annotation || null]
       );
       for (const reply of (pin.replies || [])) {
         await pool.query(
@@ -253,11 +254,12 @@ app.get('/api/projects/:id', async (req, res) => {
     }
 
     const pins = pinsRows.map(pin => ({
-      id:       Number(pin.id),
-      time:     pin.time_sec,
-      comment:  pin.comment,
-      author:   pin.author || '',
-      resolved: pin.resolved,
+      id:         Number(pin.id),
+      time:       pin.time_sec,
+      comment:    pin.comment,
+      author:     pin.author || '',
+      resolved:   pin.resolved,
+      ...(pin.annotation ? { annotation: pin.annotation } : {}),
       replies:  replies
         .filter(r => Number(r.pin_id) === Number(pin.id))
         .map(r => ({ id: Number(r.id), text: r.text })),
@@ -355,8 +357,8 @@ app.post('/api/projects/:id/versions', async (req, res) => {
       for (const pin of srcPins.rows) {
         const newPinId = Date.now() * 1000 + Math.floor(Math.random() * 1000);
         await pool.query(
-          'INSERT INTO pins (id, project_id, version_id, time_sec, comment, author, resolved) VALUES ($1, $2, $3, $4, $5, $6, $7)',
-          [newPinId, id, newVersionId, pin.time_sec, pin.comment, pin.author || '', pin.resolved]
+          'INSERT INTO pins (id, project_id, version_id, time_sec, comment, author, resolved, annotation) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)',
+          [newPinId, id, newVersionId, pin.time_sec, pin.comment, pin.author || '', pin.resolved, pin.annotation || null]
         );
 
         const srcReplies = await pool.query('SELECT * FROM replies WHERE pin_id = $1', [pin.id]);
