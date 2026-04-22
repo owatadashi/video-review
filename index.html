@@ -47,17 +47,17 @@
 
   <style>
     :root {
-      --bg: #ffffff;
-      --surface: #f5f4ef;
-      --surface2: #eceae3;
-      --border: #e5e2d8;
-      --accent: #1c1b18;
-      --accent-hover: #2e2c27;
-      --accent-dim: rgba(28,27,24,0.07);
-      --text: #1c1b18;
-      --text-muted: #6b6860;
-      --danger: #b83232;
-      --warn: #b45309;
+      --bg: #f5f5f8;
+      --surface: #ededf0;
+      --surface2: #e4e4e8;
+      --border: #d8d8de;
+      --accent: #5b5bd6;
+      --accent-hover: #4f4dc2;
+      --accent-dim: rgba(91,91,214,0.09);
+      --text: #111113;
+      --text-muted: #6b6b76;
+      --danger: #c0392b;
+      --warn: #d97706;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -105,7 +105,7 @@
     .fv-bg {
       position: absolute;
       inset: 0;
-      background: radial-gradient(ellipse at 65% 50%, #f5f2eb 0%, #ffffff 65%);
+      background: radial-gradient(ellipse at 65% 50%, #eeeef4 0%, #f5f5f8 65%);
     }
     .fv-inner {
       position: relative;
@@ -168,18 +168,18 @@
     .fv-mockup {
       width: 100%;
       max-width: 520px;
-      background: #f5f4ef;
-      border: 1px solid #e5e2d8;
+      background: #ededf0;
+      border: 1px solid #d8d8de;
       box-shadow: 0 48px 96px rgba(0,0,0,0.1), 0 0 0 1px rgba(0,0,0,0.04);
       overflow: hidden;
     }
     .fv-browser-bar {
-      background: #eceae3;
+      background: #e4e4e8;
       padding: 10px 14px;
       display: flex;
       align-items: center;
       gap: 6px;
-      border-bottom: 1px solid #e5e2d8;
+      border-bottom: 1px solid #d8d8de;
     }
     .fv-dot {
       width: 10px;
@@ -190,7 +190,7 @@
     .fv-dot-y { background: #febc2e; }
     .fv-dot-g { background: #28c840; }
     .fv-urlbar {
-      background: #dedad0;
+      background: #d4d4da;
       padding: 3px 10px;
       color: #999;
       font-size: 11px;
@@ -199,9 +199,9 @@
       max-width: 180px;
     }
     .fv-tool-header {
-      background: #f5f4ef;
+      background: #ededf0;
       padding: 12px 18px;
-      border-bottom: 1px solid #e5e2d8;
+      border-bottom: 1px solid #d8d8de;
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -218,7 +218,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      border-bottom: 1px solid #e5e2d8;
+      border-bottom: 1px solid #d8d8de;
     }
     .fv-play-btn {
       width: 42px;
@@ -238,12 +238,12 @@
       margin-left: 3px;
     }
     .fv-timeline {
-      background: #f5f4ef;
+      background: #ededf0;
       padding: 8px 18px;
       display: flex;
       align-items: center;
       gap: 10px;
-      border-bottom: 1px solid #e5e2d8;
+      border-bottom: 1px solid #d8d8de;
     }
     .fv-time {
       color: var(--accent);
@@ -251,11 +251,11 @@
       font-weight: 700;
       font-variant-numeric: tabular-nums;
     }
-    .fv-time-dim { color: #c8c4ba; }
+    .fv-time-dim { color: #c0c0c8; }
     .fv-progress {
       flex: 1;
       height: 3px;
-      background: #e5e2d8;
+      background: #d8d8de;
       position: relative;
     }
     .fv-fill { width: 35%; height: 100%; background: var(--accent); }
@@ -276,7 +276,7 @@
       gap: 6px;
     }
     .fv-comment {
-      background: #ffffff;
+      background: #f5f5f8;
       padding: 8px 12px;
       border-left: 2px solid var(--accent);
       display: flex;
@@ -290,13 +290,13 @@
       font-variant-numeric: tabular-nums;
       white-space: nowrap;
     }
-    .fv-cc { color: #8a8680; font-size: 11px; line-height: 1.5; }
+    .fv-cc { color: #6b6b76; font-size: 11px; line-height: 1.5; }
     .fv-bottom-bar {
-      background: #f5f4ef;
+      background: #ededf0;
       padding: 8px 18px;
       display: flex;
       gap: 8px;
-      border-top: 1px solid #e5e2d8;
+      border-top: 1px solid #d8d8de;
     }
     .fv-btn {
       background: var(--accent);
@@ -307,8 +307,8 @@
     }
     .fv-btn-ghost {
       background: transparent;
-      border: 1px solid #d5d2c8;
-      color: #999;
+      border: 1px solid #d0d0d6;
+      color: #9999a8;
       padding: 5px 12px;
       font-size: 11px;
     }
@@ -1241,7 +1241,7 @@
     ::-webkit-scrollbar { width: 5px; }
     ::-webkit-scrollbar-track { background: transparent; }
     ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 0; }
-    ::-webkit-scrollbar-thumb:hover { background: #b8b5ae; }
+    ::-webkit-scrollbar-thumb:hover { background: #b8b8c0; }
 
     /* ── Version tabs ── */
     .version-tabs {
