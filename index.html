@@ -329,23 +329,34 @@
     }
 
     @media (max-width: 768px) {
+      /* モバイルはスナップなし・自然なスクロール */
+      body.has-fv {
+        scroll-snap-type: none;
+        height: auto;
+      }
       #fv {
-        height: 100dvh;
-        overflow: hidden;
-        align-items: center;
-        justify-content: center;
+        height: auto;
+        min-height: 100dvh;
+        overflow: visible;
+        align-items: flex-start;
+        scroll-snap-align: none;
       }
       .fv-inner {
         flex-direction: column;
         align-items: stretch;
-        padding: 60px 28px 32px;
-        gap: 20px;
-        justify-content: center;
+        padding: 24px 24px 40px;
+        gap: 28px;
+        justify-content: flex-start;
       }
       .fv-text { text-align: left; width: 100%; }
       .fv-catchcopy { font-size: clamp(24px, 6vw, 32px); margin-bottom: 12px; }
       .fv-desc { font-size: 13px; margin-bottom: 20px; }
-      .fv-mockup-wrap { display: none; }
+      .fv-mockup-wrap { width: 100%; flex: none; display: flex; }
+      .fv-mockup { max-width: 100%; width: 100%; }
+      .fv-comments { padding: 8px 14px; }
+      .fv-comment:nth-child(n+2) { display: none; }
+      .fv-video-area { height: 90px; }
+      body.has-fv #app { scroll-snap-align: none; }
     }
 
     /* ── Icons ── */
