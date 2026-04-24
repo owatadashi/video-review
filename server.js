@@ -7,6 +7,7 @@ const { Pool }   = require('pg');
 const path       = require('path');
 const fs         = require('fs');
 const { randomUUID, randomBytes } = require('crypto');
+const sharp = require('sharp');
 
 // ─── 起動時バリデーション ───────────────────────────────────
 const required = ['R2_ACCESS_KEY_ID', 'R2_SECRET_ACCESS_KEY', 'R2_BUCKET_NAME', 'R2_ENDPOINT', 'DATABASE_URL'];
@@ -115,6 +116,24 @@ const app  = express();
 const PORT = process.env.PORT || 3000;
 
 app.use(express.json({ limit: '20mb' }));
+
+// ─── GET /og-image.png (SVG→PNG変換) ──────────────────────
+let ogImagePngCache = null;
+app.get('/og-image.png', async (req, res) => {
+  try {
+    if (!ogImagePngCache) {
+      const svgPath = path.join(__dirname, 'og-image.svg');
+      const svgBuf  = fs.readFileSync(svgPath);
+      ogImagePngCache = await sharp(svgBuf).png().toBuffer();
+    }
+    res.set({ 'Content-Type': 'image/png', 'Cache-Control': 'public, max-age=86400' });
+    res.send(ogImagePngCache);
+  } catch (e) {
+    console.error('[og-image] error:', e);
+    res.status(500).send('error');
+  }
+});
+
 app.use(express.static(path.join(__dirname)));
 
 // ─── GET /api/presign ──────────────────────────────────────
