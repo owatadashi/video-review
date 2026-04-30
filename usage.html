@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Clippinの使い方 | 動画レビュー・修正指示ツール</title>
+  <meta name="description" content="Clippin（クリッピン）の使い方を解説します。動画のタイムコードにコメントを追加して共有するだけ。ログイン不要・インストール不要で動画レビューが始められます。">
+  <link rel="canonical" href="https://clippin.work/usage">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5000671630850248"
+     crossorigin="anonymous"></script>
+  <style>
+    :root {
+      --bg: #fafafa;
+      --surface: #f1f1f4;
+      --surface2: #e8e8ec;
+      --border: #e0e0e6;
+      --accent: #0891b2;
+      --text: #0f0f12;
+      --text-muted: #6a6a77;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Hiragino Sans', 'Yu Gothic', sans-serif;
+      min-height: 100dvh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 10px 18px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      flex-shrink: 0;
+    }
+
+    .logo {
+      font-size: 17px;
+      font-weight: 700;
+      color: var(--accent);
+      text-decoration: none;
+      letter-spacing: -0.3px;
+    }
+
+    .header-nav {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      margin-left: auto;
+    }
+
+    .header-nav a {
+      font-size: 13px;
+      color: var(--text-muted);
+      text-decoration: none;
+    }
+
+    .header-cta {
+      font-size: 13px;
+      font-weight: 600;
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 7px;
+      padding: 7px 14px;
+      cursor: pointer;
+      text-decoration: none;
+    }
+
+    main {
+      flex: 1;
+      max-width: 800px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 52px 24px 96px;
+    }
+
+    .page-title {
+      font-size: 26px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      margin-bottom: 10px;
+    }
+
+    .page-lead {
+      font-size: 15px;
+      line-height: 1.8;
+      color: var(--text-muted);
+      margin-bottom: 52px;
+      max-width: 640px;
+    }
+
+    /* TOC */
+    .toc {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 20px 24px;
+      margin-bottom: 56px;
+    }
+
+    .toc-title {
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+    }
+
+    .toc ol {
+      padding-left: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .toc li a {
+      font-size: 14px;
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    .toc li a:hover { text-decoration: underline; }
+
+    /* Sections */
+    .section {
+      margin-bottom: 56px;
+    }
+
+    h2 {
+      font-size: 19px;
+      font-weight: 700;
+      letter-spacing: -0.3px;
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 2px solid var(--accent);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    h2 .sec-num {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 26px;
+      height: 26px;
+      background: var(--accent);
+      color: #fff;
+      border-radius: 50%;
+      font-size: 13px;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    h3 {
+      font-size: 15px;
+      font-weight: 700;
+      margin: 28px 0 10px;
+      color: var(--text);
+    }
+
+    p {
+      font-size: 14px;
+      line-height: 1.9;
+      color: var(--text-muted);
+      margin-bottom: 14px;
+    }
+
+    ul, ol {
+      padding-left: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+
+    li {
+      font-size: 14px;
+      line-height: 1.8;
+      color: var(--text-muted);
+    }
+
+    /* Step cards */
+    .steps {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      margin-top: 20px;
+    }
+
+    .step-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 20px 22px;
+    }
+
+    .step-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+
+    .step-num {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      background: var(--accent);
+      color: #fff;
+      border-radius: 50%;
+      font-size: 13px;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    .step-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--text);
+    }
+
+    .step-body {
+      font-size: 14px;
+      line-height: 1.85;
+      color: var(--text-muted);
+      padding-left: 40px;
+    }
+
+    /* Scene cards */
+    .scene-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    .scene-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 16px;
+    }
+
+    .scene-icon { font-size: 22px; margin-bottom: 8px; }
+
+    .scene-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 6px;
+    }
+
+    .scene-desc {
+      font-size: 12px;
+      line-height: 1.7;
+      color: var(--text-muted);
+    }
+
+    /* FAQ */
+    .faq-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+      margin-top: 16px;
+    }
+
+    .faq-item {
+      border-bottom: 1px solid var(--border);
+    }
+
+    .faq-item:last-child { border-bottom: none; }
+
+    .faq-q {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--text);
+      padding: 16px 20px;
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+    }
+
+    .faq-q::before {
+      content: 'Q';
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 20px;
+      height: 20px;
+      background: var(--accent);
+      color: #fff;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 700;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    .faq-a {
+      font-size: 14px;
+      line-height: 1.8;
+      color: var(--text-muted);
+      padding: 0 20px 16px 50px;
+    }
+
+    /* CTA */
+    .cta-box {
+      background: linear-gradient(135deg, #eaf5f8 0%, #f0f9fb 100%);
+      border: 1px solid #b8e0ea;
+      border-radius: 14px;
+      padding: 36px 32px;
+      text-align: center;
+      margin-top: 56px;
+    }
+
+    .cta-title {
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+
+    .cta-desc {
+      font-size: 14px;
+      color: var(--text-muted);
+      margin-bottom: 24px;
+      line-height: 1.7;
+    }
+
+    .cta-btn {
+      display: inline-block;
+      background: var(--accent);
+      color: #fff;
+      font-size: 15px;
+      font-weight: 700;
+      padding: 13px 32px;
+      border-radius: 10px;
+      text-decoration: none;
+      letter-spacing: 0.02em;
+    }
+
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 20px 24px;
+      font-size: 12px;
+      color: var(--text-muted);
+      text-align: center;
+    }
+
+    footer a { color: var(--text-muted); }
+
+    @media (max-width: 640px) {
+      .page-title { font-size: 22px; }
+      main { padding: 36px 16px 72px; }
+      .step-body { padding-left: 0; margin-top: 8px; }
+      .scene-grid { grid-template-columns: 1fr 1fr; }
+      .cta-box { padding: 28px 20px; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <a class="logo" href="/">Clippin</a>
+  <nav class="header-nav">
+    <a href="/usage">使い方</a>
+    <a class="header-cta" href="/">無料で使う</a>
+  </nav>
+</header>
+
+<main>
+
+  <h1 class="page-title">Clippinの使い方</h1>
+  <p class="page-lead">Clippin（クリッピン）は、動画の特定シーンにタイムコードでコメントを付けてチームと共有できる、無料の動画レビューツールです。ログイン不要・インストール不要で、今すぐ使い始められます。</p>
+
+  <nav class="toc" aria-label="目次">
+    <div class="toc-title">目次</div>
+    <ol>
+      <li><a href="#about">Clippinとは</a></li>
+      <li><a href="#scenes">こんな場面で使えます</a></li>
+      <li><a href="#howto">基本的な使い方（5ステップ）</a></li>
+      <li><a href="#features">便利な機能</a></li>
+      <li><a href="#faq">よくある質問</a></li>
+    </ol>
+  </nav>
+
+  <!-- 1. Clippinとは -->
+  <section class="section" id="about">
+    <h2><span class="sec-num">1</span>Clippinとは</h2>
+    <p>Clippin（クリッピン）は、動画制作における「修正指示」をシンプルにするためのWebツールです。動画の気になるシーンで一時停止してコメントを追加すると、タイムコード（再生時間）が自動で記録されます。</p>
+    <p>「1分32秒のテロップを修正してほしい」「0分47秒の効果音を変えてほしい」といった指示を、テキストや赤枠の画像で正確に伝えることができます。コメントをまとめた共有URLを送るだけで、チームメンバーやクライアントがすぐに内容を確認できます。</p>
+    <p>動画校正ツールはいくつか存在しますが、多くはログインが必要だったり、有料プランに機能が限定されていたりします。Clippinは完全無料・ログイン不要で、今すぐ使い始められるシンプルさにこだわっています。</p>
+  </section>
+
+  <!-- 2. 活用シーン -->
+  <section class="section" id="scenes">
+    <h2><span class="sec-num">2</span>こんな場面で使えます</h2>
+    <p>Clippinは動画制作に関わるさまざまなシーンで活用できます。</p>
+    <div class="scene-grid">
+      <div class="scene-card">
+        <div class="scene-icon">🎬</div>
+        <div class="scene-title">動画制作会社 × クライアント</div>
+        <div class="scene-desc">修正箇所をタイムコードで正確に伝え、認識のズレをなくします。</div>
+      </div>
+      <div class="scene-card">
+        <div class="scene-icon">📱</div>
+        <div class="scene-title">SNS・YouTube動画</div>
+        <div class="scene-desc">テロップや効果音など細かい修正指示を素早くフィードバック。</div>
+      </div>
+      <div class="scene-card">
+        <div class="scene-icon">🏢</div>
+        <div class="scene-title">社内動画レビュー</div>
+        <div class="scene-desc">研修動画や広報動画を社内でレビューする際のコメント共有に。</div>
+      </div>
+      <div class="scene-card">
+        <div class="scene-icon">📺</div>
+        <div class="scene-title">CM・PR動画</div>
+        <div class="scene-desc">複数の修正点をまとめて一つのURLで共有できます。</div>
+      </div>
+      <div class="scene-card">
+        <div class="scene-icon">🎓</div>
+        <div class="scene-title">教育・研修コンテンツ</div>
+        <div class="scene-desc">講師からの動画フィードバックをタイムコードで分かりやすく。</div>
+      </div>
+      <div class="scene-card">
+        <div class="scene-icon">🎵</div>
+        <div class="scene-title">MV・映像作品</div>
+        <div class="scene-desc">細かい演出の修正指示もシーン単位で正確に伝えられます。</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. 基本的な使い方 -->
+  <section class="section" id="howto">
+    <h2><span class="sec-num">3</span>基本的な使い方（5ステップ）</h2>
+    <div class="steps">
+      <div class="step-card">
+        <div class="step-header">
+          <span class="step-num">1</span>
+          <span class="step-title">動画をアップロードする</span>
+        </div>
+        <div class="step-body">
+          <a href="/" style="color:var(--accent)">clippin.work</a> にアクセスし、「クリックしてファイルを選択」ボタンをクリックするか、動画ファイルを画面にドラッグ＆ドロップします。MP4・MOV・WebM・AVI形式に対応しています。アップロードした動画はCloudflareのサーバーに保存され、30日間アクセスできます。
+        </div>
+      </div>
+      <div class="step-card">
+        <div class="step-header">
+          <span class="step-num">2</span>
+          <span class="step-title">コメントを追加したいシーンで止める</span>
+        </div>
+        <div class="step-body">
+          動画を再生して、修正指示を入れたいシーンで一時停止します。画面下のタイムラインをクリックして特定の位置にジャンプすることもできます。−5s・+5sボタンで秒単位の微調整も可能です。
+        </div>
+      </div>
+      <div class="step-card">
+        <div class="step-header">
+          <span class="step-num">3</span>
+          <span class="step-title">「コメントを追加」ボタンを押す</span>
+        </div>
+        <div class="step-body">
+          「コメントを追加」ボタンをクリックすると、その時点のタイムコードが自動で記録されたコメント入力画面が開きます。修正内容をテキストで入力し、必要であれば「フレームに赤枠を追加」でどの部分を指しているか視覚的に示すこともできます。入力が完了したら「保存する」を押します。
+        </div>
+      </div>
+      <div class="step-card">
+        <div class="step-header">
+          <span class="step-num">4</span>
+          <span class="step-title">複数のコメントを追加する</span>
+        </div>
+        <div class="step-body">
+          ステップ2〜3を繰り返して、修正が必要なすべてのシーンにコメントを追加します。コメントはタイムライン上にピンとして表示され、クリックすると該当シーンにジャンプできます。「未解決」「解決済」のフィルタリングで進捗管理もできます。
+        </div>
+      </div>
+      <div class="step-card">
+        <div class="step-header">
+          <span class="step-num">5</span>
+          <span class="step-title">URLで共有する</span>
+        </div>
+        <div class="step-body">
+          「共有」ボタンを押してプロジェクト名を入力すると、共有URLが発行されてクリップボードにコピーされます。このURLをメールやチャットで送るだけで、相手はログイン不要でコメントを確認できます。
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. 便利な機能 -->
+  <section class="section" id="features">
+    <h2><span class="sec-num">4</span>便利な機能</h2>
+
+    <h3>フレームへの赤枠追加</h3>
+    <p>コメント入力時に「フレームに赤枠を追加」ボタンを押すと、現在のフレームがキャプチャされます。ドラッグで赤い四角枠を描いてコメントに添付できるので、「このテロップ」「この人物の後ろの背景」といった視覚的な指示が正確に伝わります。</p>
+
+    <h3>バージョン管理</h3>
+    <p>修正後の動画を新バージョンとしてアップロードすることで、修正前後の動画を同じプロジェクト内で管理できます。「比較」ボタンを使うと、バージョン間でコメントの変化を並べて確認できます。</p>
+
+    <h3>コメントの返信・解決済み管理</h3>
+    <p>各コメントに返信を追加できるので、修正内容の確認や連絡をツール内で完結できます。対応が完了したコメントは「✓」ボタンで「修正済み」にマークでき、「未解決」タブで残りの作業を一目で確認できます。</p>
+
+    <h3>コメントのテキスト書き出し</h3>
+    <p>コメント一覧を「テキストでコピー」すると、タイムコードとコメントをまとめてクリップボードにコピーできます。メールや議事録にそのまま貼り付けるのに便利です。</p>
+  </section>
+
+  <!-- 5. FAQ -->
+  <section class="section" id="faq">
+    <h2><span class="sec-num">5</span>よくある質問</h2>
+    <div class="faq-list">
+      <div class="faq-item">
+        <div class="faq-q">無料で使えますか？</div>
+        <div class="faq-a">はい、現在Clippinはすべての機能を無料でご利用いただけます。</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">ログインやアカウント登録は必要ですか？</div>
+        <div class="faq-a">不要です。サイトにアクセスしてすぐに使い始められます。共有URLを受け取った側も、ログインなしでコメントを確認できます。</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">対応している動画フォーマットは？</div>
+        <div class="faq-a">MP4・MOV・WebM・AVIに対応しています。一般的な動画編集ソフトの書き出し形式であれば問題なくお使いいただけます。</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">アップロードした動画はどのくらい保存されますか？</div>
+        <div class="faq-a">アップロードから30日間保存されます。期限を過ぎると自動で削除されます。</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">動画の内容は他の人に見られますか？</div>
+        <div class="faq-a">共有URLを知っている方のみが閲覧できます。URLを共有しない限り、第三者がアクセスすることはできません。</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">スマートフォンでも使えますか？</div>
+        <div class="faq-a">はい、スマートフォンやタブレットのブラウザからもご利用いただけます。</div>
+      </div>
+      <div class="faq-item">
+        <div class="faq-q">コメントは何件まで追加できますか？</div>
+        <div class="faq-a">件数の上限はありません。動画の長さや修正箇所に応じて、必要な数だけコメントを追加できます。</div>
+      </div>
+    </div>
+  </section>
+
+  <div class="cta-box">
+    <div class="cta-title">まずは無料で試してみてください</div>
+    <div class="cta-desc">ログイン不要・インストール不要。動画をアップロードするだけで、今すぐ使い始められます。</div>
+    <a class="cta-btn" href="/">Clippinを使ってみる →</a>
+  </div>
+
+</main>
+
+<footer>
+  <a href="/privacy">プライバシーポリシー</a>
+  &nbsp;|&nbsp;
+  <a href="/usage">使い方</a>
+  &nbsp;|&nbsp;
+  &copy; 株式会社Webil
+</footer>
+
+</body>
+</html>

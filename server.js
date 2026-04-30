@@ -421,6 +421,11 @@ app.get('/privacy', (req, res) => {
   res.sendFile(path.join(__dirname, 'privacy.html'));
 });
 
+// ─── /usage → usage.html ──────────────────────────────────
+app.get('/usage', (req, res) => {
+  res.sendFile(path.join(__dirname, 'usage.html'));
+});
+
 // ─── SPA フォールバック（/project/:id → index.html + 動的タイトル）────────
 app.get('/project/:id', async (req, res) => {
   try {
