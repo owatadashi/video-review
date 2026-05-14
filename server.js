@@ -426,6 +426,11 @@ app.get('/usage', (req, res) => {
   res.sendFile(path.join(__dirname, 'usage.html'));
 });
 
+// ─── /demo → demo.html ────────────────────────────────────
+app.get('/demo', (req, res) => {
+  res.sendFile(path.join(__dirname, 'demo.html'));
+});
+
 // ─── SPA フォールバック（/project/:id → index.html + 動的タイトル）────────
 app.get('/project/:id', async (req, res) => {
   try {
