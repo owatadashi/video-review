@@ -431,6 +431,44 @@ app.get('/demo', (req, res) => {
   res.sendFile(path.join(__dirname, 'demo.html'));
 });
 
+// ─── /faq → faq.html ──────────────────────────────────────
+app.get('/faq', (req, res) => {
+  res.sendFile(path.join(__dirname, 'faq.html'));
+});
+
+// ─── /about → about.html ──────────────────────────────────
+app.get('/about', (req, res) => {
+  res.sendFile(path.join(__dirname, 'about.html'));
+});
+
+// ─── /contact → contact.html ──────────────────────────────
+app.get('/contact', (req, res) => {
+  res.sendFile(path.join(__dirname, 'contact.html'));
+});
+
+// ─── /blog → blog.html（記事一覧） ────────────────────────
+app.get('/blog', (req, res) => {
+  res.sendFile(path.join(__dirname, 'blog.html'));
+});
+
+// ─── /blog/:slug → blog/{slug}.html（個別記事） ──────────
+// 許可された slug のみ配信（不正なファイルパス遮断）
+const ALLOWED_BLOG_SLUGS = new Set([
+  'video-review-tips',
+  'frameio-vs-clippin',
+  'feedback-mistakes',
+  'freelance-workflow',
+  'timecode-basics',
+  'client-communication',
+]);
+app.get('/blog/:slug', (req, res) => {
+  const slug = req.params.slug;
+  if (!ALLOWED_BLOG_SLUGS.has(slug)) {
+    return res.status(404).sendFile(path.join(__dirname, 'blog.html'));
+  }
+  res.sendFile(path.join(__dirname, 'blog', `${slug}.html`));
+});
+
 // ─── SPA フォールバック（/project/:id → index.html + 動的タイトル）────────
 app.get('/project/:id', async (req, res) => {
   try {

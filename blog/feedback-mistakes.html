@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>動画修正指示で気をつけるべき10のポイント｜よくある失敗とその対策 | Clippinブログ</title>
+  <meta name="description" content="「ここ直して」だけでは伝わらない。動画の修正指示で失敗しがちな10のポイントと、それを防ぐ具体的な方法を解説。クライアント・ディレクター・PMの方は必読です。">
+  <meta name="keywords" content="動画修正指示,動画フィードバック,動画レビュー,失敗,コツ">
+  <link rel="canonical" href="https://clippin.work/blog/feedback-mistakes">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="動画修正指示で気をつけるべき10のポイント｜よくある失敗とその対策">
+  <meta property="og:description" content="動画の修正指示で失敗しがちな10のポイントと、それを防ぐ具体的な方法を解説。">
+  <meta property="og:url" content="https://clippin.work/blog/feedback-mistakes">
+  <meta property="og:image" content="https://clippin.work/og-image.png">
+  <style>
+    :root { --bg: #fafafa; --surface: #f1f1f4; --surface2: #e8e8ec; --border: #e0e0e6; --accent: #0891b2; --text: #0f0f12; --text-muted: #6a6a77; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Hiragino Sans', 'Yu Gothic', sans-serif; min-height: 100dvh; display: flex; flex-direction: column; }
+    header { background: var(--surface); border-bottom: 1px solid var(--border); padding: 10px 18px; display: flex; align-items: center; gap: 14px; flex-shrink: 0; }
+    .logo { font-size: 17px; font-weight: 700; color: var(--accent); text-decoration: none; letter-spacing: -0.3px; }
+    .header-nav { display: flex; gap: 16px; align-items: center; margin-left: auto; }
+    .header-nav a { font-size: 13px; color: var(--text-muted); text-decoration: none; }
+    .header-nav a:hover { color: var(--text); }
+    .header-cta { font-size: 13px; font-weight: 600; background: var(--accent); color: #fff !important; border: none; border-radius: 7px; padding: 7px 14px; cursor: pointer; text-decoration: none; }
+    main { flex: 1; max-width: 760px; width: 100%; margin: 0 auto; padding: 40px 24px 96px; }
+    .breadcrumb { font-size: 12px; color: var(--text-muted); margin-bottom: 24px; }
+    .breadcrumb a { color: var(--accent); text-decoration: none; }
+    .article-tag { display: inline-block; font-size: 11px; font-weight: 700; letter-spacing: 0.08em; color: var(--accent); background: rgba(8,145,178,0.08); padding: 4px 10px; border-radius: 4px; margin-bottom: 16px; }
+    h1 { font-size: 30px; font-weight: 700; letter-spacing: -0.5px; line-height: 1.4; margin-bottom: 18px; }
+    .article-meta { font-size: 12px; color: var(--text-muted); margin-bottom: 36px; padding-bottom: 24px; border-bottom: 1px solid var(--border); }
+    .lead { font-size: 15px; line-height: 1.95; color: var(--text); margin-bottom: 40px; padding: 20px 24px; background: var(--surface); border-left: 3px solid var(--accent); border-radius: 4px; }
+    h2 { font-size: 22px; font-weight: 700; letter-spacing: -0.3px; margin: 56px 0 18px; padding-bottom: 10px; border-bottom: 2px solid var(--accent); }
+    h3 { font-size: 17px; font-weight: 700; margin: 32px 0 12px; color: var(--text); }
+    p { font-size: 15px; line-height: 1.95; color: var(--text); margin-bottom: 18px; }
+    ul, ol { padding-left: 22px; margin-bottom: 20px; }
+    li { font-size: 15px; line-height: 1.95; margin-bottom: 6px; }
+    .box-bad { background: rgba(220, 80, 80, 0.06); border-left: 3px solid #d05050; padding: 14px 18px; border-radius: 4px; margin: 14px 0; font-size: 14px; }
+    .box-good { background: rgba(8, 145, 178, 0.06); border-left: 3px solid var(--accent); padding: 14px 18px; border-radius: 4px; margin: 14px 0; font-size: 14px; }
+    .box-label { font-size: 11px; font-weight: 700; letter-spacing: 0.08em; margin-bottom: 6px; display: block; }
+    .box-bad .box-label { color: #d05050; }
+    .box-good .box-label { color: var(--accent); }
+    .cta-card { background: linear-gradient(135deg, var(--surface), var(--surface2)); border: 1px solid var(--border); border-radius: 12px; padding: 32px 28px; margin: 48px 0 20px; text-align: center; }
+    .cta-card h3 { font-size: 19px; margin-bottom: 10px; }
+    .cta-card p { font-size: 14px; margin-bottom: 20px; color: var(--text-muted); }
+    .cta-btn { display: inline-block; background: var(--accent); color: #fff !important; padding: 12px 28px; border-radius: 8px; font-size: 14px; font-weight: 700; text-decoration: none; }
+    .related { margin-top: 60px; padding-top: 32px; border-top: 1px solid var(--border); }
+    .related h3 { font-size: 14px; color: var(--text-muted); letter-spacing: 0.08em; margin-bottom: 14px; }
+    .related ul { list-style: none; padding: 0; }
+    .related li { margin-bottom: 8px; }
+    .related a { color: var(--accent); text-decoration: none; font-size: 14px; }
+    footer { padding: 24px; text-align: center; color: var(--text-muted); font-size: 12px; border-top: 1px solid var(--border); }
+    footer a { color: var(--text-muted); text-decoration: none; }
+    @media (max-width: 600px) { h1 { font-size: 24px; } main { padding: 24px 18px 64px; } }
+  </style>
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5000671630850248" crossorigin="anonymous"></script>
+</head>
+<body>
+
+<header>
+  <a class="logo" href="/">Clippin</a>
+  <nav class="header-nav">
+    <a href="/usage">使い方</a>
+    <a href="/blog">ブログ</a>
+    <a class="header-cta" href="/">無料で使う</a>
+  </nav>
+</header>
+
+<main>
+  <div class="breadcrumb"><a href="/">Clippin</a> &gt; <a href="/blog">ブログ</a> &gt; 動画修正指示で気をつけるべき10のポイント</div>
+
+  <span class="article-tag">ノウハウ</span>
+  <h1>動画修正指示で気をつけるべき10のポイント｜よくある失敗とその対策</h1>
+  <div class="article-meta">2026年5月29日　|　読了時間：約8分</div>
+
+  <p class="lead">「ここ直して」だけの指示で、何度も修正のやり取りが発生していませんか？動画の修正指示には、ちょっとした言い方の違いで結果が大きく変わるポイントがあります。本記事では、クライアント・ディレクター・PM向けに、修正指示でよくある失敗10選と、その対策を解説します。</p>
+
+  <h2>なぜ動画修正指示は揉めやすいのか</h2>
+  <p>動画は<strong>「時間」「映像」「音」「テロップ」「色」</strong>など、要素が多すぎます。だから言葉だけで「直して」と伝えると、編集者は「どの要素のことを言っているか」を毎回推測することになります。</p>
+  <p>推測が外れると、編集者は二度手間になり、依頼者は「思った通りにならない」とイライラ。双方にとって不幸な状況になります。</p>
+  <p>以下、特に揉めやすい10のポイントを、悪い例と良い例で見ていきましょう。</p>
+
+  <h2>失敗① 「ここ」「あそこ」など指示語を使う</h2>
+  <div class="box-bad">
+    <span class="box-label">悪い例</span>
+    「ここのテロップ、変えてほしい」
+  </div>
+  <div class="box-good">
+    <span class="box-label">良い例</span>
+    「00:01:20 の "新発売" のテロップを "リニューアル" に変更してください」
+  </div>
+  <p>動画は時間軸があるため、「ここ」が指す場所は時間が経つと変わります。必ず<strong>タイムコード</strong>を添えましょう。</p>
+
+  <h2>失敗② 主観的な形容詞だけで伝える</h2>
+  <div class="box-bad">
+    <span class="box-label">悪い例</span>
+    「もう少しオシャレに」「もうちょっとカッコよく」
+  </div>
+  <div class="box-good">
+    <span class="box-label">良い例</span>
+    「明朝体ではなくゴシック体に変更し、文字色を白から #FFD700 に変更してください」
+  </div>
+  <p>「オシャレ」「カッコいい」は人によって基準が違います。<strong>具体的な要素（フォント・色・サイズ）</strong>で伝えるのが鉄則です。どうしても抽象的にしか伝えられない場合は、<strong>参考動画のURL</strong>を添付しましょう。</p>
+
+  <h2>失敗③ 修正理由を共有しない</h2>
+  <div class="box-bad">
+    <span class="box-label">悪い例</span>
+    「冒頭のBGM、別のに変えて」
+  </div>
+  <div class="box-good">
+    <span class="box-label">良い例</span>
+    「冒頭のBGMを変えてほしいです。理由は、商品の高級感を出したいので、もう少し落ち着いた雰囲気の曲が良いです」
+  </div>
+  <p>理由を共有することで、編集者は<strong>より良い代替案を提案できます</strong>。指示通りにやるだけでなく、プロの提案を引き出せるメリットがあります。</p>
+
+  <h2>失敗④ 一度に大量の修正を送る</h2>
+  <div class="box-bad">
+    <span class="box-label">悪い例</span>
+    LINEに30個の修正点を箇条書きで一気に送る
+  </div>
+  <div class="box-good">
+    <span class="box-label">良い例</span>
+    修正点を「優先度」と「カテゴリ（テロップ／音／色／カット）」で整理して送る
+  </div>
+  <p>大量の指示を一気に送ると、編集者は<strong>どこから手をつけるか迷い、優先順位を誤る</strong>可能性があります。修正点が10個以上ある場合は、必ず整理してから送りましょう。</p>
+
+  <h2>失敗⑤ 修正後に追加の指示を送る</h2>
+  <div class="box-bad">
+    <span class="box-label">悪い例</span>
+    一度修正指示を出した後、「あ、あとここも…」と数時間後にまた追加
+  </div>
+  <div class="box-good">
+    <span class="box-label">良い例</span>
+    一定の時間をとってまとめてレビュー → 「これで全部です」と明示してから送る
+  </div>
+  <p>編集者が修正に着手した後に追加指示が来ると、<strong>作業のやり直しが発生</strong>します。レビュー時間を区切る習慣をつけましょう。</p>
+
+  <h2>失敗⑥ 「何となく違う」だけ伝える</h2>
+  <div class="box-bad">
+    <span class="box-label">悪い例</span>
+    「何かイメージと違うんだよね…」
+  </div>
+  <div class="box-good">
+    <span class="box-label">良い例</span>
+    「色味が暗すぎるかも。もう少し明るく、彩度を上げてください。参考はこの動画の0:30あたり」
+  </div>
+  <p>「何となく違う」という指示は、編集者にとって<strong>最も困る言葉</strong>。違和感の正体を言語化する努力をしましょう。難しければ、<strong>参考動画やイメージ画像</strong>を添付するのが最も効果的です。</p>
+
+  <h2>失敗⑦ 過去のバージョンと比較せずに指示する</h2>
+  <div class="box-bad">
+    <span class="box-label">悪い例</span>
+    v3の動画を見て、すでにv2で修正済みだった点について再度指摘
+  </div>
+  <div class="box-good">
+    <span class="box-label">良い例</span>
+    過去バージョンとの差分を確認 → 「v3で気になる新規ポイントだけ送る」
+  </div>
+  <p>動画レビューツールを使えば、過去のコメントが時系列で残るため、<strong>既に対応済みかどうか</strong>がすぐ確認できます。</p>
+
+  <h2>失敗⑧ 複数人の意見をバラバラに送る</h2>
+  <div class="box-bad">
+    <span class="box-label">悪い例</span>
+    上司A・上司B・現場担当Cがそれぞれメールで別々に修正指示を送る
+  </div>
+  <div class="box-good">
+    <span class="box-label">良い例</span>
+    社内で<strong>取りまとめ役を一人決め</strong>、意見を統合してから送る
+  </div>
+  <p>これは制作会社あるあるです。意見が矛盾していることも多く、編集者を疲弊させます。必ず<strong>窓口を一本化</strong>しましょう。</p>
+
+  <h2>失敗⑨ 納期ギリギリに大幅な修正を入れる</h2>
+  <div class="box-bad">
+    <span class="box-label">悪い例</span>
+    納期前日に「やっぱり構成から変えたい」
+  </div>
+  <div class="box-good">
+    <span class="box-label">良い例</span>
+    最初の絵コンテ／構成段階でしっかり確認 → 仕上げ段階では細部のみ修正
+  </div>
+  <p>大幅な修正は、できるだけ<strong>早い段階</strong>で出すのが鉄則。仕上げ段階で構成を変えると、納期も品質もクラッシュします。</p>
+
+  <h2>失敗⑩ 「お任せします」と丸投げする</h2>
+  <div class="box-bad">
+    <span class="box-label">悪い例</span>
+    「いい感じにお願いします」「お任せします」
+  </div>
+  <div class="box-good">
+    <span class="box-label">良い例</span>
+    最低限の方向性・トーン・避けたい表現を共有した上で「ここから先はお任せします」
+  </div>
+  <p>「お任せします」は一見親切に聞こえますが、編集者にとっては<strong>判断材料がなく一番困る</strong>パターン。少なくとも「絶対に避けたいNG例」「目指したい方向性」だけは共有しましょう。</p>
+
+  <h2>まとめ｜修正指示の質が動画の質を決める</h2>
+  <p>動画制作の品質は、<strong>編集者の腕だけではなく、修正指示の出し方</strong>で大きく変わります。10のポイントすべてを意識するのは大変ですが、最低限「タイムコード」「具体的な要素」「理由」の3つは押さえましょう。</p>
+  <p>そして、これらを毎回テキストで書くのが面倒な場合は、<strong>動画レビューツール</strong>を使うことを強くおすすめします。動画上をクリックしてコメントを残すだけで、タイムコードが自動記録され、整理されたコメント一覧として編集者に届きます。</p>
+
+  <div class="cta-card">
+    <h3>Clippin で修正指示をラクに</h3>
+    <p>動画上をクリックするだけでタイムコード付きコメント<br>ログイン不要・無料・日本語完全対応</p>
+    <a class="cta-btn" href="/">無料で使ってみる →</a>
+  </div>
+
+  <div class="related">
+    <h3>関連記事</h3>
+    <ul>
+      <li><a href="/blog/video-review-tips">動画レビューを効率化する5つのコツ｜修正指示で消耗しないために</a></li>
+      <li><a href="/blog/client-communication">クライアントワークでの動画レビュー｜やってはいけないNG例</a></li>
+      <li><a href="/blog/timecode-basics">タイムコードとは？動画制作で知っておくべき基礎知識</a></li>
+    </ul>
+  </div>
+
+</main>
+
+<footer>
+  <a href="/">トップ</a>　|　<a href="/usage">使い方</a>　|　<a href="/blog">ブログ</a>　|　<a href="/privacy">プライバシーポリシー</a>　|　&copy; 株式会社Webil
+</footer>
+
+</body>
+</html>

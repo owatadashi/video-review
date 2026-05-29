@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>お問い合わせ｜Clippin</title>
+  <meta name="description" content="Clippin に関するお問い合わせフォーム。サービスに関するご質問、機能要望、不具合報告、お仕事のご依頼など、お気軽にご連絡ください。日本語で対応いたします。">
+  <meta name="keywords" content="Clippin,お問い合わせ,サポート,要望">
+  <link rel="canonical" href="https://clippin.work/contact">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="お問い合わせ｜Clippin">
+  <meta property="og:description" content="Clippin に関するお問い合わせフォーム。">
+  <meta property="og:url" content="https://clippin.work/contact">
+  <meta property="og:image" content="https://clippin.work/og-image.png">
+  <style>
+    :root { --bg: #fafafa; --surface: #f1f1f4; --surface2: #e8e8ec; --border: #e0e0e6; --accent: #0891b2; --text: #0f0f12; --text-muted: #6a6a77; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Hiragino Sans', 'Yu Gothic', sans-serif; min-height: 100dvh; display: flex; flex-direction: column; }
+    header { background: var(--surface); border-bottom: 1px solid var(--border); padding: 10px 18px; display: flex; align-items: center; gap: 14px; flex-shrink: 0; }
+    .logo { font-size: 17px; font-weight: 700; color: var(--accent); text-decoration: none; letter-spacing: -0.3px; }
+    .header-nav { display: flex; gap: 16px; align-items: center; margin-left: auto; }
+    .header-nav a { font-size: 13px; color: var(--text-muted); text-decoration: none; }
+    .header-nav a:hover { color: var(--text); }
+    .header-cta { font-size: 13px; font-weight: 600; background: var(--accent); color: #fff !important; border: none; border-radius: 7px; padding: 7px 14px; cursor: pointer; text-decoration: none; }
+    main { flex: 1; max-width: 640px; width: 100%; margin: 0 auto; padding: 52px 24px 96px; }
+    h1 { font-size: 28px; font-weight: 700; letter-spacing: -0.5px; margin-bottom: 10px; }
+    .lead { font-size: 15px; line-height: 1.85; color: var(--text-muted); margin-bottom: 40px; }
+    .form-group { margin-bottom: 22px; }
+    label { font-size: 13px; font-weight: 700; display: block; margin-bottom: 7px; }
+    .required { color: #d05050; margin-left: 4px; }
+    input[type="text"], input[type="email"], select, textarea {
+      width: 100%; padding: 11px 14px; border: 1px solid var(--border); border-radius: 8px;
+      background: #fff; font-size: 14px; font-family: inherit; transition: border 0.15s;
+    }
+    input:focus, select:focus, textarea:focus { outline: none; border-color: var(--accent); }
+    textarea { min-height: 160px; resize: vertical; line-height: 1.6; }
+    .submit-btn { background: var(--accent); color: #fff; border: none; border-radius: 8px; padding: 13px 32px; font-size: 14px; font-weight: 700; cursor: pointer; display: block; width: 100%; transition: opacity 0.15s; }
+    .submit-btn:hover { opacity: 0.9; }
+    .submit-btn:disabled { background: var(--text-muted); cursor: not-allowed; }
+    .form-note { font-size: 12px; color: var(--text-muted); margin-top: 10px; line-height: 1.7; }
+    .success { background: rgba(8,145,178,0.06); border-left: 3px solid var(--accent); padding: 16px 20px; border-radius: 4px; margin-bottom: 20px; font-size: 14px; line-height: 1.8; }
+    .alt-contact { margin-top: 40px; padding: 22px 24px; background: var(--surface); border-radius: 10px; border: 1px solid var(--border); }
+    .alt-contact h2 { font-size: 15px; margin-bottom: 8px; }
+    .alt-contact p { font-size: 13px; line-height: 1.8; color: var(--text-muted); }
+    .alt-contact a { color: var(--accent); text-decoration: none; }
+    footer { padding: 24px; text-align: center; color: var(--text-muted); font-size: 12px; border-top: 1px solid var(--border); }
+    footer a { color: var(--text-muted); text-decoration: none; }
+    @media (max-width: 600px) { h1 { font-size: 23px; } main { padding: 32px 18px 64px; } }
+  </style>
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5000671630850248" crossorigin="anonymous"></script>
+</head>
+<body>
+
+<header>
+  <a class="logo" href="/">Clippin</a>
+  <nav class="header-nav">
+    <a href="/usage">使い方</a>
+    <a href="/blog">ブログ</a>
+    <a class="header-cta" href="/">無料で使う</a>
+  </nav>
+</header>
+
+<main>
+  <h1>お問い合わせ</h1>
+  <p class="lead">Clippin に関するご質問、機能要望、不具合報告、お仕事のご依頼など、お気軽にお寄せください。通常2〜3営業日以内に日本語でご返信いたします。</p>
+
+  <div id="success-msg" class="success" style="display:none;">
+    <strong>送信完了しました</strong><br>
+    お問い合わせありがとうございます。担当者より2〜3営業日以内にご返信いたします。
+  </div>
+
+  <form id="contact-form" onsubmit="handleSubmit(event)">
+    <div class="form-group">
+      <label for="name">お名前<span class="required">*</span></label>
+      <input type="text" id="name" name="name" required placeholder="山田 太郎">
+    </div>
+
+    <div class="form-group">
+      <label for="email">メールアドレス<span class="required">*</span></label>
+      <input type="email" id="email" name="email" required placeholder="example@email.com">
+    </div>
+
+    <div class="form-group">
+      <label for="company">会社名・屋号</label>
+      <input type="text" id="company" name="company" placeholder="（任意）株式会社◯◯">
+    </div>
+
+    <div class="form-group">
+      <label for="category">お問い合わせ種別<span class="required">*</span></label>
+      <select id="category" name="category" required>
+        <option value="">選択してください</option>
+        <option value="質問">サービスに関する質問</option>
+        <option value="要望">機能要望</option>
+        <option value="不具合">不具合報告</option>
+        <option value="法人">法人利用について</option>
+        <option value="メディア">取材・メディア掲載</option>
+        <option value="その他">その他</option>
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label for="message">お問い合わせ内容<span class="required">*</span></label>
+      <textarea id="message" name="message" required placeholder="お問い合わせ内容をご記入ください"></textarea>
+    </div>
+
+    <button type="submit" class="submit-btn" id="submit-btn">送信する</button>
+    <p class="form-note">送信いただいた情報は、お問い合わせ対応のみに使用し、第三者には提供いたしません。詳しくは <a href="/privacy" style="color:var(--accent);">プライバシーポリシー</a> をご確認ください。</p>
+  </form>
+
+  <div class="alt-contact">
+    <h2>その他のお問い合わせ方法</h2>
+    <p>
+      お急ぎの場合や、フォーム以外でご連絡を希望される場合は、メールでもお問い合わせを承っています。<br>
+      件名に「Clippinに関するお問い合わせ」と記載の上、ご連絡ください。
+    </p>
+  </div>
+
+</main>
+
+<footer>
+  <a href="/">トップ</a>　|　<a href="/usage">使い方</a>　|　<a href="/blog">ブログ</a>　|　<a href="/faq">FAQ</a>　|　<a href="/about">運営者情報</a>　|　<a href="/contact">お問い合わせ</a>　|　<a href="/privacy">プライバシーポリシー</a>　|　&copy; 株式会社Webil
+</footer>
+
+<script>
+function handleSubmit(e) {
+  e.preventDefault();
+  const btn = document.getElementById('submit-btn');
+  btn.disabled = true;
+  btn.textContent = '送信中...';
+
+  // ここはバックエンド実装時にfetchへ差し替え
+  // 現在は擬似的に送信成功扱い
+  setTimeout(() => {
+    document.getElementById('contact-form').style.display = 'none';
+    document.getElementById('success-msg').style.display = 'block';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, 800);
+}
+</script>
+
+</body>
+</html>

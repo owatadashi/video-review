@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>タイムコードとは？動画制作で知っておくべき基礎知識 | Clippinブログ</title>
+  <meta name="description" content="動画制作で頻出する「タイムコード」の意味と使い方を、初心者にもわかりやすく解説。HH:MM:SS:FF の読み方、ドロップフレーム／ノンドロップフレームの違い、レビューでの活用法まで網羅。">
+  <meta name="keywords" content="タイムコード,動画制作,基礎知識,HH:MM:SS,ドロップフレーム,動画編集">
+  <link rel="canonical" href="https://clippin.work/blog/timecode-basics">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="タイムコードとは？動画制作で知っておくべき基礎知識">
+  <meta property="og:description" content="動画制作で頻出する「タイムコード」の意味と使い方を、初心者にもわかりやすく解説。">
+  <meta property="og:url" content="https://clippin.work/blog/timecode-basics">
+  <meta property="og:image" content="https://clippin.work/og-image.png">
+  <style>
+    :root { --bg: #fafafa; --surface: #f1f1f4; --surface2: #e8e8ec; --border: #e0e0e6; --accent: #0891b2; --text: #0f0f12; --text-muted: #6a6a77; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Hiragino Sans', 'Yu Gothic', sans-serif; min-height: 100dvh; display: flex; flex-direction: column; }
+    header { background: var(--surface); border-bottom: 1px solid var(--border); padding: 10px 18px; display: flex; align-items: center; gap: 14px; flex-shrink: 0; }
+    .logo { font-size: 17px; font-weight: 700; color: var(--accent); text-decoration: none; letter-spacing: -0.3px; }
+    .header-nav { display: flex; gap: 16px; align-items: center; margin-left: auto; }
+    .header-nav a { font-size: 13px; color: var(--text-muted); text-decoration: none; }
+    .header-nav a:hover { color: var(--text); }
+    .header-cta { font-size: 13px; font-weight: 600; background: var(--accent); color: #fff !important; border: none; border-radius: 7px; padding: 7px 14px; cursor: pointer; text-decoration: none; }
+    main { flex: 1; max-width: 760px; width: 100%; margin: 0 auto; padding: 40px 24px 96px; }
+    .breadcrumb { font-size: 12px; color: var(--text-muted); margin-bottom: 24px; }
+    .breadcrumb a { color: var(--accent); text-decoration: none; }
+    .article-tag { display: inline-block; font-size: 11px; font-weight: 700; letter-spacing: 0.08em; color: var(--accent); background: rgba(8,145,178,0.08); padding: 4px 10px; border-radius: 4px; margin-bottom: 16px; }
+    h1 { font-size: 30px; font-weight: 700; letter-spacing: -0.5px; line-height: 1.4; margin-bottom: 18px; }
+    .article-meta { font-size: 12px; color: var(--text-muted); margin-bottom: 36px; padding-bottom: 24px; border-bottom: 1px solid var(--border); }
+    .lead { font-size: 15px; line-height: 1.95; color: var(--text); margin-bottom: 40px; padding: 20px 24px; background: var(--surface); border-left: 3px solid var(--accent); border-radius: 4px; }
+    h2 { font-size: 22px; font-weight: 700; letter-spacing: -0.3px; margin: 56px 0 18px; padding-bottom: 10px; border-bottom: 2px solid var(--accent); }
+    h3 { font-size: 17px; font-weight: 700; margin: 32px 0 12px; color: var(--text); }
+    p { font-size: 15px; line-height: 1.95; color: var(--text); margin-bottom: 18px; }
+    ul, ol { padding-left: 22px; margin-bottom: 20px; }
+    li { font-size: 15px; line-height: 1.95; margin-bottom: 6px; }
+    table { width: 100%; border-collapse: collapse; margin: 18px 0; font-size: 14px; }
+    th, td { border: 1px solid var(--border); padding: 10px 14px; text-align: left; }
+    th { background: var(--surface); font-weight: 700; }
+    code { background: var(--surface2); padding: 2px 7px; border-radius: 3px; font-family: 'SF Mono', Monaco, monospace; font-size: 13px; }
+    .code-block { background: var(--surface2); padding: 16px 20px; border-radius: 6px; font-family: 'SF Mono', Monaco, monospace; font-size: 14px; margin: 14px 0; overflow-x: auto; }
+    .cta-card { background: linear-gradient(135deg, var(--surface), var(--surface2)); border: 1px solid var(--border); border-radius: 12px; padding: 32px 28px; margin: 48px 0 20px; text-align: center; }
+    .cta-card h3 { font-size: 19px; margin-bottom: 10px; }
+    .cta-card p { font-size: 14px; margin-bottom: 20px; color: var(--text-muted); }
+    .cta-btn { display: inline-block; background: var(--accent); color: #fff !important; padding: 12px 28px; border-radius: 8px; font-size: 14px; font-weight: 700; text-decoration: none; }
+    .related { margin-top: 60px; padding-top: 32px; border-top: 1px solid var(--border); }
+    .related h3 { font-size: 14px; color: var(--text-muted); letter-spacing: 0.08em; margin-bottom: 14px; }
+    .related ul { list-style: none; padding: 0; }
+    .related li { margin-bottom: 8px; }
+    .related a { color: var(--accent); text-decoration: none; font-size: 14px; }
+    footer { padding: 24px; text-align: center; color: var(--text-muted); font-size: 12px; border-top: 1px solid var(--border); }
+    footer a { color: var(--text-muted); text-decoration: none; }
+    @media (max-width: 600px) { h1 { font-size: 24px; } main { padding: 24px 18px 64px; } }
+  </style>
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5000671630850248" crossorigin="anonymous"></script>
+</head>
+<body>
+
+<header>
+  <a class="logo" href="/">Clippin</a>
+  <nav class="header-nav">
+    <a href="/usage">使い方</a>
+    <a href="/blog">ブログ</a>
+    <a class="header-cta" href="/">無料で使う</a>
+  </nav>
+</header>
+
+<main>
+  <div class="breadcrumb"><a href="/">Clippin</a> &gt; <a href="/blog">ブログ</a> &gt; タイムコードとは？</div>
+
+  <span class="article-tag">基礎知識</span>
+  <h1>タイムコードとは？動画制作で知っておくべき基礎知識</h1>
+  <div class="article-meta">2026年5月29日　|　読了時間：約5分</div>
+
+  <p class="lead">動画制作の現場で頻繁に登場する「タイムコード」。なんとなく意味は分かっていても、正確に説明できない方も多いのではないでしょうか。本記事では、タイムコードの基本から実践的な使い方まで、動画制作の初心者にもわかりやすく解説します。</p>
+
+  <h2>タイムコードとは？</h2>
+  <p>タイムコード（Time Code）とは、<strong>動画の中の特定の位置を表す時刻情報</strong>のことです。動画は秒間に複数枚の画像（フレーム）で構成されており、タイムコードはそのフレーム1つ1つに固有の番号を割り振る仕組みです。</p>
+  <p>もっとシンプルに言うと、「動画の何時何分何秒何フレーム目か」を示す<strong>住所</strong>のようなものです。</p>
+
+  <h2>タイムコードの基本フォーマット</h2>
+  <p>タイムコードは、通常以下のような形式で表記されます。</p>
+  <div class="code-block">HH : MM : SS : FF</div>
+  <ul>
+    <li><strong>HH</strong>：時間（Hours）</li>
+    <li><strong>MM</strong>：分（Minutes）</li>
+    <li><strong>SS</strong>：秒（Seconds）</li>
+    <li><strong>FF</strong>：フレーム（Frames）</li>
+  </ul>
+  <p>例えば <code>00:01:30:15</code> は「<strong>0時間1分30秒の、15フレーム目</strong>」を意味します。</p>
+
+  <h2>フレームレートとの関係</h2>
+  <p>1秒間に何フレームあるかは、動画の <strong>フレームレート（fps）</strong> によって変わります。</p>
+  <table>
+    <thead>
+      <tr><th>フレームレート</th><th>1秒あたりのフレーム数</th><th>主な用途</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>24fps</td><td>24</td><td>映画</td></tr>
+      <tr><td>30fps（29.97fps）</td><td>30</td><td>テレビ放送（北米／日本）</td></tr>
+      <tr><td>60fps</td><td>60</td><td>スポーツ・ゲーム実況・滑らかな映像</td></tr>
+      <tr><td>120fps</td><td>120</td><td>スローモーション撮影</td></tr>
+    </tbody>
+  </table>
+  <p>例えば30fpsの動画では、<code>00:00:01:00</code> = 1秒0フレーム = 1秒経過した瞬間です。次のフレームは <code>00:00:01:01</code> となります。30フレーム数えると <code>00:00:02:00</code>（2秒）になります。</p>
+
+  <h2>ドロップフレームとノンドロップフレーム</h2>
+  <p>少しややこしいのが、テレビ放送で使われる <strong>29.97fps</strong> の話です。「29.97」という中途半端な数字は、整数の30と合わない問題が発生します。</p>
+
+  <h3>ドロップフレーム（DF）</h3>
+  <p>実際の時間と表示時間のズレを補正するため、<strong>定期的にフレーム番号をスキップ</strong>する方式。ドロップとは言っても、映像そのものは欠落しません。表記では <code>00:01:00;00</code> のように、最後をセミコロン（<code>;</code>）で区切ります。</p>
+
+  <h3>ノンドロップフレーム（NDF）</h3>
+  <p>フレーム番号を律儀に連続させる方式。<strong>表示時間と実時間にズレが生じます</strong>。表記では <code>00:01:00:00</code> のようにコロン（<code>:</code>）のみ。</p>
+
+  <p>YouTubeやSNS用の動画では、通常 <strong>30fps（または29.97 NDF）</strong> で問題ありません。テレビ放送の場合のみ、ドロップフレームを意識する必要があります。</p>
+
+  <h2>レビュー時のタイムコードの活用</h2>
+  <p>動画レビューにおいて、タイムコードを使うメリットは絶大です。</p>
+
+  <h3>① 正確な場所を指定できる</h3>
+  <p>「冒頭のあたり」「真ん中くらい」では伝わりません。<code>00:00:25</code> と書けば、編集者はその瞬間に飛べます。</p>
+
+  <h3>② コメントの整理がしやすい</h3>
+  <p>タイムコード順にコメントを並べることで、編集者は<strong>動画を頭から確認しながら修正</strong>できます。</p>
+
+  <h3>③ バージョン間で比較しやすい</h3>
+  <p>「v1の00:01:30 と v2の00:01:30 を比較したい」など、過去バージョンとの差分確認が容易になります。</p>
+
+  <h2>タイムコードを簡単に扱う方法</h2>
+  <p>レビュー時、毎回手動でタイムコードを記録するのは大変です。<strong>動画レビューツール</strong>を使えば、動画を一時停止してコメントを書くだけで、その時点のタイムコードが自動的に記録されます。</p>
+  <p>例えば <a href="/" style="color:var(--accent);">Clippin</a> なら、動画上をクリックするだけで以下が自動入力されます：</p>
+  <ul>
+    <li>現在のタイムコード（HH:MM:SS）</li>
+    <li>クリックした座標（画面のどこを指しているか）</li>
+    <li>コメント投稿者の名前</li>
+    <li>投稿時刻</li>
+  </ul>
+
+  <h2>まとめ｜タイムコードは動画制作の共通言語</h2>
+  <p>タイムコードは動画制作における<strong>共通言語</strong>です。クライアント・編集者・ディレクターが同じ「住所」を共有することで、コミュニケーションコストが劇的に下がります。</p>
+  <p>まずは <strong>HH:MM:SS</strong> の基本形を覚えるだけでも十分です。フレーム単位の指示が必要になった時、ドロップフレーム／ノンドロップフレームの違いを思い出してみてください。</p>
+
+  <div class="cta-card">
+    <h3>Clippin でタイムコード入力を自動化</h3>
+    <p>動画上をクリックするだけで、タイムコード付きコメントを残せる<br>ログイン不要・無料</p>
+    <a class="cta-btn" href="/">無料で使ってみる →</a>
+  </div>
+
+  <div class="related">
+    <h3>関連記事</h3>
+    <ul>
+      <li><a href="/blog/video-review-tips">動画レビューを効率化する5つのコツ｜修正指示で消耗しないために</a></li>
+      <li><a href="/blog/feedback-mistakes">動画修正指示で気をつけるべき10のポイント｜よくある失敗とその対策</a></li>
+      <li><a href="/blog/freelance-workflow">フリーランス動画編集者の修正対応を効率化する方法</a></li>
+    </ul>
+  </div>
+
+</main>
+
+<footer>
+  <a href="/">トップ</a>　|　<a href="/usage">使い方</a>　|　<a href="/blog">ブログ</a>　|　<a href="/privacy">プライバシーポリシー</a>　|　&copy; 株式会社Webil
+</footer>
+
+</body>
+</html>

@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Clippinブログ｜動画制作・レビューに役立つ情報</title>
+  <meta name="description" content="動画制作・修正指示・レビューの効率化に役立つ記事を発信。フリーランス動画編集者・制作会社・インハウス担当者向けの実用的なノウハウをまとめています。">
+  <meta name="keywords" content="動画レビュー,動画修正指示,動画制作,動画編集,ノウハウ,Clippin">
+  <link rel="canonical" href="https://clippin.work/blog">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="Clippinブログ｜動画制作・レビューに役立つ情報">
+  <meta property="og:description" content="動画制作・修正指示・レビューの効率化に役立つ記事を発信。">
+  <meta property="og:url" content="https://clippin.work/blog">
+  <meta property="og:image" content="https://clippin.work/og-image.png">
+  <style>
+    :root {
+      --bg: #fafafa; --surface: #f1f1f4; --surface2: #e8e8ec;
+      --border: #e0e0e6; --accent: #0891b2;
+      --text: #0f0f12; --text-muted: #6a6a77;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg); color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Hiragino Sans', 'Yu Gothic', sans-serif;
+      min-height: 100dvh; display: flex; flex-direction: column;
+    }
+    header {
+      background: var(--surface); border-bottom: 1px solid var(--border);
+      padding: 10px 18px; display: flex; align-items: center; gap: 14px; flex-shrink: 0;
+    }
+    .logo { font-size: 17px; font-weight: 700; color: var(--accent); text-decoration: none; letter-spacing: -0.3px; }
+    .header-nav { display: flex; gap: 16px; align-items: center; margin-left: auto; }
+    .header-nav a { font-size: 13px; color: var(--text-muted); text-decoration: none; }
+    .header-nav a:hover { color: var(--text); }
+    .header-cta { font-size: 13px; font-weight: 600; background: var(--accent); color: #fff !important; border: none; border-radius: 7px; padding: 7px 14px; cursor: pointer; text-decoration: none; }
+    main { flex: 1; max-width: 920px; width: 100%; margin: 0 auto; padding: 52px 24px 96px; }
+    .page-title { font-size: 28px; font-weight: 700; letter-spacing: -0.5px; margin-bottom: 10px; }
+    .page-lead { font-size: 15px; line-height: 1.8; color: var(--text-muted); margin-bottom: 48px; max-width: 640px; }
+    .article-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 18px; }
+    .article-card {
+      background: var(--surface); border: 1px solid var(--border); border-radius: 12px;
+      padding: 22px 22px 18px; text-decoration: none; color: var(--text);
+      transition: all 0.15s; display: flex; flex-direction: column;
+    }
+    .article-card:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.08); border-color: var(--accent); }
+    .article-tag { display: inline-block; font-size: 10px; font-weight: 700; letter-spacing: 0.08em; color: var(--accent); background: rgba(8,145,178,0.08); padding: 3px 8px; border-radius: 4px; margin-bottom: 12px; align-self: flex-start; }
+    .article-title { font-size: 16px; font-weight: 700; line-height: 1.55; margin-bottom: 10px; letter-spacing: -0.3px; }
+    .article-excerpt { font-size: 13px; line-height: 1.7; color: var(--text-muted); margin-bottom: 14px; flex: 1; }
+    .article-meta { font-size: 11px; color: var(--text-muted); display: flex; gap: 12px; }
+    footer { padding: 24px; text-align: center; color: var(--text-muted); font-size: 12px; border-top: 1px solid var(--border); }
+    footer a { color: var(--text-muted); text-decoration: none; }
+    footer a:hover { color: var(--text); }
+    @media (max-width: 600px) {
+      .page-title { font-size: 23px; }
+      main { padding: 32px 18px 64px; }
+    }
+  </style>
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5000671630850248" crossorigin="anonymous"></script>
+</head>
+<body>
+
+<header>
+  <a class="logo" href="/">Clippin</a>
+  <nav class="header-nav">
+    <a href="/usage">使い方</a>
+    <a href="/blog">ブログ</a>
+    <a class="header-cta" href="/">無料で使う</a>
+  </nav>
+</header>
+
+<main>
+  <h1 class="page-title">Clippinブログ</h1>
+  <p class="page-lead">動画レビュー・修正指示・制作ワークフローを効率化するための実用的な情報を発信しています。フリーランス・制作会社・インハウス担当者の方に役立つ内容を中心にまとめました。</p>
+
+  <div class="article-grid">
+
+    <a class="article-card" href="/blog/video-review-tips">
+      <span class="article-tag">ノウハウ</span>
+      <h2 class="article-title">動画レビューを効率化する5つのコツ｜修正指示で消耗しないために</h2>
+      <p class="article-excerpt">タイムコードの伝え方、優先度のつけ方、バージョン管理など、動画レビューの効率を劇的に上げる5つの実践テクニックを紹介します。</p>
+      <div class="article-meta"><span>2026.05.29</span><span>約5分</span></div>
+    </a>
+
+    <a class="article-card" href="/blog/frameio-vs-clippin">
+      <span class="article-tag">比較</span>
+      <h2 class="article-title">Frame.io vs Clippin｜日本人向け動画レビューツールはどっち？</h2>
+      <p class="article-excerpt">海外で定番のFrame.ioと、日本生まれのClippin。料金・機能・使いやすさを徹底比較。あなたに合うツールがわかります。</p>
+      <div class="article-meta"><span>2026.05.29</span><span>約7分</span></div>
+    </a>
+
+    <a class="article-card" href="/blog/feedback-mistakes">
+      <span class="article-tag">ノウハウ</span>
+      <h2 class="article-title">動画修正指示で気をつけるべき10のポイント｜よくある失敗とその対策</h2>
+      <p class="article-excerpt">「ここ直して」だけでは伝わらない。動画修正指示で失敗しがちな10のポイントと、それを防ぐ具体的な方法を解説します。</p>
+      <div class="article-meta"><span>2026.05.29</span><span>約8分</span></div>
+    </a>
+
+    <a class="article-card" href="/blog/freelance-workflow">
+      <span class="article-tag">フリーランス</span>
+      <h2 class="article-title">フリーランス動画編集者の修正対応を効率化する方法</h2>
+      <p class="article-excerpt">修正対応の時間を削減し、本業の編集に集中するためのワークフロー設計とおすすめツールを紹介します。</p>
+      <div class="article-meta"><span>2026.05.29</span><span>約6分</span></div>
+    </a>
+
+    <a class="article-card" href="/blog/timecode-basics">
+      <span class="article-tag">基礎知識</span>
+      <h2 class="article-title">タイムコードとは？動画制作で知っておくべき基礎知識</h2>
+      <p class="article-excerpt">動画制作で頻出する「タイムコード」の意味と使い方を、初心者にもわかりやすく解説します。</p>
+      <div class="article-meta"><span>2026.05.29</span><span>約5分</span></div>
+    </a>
+
+    <a class="article-card" href="/blog/client-communication">
+      <span class="article-tag">コミュニケーション</span>
+      <h2 class="article-title">クライアントワークでの動画レビュー｜やってはいけないNG例</h2>
+      <p class="article-excerpt">制作会社・代理店向け。クライアントとのレビューやり取りで信頼を失うNG例と、信頼される対応例を比較解説。</p>
+      <div class="article-meta"><span>2026.05.29</span><span>約7分</span></div>
+    </a>
+
+  </div>
+</main>
+
+<footer>
+  <a href="/">トップ</a>　|
+  <a href="/usage">使い方</a>　|
+  <a href="/blog">ブログ</a>　|
+  <a href="/privacy">プライバシーポリシー</a>　|
+  &copy; 株式会社Webil
+</footer>
+
+</body>
+</html>

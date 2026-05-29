@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>動画レビューを効率化する5つのコツ｜修正指示で消耗しないために | Clippinブログ</title>
+  <meta name="description" content="動画制作の現場で「修正指示が伝わらない」「やり取りに時間がかかる」と悩むフリーランス・制作会社のために、動画レビューを劇的に効率化する5つの実践テクニックを解説します。">
+  <meta name="keywords" content="動画レビュー,動画修正指示,効率化,タイムコード,動画制作,ワークフロー">
+  <link rel="canonical" href="https://clippin.work/blog/video-review-tips">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="動画レビューを効率化する5つのコツ｜修正指示で消耗しないために">
+  <meta property="og:description" content="動画制作の修正やり取りを3倍速くする実践テクニック5選。">
+  <meta property="og:url" content="https://clippin.work/blog/video-review-tips">
+  <meta property="og:image" content="https://clippin.work/og-image.png">
+  <style>
+    :root {
+      --bg: #fafafa; --surface: #f1f1f4; --surface2: #e8e8ec;
+      --border: #e0e0e6; --accent: #0891b2;
+      --text: #0f0f12; --text-muted: #6a6a77;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Hiragino Sans', 'Yu Gothic', sans-serif; min-height: 100dvh; display: flex; flex-direction: column; }
+    header { background: var(--surface); border-bottom: 1px solid var(--border); padding: 10px 18px; display: flex; align-items: center; gap: 14px; flex-shrink: 0; }
+    .logo { font-size: 17px; font-weight: 700; color: var(--accent); text-decoration: none; letter-spacing: -0.3px; }
+    .header-nav { display: flex; gap: 16px; align-items: center; margin-left: auto; }
+    .header-nav a { font-size: 13px; color: var(--text-muted); text-decoration: none; }
+    .header-nav a:hover { color: var(--text); }
+    .header-cta { font-size: 13px; font-weight: 600; background: var(--accent); color: #fff !important; border: none; border-radius: 7px; padding: 7px 14px; cursor: pointer; text-decoration: none; }
+    main { flex: 1; max-width: 760px; width: 100%; margin: 0 auto; padding: 40px 24px 96px; }
+    .breadcrumb { font-size: 12px; color: var(--text-muted); margin-bottom: 24px; }
+    .breadcrumb a { color: var(--accent); text-decoration: none; }
+    .article-tag { display: inline-block; font-size: 11px; font-weight: 700; letter-spacing: 0.08em; color: var(--accent); background: rgba(8,145,178,0.08); padding: 4px 10px; border-radius: 4px; margin-bottom: 16px; }
+    h1 { font-size: 30px; font-weight: 700; letter-spacing: -0.5px; line-height: 1.4; margin-bottom: 18px; }
+    .article-meta { font-size: 12px; color: var(--text-muted); margin-bottom: 36px; padding-bottom: 24px; border-bottom: 1px solid var(--border); }
+    .lead { font-size: 15px; line-height: 1.95; color: var(--text); margin-bottom: 40px; padding: 20px 24px; background: var(--surface); border-left: 3px solid var(--accent); border-radius: 4px; }
+    h2 { font-size: 22px; font-weight: 700; letter-spacing: -0.3px; margin: 56px 0 18px; padding-bottom: 10px; border-bottom: 2px solid var(--accent); }
+    h3 { font-size: 17px; font-weight: 700; margin: 32px 0 12px; color: var(--text); }
+    p { font-size: 15px; line-height: 1.95; color: var(--text); margin-bottom: 18px; }
+    ul, ol { padding-left: 22px; margin-bottom: 20px; }
+    li { font-size: 15px; line-height: 1.95; margin-bottom: 6px; }
+    .box-bad { background: rgba(220, 80, 80, 0.06); border-left: 3px solid #d05050; padding: 14px 18px; border-radius: 4px; margin: 14px 0; font-size: 14px; }
+    .box-good { background: rgba(8, 145, 178, 0.06); border-left: 3px solid var(--accent); padding: 14px 18px; border-radius: 4px; margin: 14px 0; font-size: 14px; }
+    .box-label { font-size: 11px; font-weight: 700; letter-spacing: 0.08em; margin-bottom: 6px; display: block; }
+    .box-bad .box-label { color: #d05050; }
+    .box-good .box-label { color: var(--accent); }
+    table { width: 100%; border-collapse: collapse; margin: 18px 0; font-size: 14px; }
+    th, td { border: 1px solid var(--border); padding: 10px 14px; text-align: left; }
+    th { background: var(--surface); font-weight: 700; }
+    .cta-card { background: linear-gradient(135deg, var(--surface), var(--surface2)); border: 1px solid var(--border); border-radius: 12px; padding: 32px 28px; margin: 48px 0 20px; text-align: center; }
+    .cta-card h3 { font-size: 19px; margin-bottom: 10px; }
+    .cta-card p { font-size: 14px; margin-bottom: 20px; color: var(--text-muted); }
+    .cta-btn { display: inline-block; background: var(--accent); color: #fff !important; padding: 12px 28px; border-radius: 8px; font-size: 14px; font-weight: 700; text-decoration: none; }
+    .related { margin-top: 60px; padding-top: 32px; border-top: 1px solid var(--border); }
+    .related h3 { font-size: 14px; color: var(--text-muted); letter-spacing: 0.08em; margin-bottom: 14px; }
+    .related ul { list-style: none; padding: 0; }
+    .related li { margin-bottom: 8px; }
+    .related a { color: var(--accent); text-decoration: none; font-size: 14px; }
+    .related a:hover { text-decoration: underline; }
+    footer { padding: 24px; text-align: center; color: var(--text-muted); font-size: 12px; border-top: 1px solid var(--border); }
+    footer a { color: var(--text-muted); text-decoration: none; }
+    @media (max-width: 600px) { h1 { font-size: 24px; } main { padding: 24px 18px 64px; } }
+  </style>
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5000671630850248" crossorigin="anonymous"></script>
+</head>
+<body>
+
+<header>
+  <a class="logo" href="/">Clippin</a>
+  <nav class="header-nav">
+    <a href="/usage">使い方</a>
+    <a href="/blog">ブログ</a>
+    <a class="header-cta" href="/">無料で使う</a>
+  </nav>
+</header>
+
+<main>
+  <div class="breadcrumb"><a href="/">Clippin</a> &gt; <a href="/blog">ブログ</a> &gt; 動画レビューを効率化する5つのコツ</div>
+
+  <span class="article-tag">ノウハウ</span>
+  <h1>動画レビューを効率化する5つのコツ｜修正指示で消耗しないために</h1>
+  <div class="article-meta">2026年5月29日　|　読了時間：約5分</div>
+
+  <p class="lead">動画制作の現場で、レビュー（修正指示）のやり取りに無駄な時間を取られていませんか？本記事では、フリーランス・制作会社・インハウス担当者向けに、動画レビューを劇的に効率化する5つのコツを紹介します。</p>
+
+  <h2>なぜ動画レビューは難しいのか</h2>
+  <p>動画制作の現場で、こんなトラブルに心当たりはありませんか？</p>
+  <ul>
+    <li>「2分30秒のテロップを直して」と言われたけど、どこのこと？</li>
+    <li>LINEで「ここ修正」と画像が送られてきたが、どの動画のどのバージョンか分からない</li>
+    <li>修正済みのつもりが、別のシーンを直していた</li>
+    <li>メールのスレッドで返信が散らかり、最終確認の段階で全部混乱</li>
+  </ul>
+  <p>動画のレビューが難しいのは、「時間軸を持ったメディア」だからです。文字や画像と違って、特定の場所を正確に指し示すのが難しい。だからこそ、適切なツール・ルール・コミュニケーション設計が必要になります。</p>
+
+  <h2>コツ① タイムコード（時:分:秒）を必ず明記する</h2>
+  <p>最も基本的かつ、最も効果的なルールです。</p>
+
+  <div class="box-bad">
+    <span class="box-label">悪い例</span>
+    「最初のテロップが気になる」
+  </div>
+
+  <div class="box-good">
+    <span class="box-label">良い例</span>
+    「00:00:15 のテロップ "新発売" を、"NEW!" に変更してください」
+  </div>
+
+  <p>タイムコードがあれば、編集者は迷わずその場所に飛べます。テキストでやり取りする場合は <strong>必ず時刻と修正内容をセットで</strong> 伝えましょう。</p>
+  <p>ただし、テキストで毎回タイムコードを書くのは面倒。だからこそ、動画上にコメントを残せる動画レビューツールが便利です。例えば <a href="/" style="color:var(--accent);">Clippin</a> なら、動画の画面をクリックするだけでタイムコード付きコメントを残せます。</p>
+
+  <h2>コツ② レビュー前に「目的」と「制約」を共有する</h2>
+  <p>修正指示を受ける側からすると、「<strong>何のために</strong>直すのか」が分からないと、最適な対応ができません。</p>
+  <p>例えば「BGMを変えて」と言われた時：</p>
+  <ul>
+    <li>A. ターゲット層に合わないから → 候補となる楽曲のジャンルを聞きたい</li>
+    <li>B. 著作権が心配だから → フリー音源で代替案を出せる</li>
+    <li>C. 単に飽きたから → 雰囲気の似た別の曲を提案できる</li>
+  </ul>
+  <p>理由を共有することで、編集者から <strong>より良い提案が返ってくる確率が上がります</strong>。</p>
+  <p>レビューを始める前に、以下を共有しましょう：</p>
+  <ul>
+    <li>動画の <strong>目的</strong>（誰に何を伝えたい？）</li>
+    <li><strong>納期</strong>（いつまでに完成させたい？）</li>
+    <li><strong>制約</strong>（予算・素材・尺・媒体）</li>
+  </ul>
+
+  <h2>コツ③ 修正は「優先度」をつけて伝える</h2>
+  <p>すべての修正指示を「同じ重要度」で伝えてしまうと、編集者は何から手をつけるか迷います。納期が迫っている時ほど、優先度をつけて伝えるべきです。</p>
+  <p><strong>おすすめの3段階：</strong></p>
+  <table>
+    <thead>
+      <tr><th>優先度</th><th>表記</th><th>意味</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>高</td><td>【MUST】</td><td>必ず修正してほしい</td></tr>
+      <tr><td>中</td><td>【WANT】</td><td>できれば修正したい</td></tr>
+      <tr><td>低</td><td>【NICE TO HAVE】</td><td>余裕があれば</td></tr>
+    </tbody>
+  </table>
+  <p>例：</p>
+  <ul>
+    <li><strong>【MUST】</strong> 00:01:20 ロゴの色が間違っています。正しくは #FF6B00 です</li>
+    <li><strong>【WANT】</strong> 00:02:45 BGMをもう少し控えめに</li>
+    <li><strong>【NICE TO HAVE】</strong> 全体的にもう少しテンポ良くできれば</li>
+  </ul>
+  <p>これだけで編集者の判断負荷が大きく下がります。</p>
+
+  <h2>コツ④ バージョン管理を徹底する</h2>
+  <p>修正を重ねるうちに「あれ、これは v2 のどのバージョン？」と混乱しがちです。</p>
+  <p><strong>バージョン管理のルール例：</strong></p>
+  <ul>
+    <li>v1：初稿</li>
+    <li>v2：第1回修正</li>
+    <li>v3：第2回修正</li>
+    <li>final：最終確定版</li>
+  </ul>
+  <p>ファイル名やURLに必ずバージョン番号を入れましょう。</p>
+  <p>ただし、動画ファイルをDropboxやGoogle Driveで何度もアップロードし直すのは非効率。<strong>バージョン管理機能を持つ動画レビューツール</strong>を使うと、過去のレビュー履歴も含めて全て一元管理できます。</p>
+  <p>Clippinでは、新しいバージョンを作成すると <strong>前のバージョンのコメントが自動で引き継がれる</strong> ので、「どの指示がまだ反映されていないか」が一目で分かります。</p>
+
+  <h2>コツ⑤ レビュー時間を区切る</h2>
+  <p>「いつでも気が向いた時にコメント送ってください」は危険です。</p>
+  <p>編集者は受け取ったコメントを反映する作業に集中したいため、<strong>コメントが小出しに何度も届く</strong>と作業効率が大きく落ちます。</p>
+  <p><strong>ベストプラクティス：</strong></p>
+  <ul>
+    <li>レビュー期間を <strong>明示する</strong>（例：水曜18時までに全コメント送信）</li>
+    <li>レビューが終わったら <strong>「レビュー完了」の合図を送る</strong></li>
+    <li>追加修正は <strong>次のバージョンでまとめて</strong> 送る</li>
+  </ul>
+  <p>これだけで、編集者の集中時間を確保でき、結果的に <strong>品質も納期もアップ</strong>します。</p>
+
+  <h2>まとめ｜ツールを使うことが最大の時短</h2>
+  <p>5つのコツを紹介しましたが、これらをすべて実践しても、メールやチャットだけでやり取りすると限界があります。</p>
+  <p>動画レビュー専用のツールを使うことで、</p>
+  <ul>
+    <li>タイムコードが自動で記録される</li>
+    <li>コメントが時系列でも、優先度別でも整理できる</li>
+    <li>バージョン管理が自動化される</li>
+    <li>レビュー完了の通知ができる</li>
+  </ul>
+  <p>といったメリットが得られます。</p>
+
+  <div class="cta-card">
+    <h3>Clippin で動画レビューを試してみる</h3>
+    <p>ログイン不要・無料・URLを送るだけで共有できる<br>日本語完全対応の動画レビューツール</p>
+    <a class="cta-btn" href="/">無料で使ってみる →</a>
+  </div>
+
+  <div class="related">
+    <h3>関連記事</h3>
+    <ul>
+      <li><a href="/blog/frameio-vs-clippin">Frame.io vs Clippin｜日本人向け動画レビューツールはどっち？</a></li>
+      <li><a href="/blog/feedback-mistakes">動画修正指示で気をつけるべき10のポイント｜よくある失敗とその対策</a></li>
+      <li><a href="/blog/client-communication">クライアントワークでの動画レビュー｜やってはいけないNG例</a></li>
+    </ul>
+  </div>
+
+</main>
+
+<footer>
+  <a href="/">トップ</a>　|　<a href="/usage">使い方</a>　|　<a href="/blog">ブログ</a>　|　<a href="/privacy">プライバシーポリシー</a>　|　&copy; 株式会社Webil
+</footer>
+
+</body>
+</html>
