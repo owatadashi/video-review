@@ -158,6 +158,103 @@ app.get('/api/presign', async (req, res) => {
   }
 });
 
+// ─── Cloudflare Stream ─────────────────────────────────────
+const CF_ACCOUNT_ID   = process.env.CF_ACCOUNT_ID   || '';
+const CF_STREAM_TOKEN = process.env.CF_STREAM_TOKEN || '';
+const STREAM_ENABLED  = !!(CF_ACCOUNT_ID && CF_STREAM_TOKEN);
+const STREAM_MAX_DURATION_SEC = 3 * 60 * 60;       // 動画は最長3時間まで
+const STREAM_EXPIRY_DAYS      = 30;                // 30日後に自動削除（R2運用と同じ）
+
+const b64 = (s) => Buffer.from(String(s), 'utf8').toString('base64');
+
+// GET /api/config → フロント向け機能フラグ
+app.get('/api/config', (_req, res) => {
+  res.json({ streamEnabled: STREAM_ENABLED });
+});
+
+// POST /api/stream-upload  { filename, sizeBytes } → tus アップロードURL発行
+app.post('/api/stream-upload', async (req, res) => {
+  if (!STREAM_ENABLED) {
+    return res.status(503).json({ error: 'Stream が未設定です（CF_ACCOUNT_ID / CF_STREAM_TOKEN）' });
+  }
+  const { filename, sizeBytes } = req.body;
+  if (!sizeBytes || !Number.isFinite(Number(sizeBytes))) {
+    return res.status(400).json({ error: 'sizeBytes が必要です' });
+  }
+
+  try {
+    // 30日後に自動削除（R2運用と同じ）。Stream は最短30日先を要求するので +1日の余裕を持たせる
+    const scheduledDeletion = new Date(Date.now() + (STREAM_EXPIRY_DAYS + 1) * 24 * 60 * 60 * 1000).toISOString();
+    const meta = [
+      filename ? `name ${b64(path.basename(filename))}` : null,
+      `maxDurationSeconds ${b64(STREAM_MAX_DURATION_SEC)}`,
+      `scheduledDeletion ${b64(scheduledDeletion)}`,
+    ].filter(Boolean).join(',');
+
+    const cfRes = await fetch(
+      `https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/stream?direct_user=true`,
+      {
+        method: 'POST',
+        headers: {
+          Authorization:     `Bearer ${CF_STREAM_TOKEN}`,
+          'Tus-Resumable':   '1.0.0',
+          'Upload-Length':   String(sizeBytes),
+          'Upload-Metadata': meta,
+        },
+      }
+    );
+
+    if (!cfRes.ok) {
+      const body = await cfRes.text();
+      console.error('[stream-upload] CF error:', cfRes.status, body.slice(0, 300));
+      return res.status(502).json({ error: `Stream アップロードURL発行に失敗（HTTP ${cfRes.status}）` });
+    }
+
+    const uploadUrl = cfRes.headers.get('location');
+    const uid       = cfRes.headers.get('stream-media-id');
+    console.log(`[stream-upload] uid=${uid} size=${sizeBytes}`);
+    res.json({ uploadUrl, uid });
+  } catch (err) {
+    console.error('[stream-upload] error:', err);
+    res.status(500).json({ error: 'Stream アップロードURL発行に失敗しました: ' + err.message });
+  }
+});
+
+// GET /api/stream-status/:uid → 処理状況・再生URL取得
+app.get('/api/stream-status/:uid', async (req, res) => {
+  if (!STREAM_ENABLED) {
+    return res.status(503).json({ error: 'Stream が未設定です' });
+  }
+  const uid = req.params.uid;
+  if (!/^[a-f0-9]{32}$/i.test(uid)) {
+    return res.status(400).json({ error: '不正な uid です' });
+  }
+
+  try {
+    const cfRes = await fetch(
+      `https://api.cloudflare.com/client/v4/accounts/${CF_ACCOUNT_ID}/stream/${uid}`,
+      { headers: { Authorization: `Bearer ${CF_STREAM_TOKEN}` } }
+    );
+    const data = await cfRes.json();
+    if (!cfRes.ok || !data.success) {
+      console.error('[stream-status] CF error:', cfRes.status, JSON.stringify(data.errors || {}).slice(0, 300));
+      return res.status(502).json({ error: 'Stream 状態取得に失敗しました' });
+    }
+
+    const v = data.result;
+    res.json({
+      readyToStream: v.readyToStream,
+      state:         v.status?.state,          // pendingupload / inprogress / ready / error
+      pctComplete:   v.status?.pctComplete,
+      hlsUrl:        v.playback?.hls || '',
+      duration:      v.duration,
+    });
+  } catch (err) {
+    console.error('[stream-status] error:', err);
+    res.status(500).json({ error: 'Stream 状態取得に失敗しました: ' + err.message });
+  }
+});
+
 // ─── POST /api/projects ────────────────────────────────────
 app.post('/api/projects', async (req, res) => {
   const { name, videoUrl, videoType, fileId, pins } = req.body;

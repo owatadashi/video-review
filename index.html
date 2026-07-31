@@ -48,6 +48,8 @@
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5000671630850248"
      crossorigin="anonymous"></script>
   <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/hls.js@1.5.13/dist/hls.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/tus-js-client@4.1.0/dist/tus.min.js"></script>
 
   <style>
     :root {
@@ -2159,6 +2161,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
   // ─── Player refs ───────────────────────────────────────
   let nativeVideoEl = null;  // <video> element
+  let hlsInstance = null;    // hls.js インスタンス（HLS再生時）
   let localFile = null;      // File object for local uploads
 
   // ─── Timer display (read-only; driven by player or manual) ─
@@ -2390,8 +2393,18 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
     const video = document.createElement('video');
     video.controls = true;
-    video.src = src;
     video.preload = 'auto';
+
+    // HLS (.m3u8) は hls.js 経由で再生（Safari はネイティブ対応）
+    if (hlsInstance) { hlsInstance.destroy(); hlsInstance = null; }
+    const isHls = /\.m3u8($|\?)/.test(src);
+    if (isHls && window.Hls && Hls.isSupported()) {
+      hlsInstance = new Hls();
+      hlsInstance.loadSource(src);
+      hlsInstance.attachMedia(video);
+    } else {
+      video.src = src;  // ネイティブHLS対応(Safari) or 通常mp4
+    }
     video.setAttribute('playsinline', '');
     video.setAttribute('webkit-playsinline', '');
     video.style.cssText = 'width:100%;height:100%;background:#000';
@@ -3204,8 +3217,16 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
   async function doNewVersionUpload(file) {
     document.getElementById('uploadTitle').textContent = '新バージョンをアップロード中...';
-    setUploadUI(true, 0, 'Presigned URL を取得中...');
+    setUploadUI(true, 0, '準備中...');
     try {
+      // ★ Stream 有効時
+      if (streamEnabled) {
+        const { hlsUrl } = await uploadToStream(file, (pct, label) => setUploadUI(true, pct, label));
+        setUploadUI(false, 100, '完了');
+        await createNewVersion({ videoUrl: hlsUrl, videoType: 'direct', fileId: '' });
+        return;
+      }
+
       const presignRes = await fetch(
         `/api/presign?filename=${encodeURIComponent(file.name)}&type=${encodeURIComponent(file.type || 'video/mp4')}`
       );
@@ -3483,17 +3504,90 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     toast(`${newPins.length}件のコメントをインポートしました`);
   }
 
+  // ─── Cloudflare Stream アップロード（tus + トランスコード待ち）──
+  // 成功すると { hlsUrl, uid } を返す。onProgress(pct, label) で進捗通知。
+  async function uploadToStream(file, onProgress) {
+    // ① アップロードURL発行
+    const res = await fetch('/api/stream-upload', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ filename: file.name, sizeBytes: file.size }),
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.error || `stream-upload HTTP ${res.status}`);
+    }
+    const { uploadUrl, uid } = await res.json();
+
+    // ② tus でレジューム可能アップロード
+    await new Promise((resolve, reject) => {
+      const upload = new tus.Upload(file, {
+        uploadUrl,
+        chunkSize: 50 * 1024 * 1024,   // 50MB チャンク（Stream 要件: 5MB以上の倍数）
+        retryDelays: [0, 3000, 5000, 10000, 20000],
+        metadata: { filename: file.name, filetype: file.type || 'video/mp4' },
+        onError: reject,
+        onProgress: (uploaded, total) => {
+          const pct = Math.round(uploaded / total * 90) + 3;
+          onProgress(pct, `アップロード中... ${(uploaded/1024/1024).toFixed(0)}MB / ${(total/1024/1024).toFixed(0)}MB`);
+        },
+        onSuccess: resolve,
+      });
+      upload.start();
+    });
+
+    // ③ トランスコード完了までポーリング
+    for (;;) {
+      await new Promise(r => setTimeout(r, 3000));
+      const s = await fetch(`/api/stream-status/${uid}`).then(r => r.json()).catch(() => null);
+      if (!s) continue;
+      if (s.state === 'error') throw new Error('動画の変換に失敗しました');
+      if (s.readyToStream && s.hlsUrl) {
+        onProgress(100, '完了');
+        return { hlsUrl: s.hlsUrl, uid };
+      }
+      const pct = 93 + Math.round((s.pctComplete || 0) / 100 * 6);
+      onProgress(Math.min(pct, 99), `動画を最適化中... ${Math.round(s.pctComplete || 0)}%`);
+    }
+  }
+
   // ─── Cloudflare R2 アップロード（Presigned URL 経由）────────
   async function doCloudUpload(projectName) {
     if (!localFile) { toast('ファイルがありません'); return; }
 
-    document.getElementById('uploadTitle').textContent = 'R2 にアップロード中...';
-    setUploadUI(true, 0, 'Presigned URL を取得中...');
+    document.getElementById('uploadTitle').textContent = 'アップロード中...';
+    setUploadUI(true, 0, '準備中...');
 
     try {
       // file:// で直接開いている場合はサーバーAPIが使えない
       if (location.protocol === 'file:') {
         throw new Error('サーバー経由で開いてください（npm start → http://localhost:3000）');
+      }
+
+      // ★ Stream 有効時：Cloudflare Stream にアップロード → HLS 配信
+      if (streamEnabled) {
+        const { hlsUrl } = await uploadToStream(localFile, (pct, label) => setUploadUI(true, pct, label));
+
+        if (state.objectUrl) { URL.revokeObjectURL(state.objectUrl); state.objectUrl = ''; }
+        state.videoType = 'direct';   // .m3u8 は renderNativeVideo が自動判別
+        state.videoUrl  = hlsUrl;
+        state.fileId    = '';
+        localFile       = null;
+
+        if (nativeVideoEl) {
+          const resumeTime = nativeVideoEl.currentTime;
+          renderNativeVideo(hlsUrl);
+          nativeVideoEl.addEventListener('loadedmetadata', () => {
+            nativeVideoEl.currentTime = resumeTime;
+          }, { once: true });
+        }
+
+        document.getElementById('fileBanner').classList.remove('show');
+        showR2Banner(new Date());
+        setUploadUI(false, 100, '完了');
+        await new Promise(r => setTimeout(r, 200));
+        await saveProjectToDB(projectName);
+        return;
       }
 
       // ① Presigned URL を取得
@@ -3755,6 +3849,13 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       document.body.classList.add('has-fv');
     }
   })();
+
+  // ─── 機能フラグ取得（Stream 有効か）─────────────────────
+  let streamEnabled = false;
+  fetch('/api/config')
+    .then(r => r.json())
+    .then(c => { streamEnabled = !!c.streamEnabled; })
+    .catch(() => {});
 
   // ─── Init ──────────────────────────────────────────────
   (function init() {
