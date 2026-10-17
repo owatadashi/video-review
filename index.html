@@ -2435,6 +2435,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
   // R2 に Presigned URL で PUT し、公開URLを返す
   async function uploadToR2(file, onProgress) {
+    await assertFileReadable(file);
     const presignRes = await fetch(
       `/api/presign?filename=${encodeURIComponent(file.name)}&type=${encodeURIComponent(file.type || 'video/mp4')}`
     );
@@ -3724,9 +3725,33 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     toast(`${newPins.length}件のコメントをインポートしました`);
   }
 
+  // ─── アップロード元ファイルの読み取りチェック ─────────────
+  // 選択後にファイルが移動・削除・上書きされたり、同期フォルダ/外付けディスクが
+  // 切断されると、ブラウザからは size が 0 になったり読み取りエラーになる
+  const UNREADABLE_FILE_MSG =
+    'ファイルを読み込めませんでした。アップロード中に元ファイルを移動・名前変更・上書きしていないか、' +
+    'Googleドライブ等の同期フォルダや外付けディスク上のファイルでないか確認し、' +
+    'デスクトップなどにコピーしてから選び直してください';
+
+  async function assertFileReadable(file) {
+    if (!file.size) throw new Error(UNREADABLE_FILE_MSG);
+    try { await file.slice(0, 1).arrayBuffer(); }
+    catch { throw new Error(UNREADABLE_FILE_MSG); }
+  }
+
+  // tus のエラーを、原因（ファイル側 / 通信側）がわかる日本語メッセージに変換
+  async function describeUploadError(file, err) {
+    try { await assertFileReadable(file); }
+    catch (e) { return e; }
+    console.error('[stream upload] tus error:', err);
+    return new Error('通信が途切れたためアップロードが中断しました。ネット接続を確認して「再試行」してください');
+  }
+
   // ─── Cloudflare Stream アップロード（tus + トランスコード待ち）──
   // 成功すると { hlsUrl, uid } を返す。onProgress(pct, label) で進捗通知。
   async function uploadToStream(file, onProgress) {
+    await assertFileReadable(file);
+
     // ① アップロードURL発行
     const res = await fetch('/api/stream-upload', {
       method: 'POST',
@@ -3744,9 +3769,9 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       const upload = new tus.Upload(file, {
         uploadUrl,
         chunkSize: 50 * 1024 * 1024,   // 50MB チャンク（Stream 要件: 5MB以上の倍数）
-        retryDelays: [0, 3000, 5000, 10000, 20000],
+        retryDelays: [0, 3000, 5000, 10000, 20000, 30000, 60000],
         metadata: { filename: file.name, filetype: file.type || 'video/mp4' },
-        onError: reject,
+        onError: async err => reject(await describeUploadError(file, err)),
         onProgress: (uploaded, total) => {
           const pct = Math.round(uploaded / total * 90) + 3;
           onProgress(pct, `アップロード中... ${(uploaded/1024/1024).toFixed(0)}MB / ${(total/1024/1024).toFixed(0)}MB`);
