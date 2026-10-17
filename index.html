@@ -33,7 +33,7 @@
   <meta property="og:title" content="Clippin（クリッピン）| 動画レビュー・修正指示ツール">
   <meta property="og:description" content="動画の気になる場面に、タイムコードで直接コメントを残せる無料の動画レビューツール。ログイン不要・インストール不要で、URLを送るだけでチームやクライアントと即共有。アップロードした動画は30日間保存されます。">
   <meta property="og:url" content="https://clippin.work/">
-  <meta property="og:image" content="https://clippin.work/og-image.png">
+  <meta property="og:image" content="https://clippin.work/og-image.png?v=2">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
 
@@ -41,7 +41,7 @@
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Clippin（クリッピン）| 動画レビュー・修正指示ツール">
   <meta name="twitter:description" content="動画の気になる場面に、タイムコードで直接コメントを残せる無料の動画レビューツール。ログイン不要・インストール不要で、URLを送るだけでチームやクライアントと即共有。アップロードした動画は30日間保存されます。">
-  <meta name="twitter:image" content="https://clippin.work/og-image.png">
+  <meta name="twitter:image" content="https://clippin.work/og-image.png?v=2">
 
   <link rel="icon" type="image/svg+xml" href="/favicon.svg?v=3">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -1743,6 +1743,7 @@
     body.in-project .header-upload, body.in-project .header-nav, body.in-project footer { display: none; }
     body.in-project .btn-share-main { display: inline-flex; }
     .r2-banner { border: none; padding: 0; font-size: 12px; color: var(--ink-3); white-space: nowrap; background: none; }
+    body:not(.in-project) .r2-banner { display: none !important; }
 
     /* Version chips（ヘッダー内） */
     .version-bar { background: none; border: none; padding: 0; gap: 2px; align-items: center; overflow: visible; }
@@ -2123,6 +2124,101 @@
     /* ロゴ: ホバーで付箋がぺらっと */
     .logo:hover .logo-mark { animation: wiggle .45s ease-in-out; }
 
+    /* ════════════════════════════════════════════════════════
+       Stationery details — テンプレ感を消すための細部
+       ════════════════════════════════════════════════════════ */
+    /* 「声」のある見出しは明朝で */
+    .desk-title, .modal-title, .modal h3, .pins-empty-msg strong {
+      font-family: var(--mincho); font-weight: 900; letter-spacing: .02em;
+    }
+    .modal-title, .modal h3 { font-size: 20px; }
+
+    /* ── アップロード画面（机の上） ── */
+    .placeholder { overflow-y: auto; justify-content: center; padding: 40px 32px; }
+    .desk { width: 100%; max-width: 980px; display: grid; grid-template-columns: minmax(0, 1fr); gap: 56px; align-items: start; }
+    .desk:has(#recentBox:not([style*="none"])) { grid-template-columns: minmax(0, 1fr) 300px; }
+    .desk-main { display: flex; flex-direction: column; gap: 20px; }
+    .desk-title { font-size: clamp(26px, 2.6vw, 34px); line-height: 1.35; color: var(--ink); }
+    .upload-zone {
+      max-width: none; align-items: flex-start; text-align: left;
+      padding: 40px 40px 34px !important; gap: 6px;
+      border: 1.5px dashed var(--ink-3) !important;
+      background:
+        repeating-linear-gradient(0deg, transparent 0 27px, rgba(29,28,26,.045) 27px 28px),
+        var(--card);
+    }
+    .upload-zone:focus-visible { outline: 2px solid var(--ink); outline-offset: 3px; }
+    .upload-zone-title { font-size: 20px; }
+    .upload-zone-drop { font-size: 20px; }
+    .upload-zone-sub { font-size: 13.5px; color: var(--ink-2); }
+    .upload-zone-formats { margin-top: 14px; letter-spacing: .04em; }
+
+    /* 重ねた動画カードと、いちばん上に貼られた付箋 */
+    .reel { position: relative; width: 132px; height: 84px; margin-bottom: 22px; }
+    .reel-card { position: absolute; inset: 0; border-radius: 3px; background: var(--stage); transition: transform .3s var(--ease-stick); }
+    .reel-card::before { content: ""; position: absolute; left: 0; right: 0; top: 7px; height: 4px; background: repeating-linear-gradient(90deg, rgba(243,239,230,.35) 0 6px, transparent 6px 12px); }
+    .reel-card::after  { content: ""; position: absolute; left: 0; right: 0; bottom: 7px; height: 4px; background: repeating-linear-gradient(90deg, rgba(243,239,230,.35) 0 6px, transparent 6px 12px); }
+    .reel-card.c1 { transform: rotate(-7deg) translate(-6px, 4px); background: #3a3833; }
+    .reel-card.c2 { transform: rotate(4deg) translate(6px, 2px); background: #2a2925; }
+    .reel-card.c3 { background: var(--stage); }
+    .reel-tab { position: absolute; right: -14px; top: 16px; width: 34px; height: 30px; background: var(--fusen); transform: rotate(6deg); box-shadow: 0 3px 6px rgba(0,0,0,.18);
+      clip-path: polygon(0 0, 100% 0, 100% 74%, 76% 100%, 0 100%); transition: transform .3s var(--ease-stick); }
+    .upload-zone:hover .reel-card.c1, .upload-zone.drag-over .reel-card.c1 { transform: rotate(-11deg) translate(-12px, 6px); }
+    .upload-zone:hover .reel-card.c2, .upload-zone.drag-over .reel-card.c2 { transform: rotate(8deg) translate(12px, 2px); }
+    .upload-zone:hover .reel-tab, .upload-zone.drag-over .reel-tab { transform: rotate(-4deg) translateY(-3px); }
+    .upload-zone.drag-over { background: var(--fusen-soft); }
+
+    .desk-steps { list-style: none; display: flex; flex-wrap: wrap; gap: 8px 28px; font-size: 13px; color: var(--ink-2); }
+    .desk-steps li { display: flex; align-items: baseline; gap: 8px; }
+    .desk-steps b { font-family: var(--mincho); font-weight: 900; font-size: 16px; color: var(--ink); }
+    .ph-privacy-note { text-align: left; margin: 0; max-width: none; }
+
+    /* 最近つくったリンク: 罫線の台帳 */
+    .recent-box { max-width: none; border: none; border-top: 2px solid var(--ink); border-radius: 0; background: none; box-shadow: none; padding-top: 2px; margin-top: 62px; }
+    .recent-head { border-bottom: 1px solid var(--line); padding: 10px 0; font-family: var(--mincho); font-weight: 900; font-size: 15px; }
+    .recent-clear { font-family: var(--jp); font-size: 11px; text-decoration: none; border-bottom: 1px solid var(--line); }
+    .recent-list { max-height: 340px; }
+    .recent-item { display: grid; grid-template-columns: 38px 1fr auto auto; gap: 10px; align-items: baseline; padding: 10px 0; border-bottom: 1px dotted var(--line); font-size: 13px; }
+    .recent-date { font-size: 11px; }
+    .recent-item a { font-weight: 500; }
+    .recent-kind { background: none; padding: 0; color: var(--ink-3); font-size: 10.5px; font-weight: 400; }
+    .recent-kind:empty { display: none; }
+    .recent-copy { border: none; padding: 0; font-size: 11px; color: var(--ink-3); border-bottom: 1px solid transparent; border-radius: 0; }
+    .recent-copy:hover { color: var(--ink); border-bottom-color: var(--ink); }
+    .recent-copy.is-flashed { background: none !important; border-color: transparent !important; color: var(--ink) !important; }
+    .recent-foot { font-size: 11px; color: var(--ink-3); margin-top: 10px; }
+
+    /* モーダル内の説明文・入力 */
+    .modal-desc, #importOverlay .modal p { font-size: 13px; line-height: 1.85; color: var(--ink-2); margin: 0 0 14px; }
+    .import-example code { font-family: var(--mono); font-size: 12.5px; background: var(--fusen-soft); border-left: 4px solid var(--fusen); padding: 4px 10px; display: inline-block; color: var(--ink); }
+    #importTextarea { font-family: var(--mono); font-size: 13px; line-height: 1.8; min-height: 140px; }
+    .offset-row { gap: 6px; }
+    .offset-input { font-family: var(--mono); font-size: 18px; text-align: center; background: #fff; border: 1px solid var(--line); border-radius: var(--radius); color: var(--ink); }
+    .offset-input:focus { outline: none; border-color: var(--ink); box-shadow: 0 0 0 3px var(--accent-dim); }
+    .tc-adj { background: none; border: 1px solid var(--line); color: var(--ink-2); font-size: 12px; padding: 6px 9px; cursor: pointer; }
+    .tc-adj:hover { border-color: var(--ink); color: var(--ink); background: none; }
+
+    /* 付箋の操作: 言葉のボタン */
+    .pin-actions { gap: 0; padding: 2px 4px; }
+    .resolve-btn, .reply-btn, .edit-btn, .del-btn { font-family: var(--jp); font-size: 11.5px; line-height: 1; padding: 6px 7px; color: var(--ink-2); }
+    .resolve-btn { color: var(--ink); font-weight: 700; }
+    .resolve-btn.resolved { background: none; font-weight: 400; color: var(--ink-2); }
+
+    /* フッター */
+    footer { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px 24px; padding: 16px 28px; text-align: left; }
+    .footer-links { display: flex; flex-wrap: wrap; gap: 6px 20px; }
+    .footer-links a { color: var(--ink-2); text-decoration: none; }
+    .footer-links a:hover { color: var(--ink); text-decoration: underline; }
+    .footer-copy { color: var(--ink-3); }
+
+    @media (max-width: 900px) {
+      .desk, .desk:has(#recentBox:not([style*="none"])) { grid-template-columns: minmax(0, 1fr); gap: 28px; }
+      .recent-box { margin-top: 0; }
+      .placeholder { padding: 24px 16px; justify-content: flex-start; }
+      .upload-zone { padding: 28px 24px 24px !important; }
+      footer { padding: 16px; }
+    }
+
     /* ショートカットのヒント（PCのみ） */
     .kbd-hints { display: flex; gap: 14px; font-size: 11px; color: var(--ink-3); white-space: nowrap; }
     .kbd-hints kbd { font-family: var(--mono); font-size: 10.5px; border: 1px solid var(--line); border-bottom-width: 2px; border-radius: 3px; padding: 0 5px; margin-right: 5px; color: var(--ink-2); background: var(--card); }
@@ -2143,7 +2239,6 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <section id="fv">
   <div class="fv-inner">
     <div class="fv-text">
-      <div class="fv-eyebrow">VIDEO REVIEW TOOL</div>
       <h1 class="fv-catchcopy">動画に、<br><span class="mark">付箋</span>を貼るように<br>修正を伝える。</h1>
       <p class="fv-desc">気になった場面で止めて、そのまま書き込むだけ。タイムコード付きのコメントが、リンクひとつで相手に届きます。ログインもインストールもいりません。</p>
       <div class="fv-ctas">
@@ -2176,6 +2271,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <a href="/usage">使い方</a>
     <a href="/demo">デモ</a>
     <a href="/blog">ブログ</a>
+    <a href="/faq">よくある質問</a>
   </nav>
   <div class="header-project-name" id="headerProjectName">
     <span class="header-crumb-sep crumb-batch">/</span>
@@ -2206,20 +2302,37 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
     <div class="video-wrap" id="videoWrap">
       <div class="placeholder" id="placeholder">
-        <div class="upload-zone" id="uploadZone" onclick="document.getElementById('fileInput').click()">
-          <div class="upload-icon"><i data-lucide="upload-cloud" class="icon-lg"></i></div>
-          <p class="upload-zone-title">クリックしてファイルを選択</p>
-          <p class="upload-zone-drop" aria-hidden="true">ここで離すと読み込みます</p>
-          <p class="upload-zone-sub">または動画をここにドロップ（複数可）</p>
-          <p class="upload-zone-formats">MP4 · MOV · WebM · AVI など</p>
-        </div>
-        <p class="ph-privacy-note"><i data-lucide="lock" class="icon" style="opacity:.5"></i> アップロードした動画は、共有URLを知っている方のみ再生できます。30日後に自動削除されます。</p>
-        <div class="recent-box" id="recentBox" style="display:none">
-          <div class="recent-head">
-            <span>この端末で最近作成したリンク</span>
-            <button class="recent-clear" onclick="clearRecent()">履歴を消去</button>
+        <div class="desk">
+          <div class="desk-main">
+            <h2 class="desk-title">どの動画に、付箋を貼りますか。</h2>
+            <div class="upload-zone" id="uploadZone" role="button" tabindex="0"
+                 onclick="document.getElementById('fileInput').click()"
+                 onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click()}">
+              <div class="reel" aria-hidden="true">
+                <span class="reel-card c1"></span>
+                <span class="reel-card c2"></span>
+                <span class="reel-card c3"><span class="reel-tab"></span></span>
+              </div>
+              <p class="upload-zone-title">動画ファイルを、ここに置く</p>
+              <p class="upload-zone-drop" aria-hidden="true">そのまま離してください</p>
+              <p class="upload-zone-sub">クリックして選ぶこともできます。何本でもまとめてどうぞ。</p>
+              <p class="upload-zone-formats">MP4 / MOV / WebM / AVI</p>
+            </div>
+            <ol class="desk-steps">
+              <li><b>一</b>動画を置く</li>
+              <li><b>二</b>気になる場面に付箋を貼る</li>
+              <li><b>三</b>リンクを送る</li>
+            </ol>
+            <p class="ph-privacy-note">リンクを知っている人だけが見られます。動画は30日後に自動で削除されます。</p>
           </div>
-          <ul class="recent-list" id="recentList"></ul>
+          <div class="recent-box" id="recentBox" style="display:none">
+            <div class="recent-head">
+              <span>最近つくったリンク</span>
+              <button class="recent-clear" onclick="clearRecent()">消去</button>
+            </div>
+            <ul class="recent-list" id="recentList"></ul>
+            <p class="recent-foot">この端末のブラウザにだけ残ります</p>
+          </div>
         </div>
       </div>
       <div class="sync-hint" id="syncHint">再生と同時にタイマー開始</div>
@@ -2316,14 +2429,14 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     </div>
     <div class="pins-scroll" id="pinsList">
       <div class="pins-empty">
-        <div class="pins-empty-icon"><i data-lucide="map-pin" class="icon-lg"></i></div>
-        <div>タイムコード付きのコメントが<br>ここに表示されます</div>
+        <div class="pins-empty-note" aria-hidden="true"></div>
+        <div class="pins-empty-msg"><strong>まだ付箋はありません</strong>気になる場面で止めて<kbd>P</kbd>を押すと、<br>その時間に付箋を貼れます</div>
       </div>
     </div>
     <div class="sidebar-tools">
       <button class="btn-copy-text" onclick="copyPinsAsText()" title="コメントをテキストでコピー"><i data-lucide="clipboard" class="icon"></i> テキストでコピー</button>
-      <button class="btn-copy-text" onclick="openImportModal()" title="テキストからコメントを取り込む"><i data-lucide="file-input" class="icon"></i> 取り込み</button>
-      <button class="btn-copy-text" id="btnOffset" onclick="openOffsetModal()" style="display:none" title="タイムコードを一括調整"><i data-lucide="clock" class="icon"></i> 時間調整</button>
+      <button class="btn-copy-text" onclick="openImportModal()" title="テキストから付箋を取り込む"><i data-lucide="file-input" class="icon"></i> 取り込み</button>
+      <button class="btn-copy-text" id="btnOffset" onclick="openOffsetModal()" style="display:none" title="付箋の時間をまとめてずらす"><i data-lucide="clock" class="icon"></i> 時間をずらす</button>
     </div>
   </div>
 
@@ -2392,13 +2505,13 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <!-- Import from text modal -->
 <div id="importOverlay">
   <div class="modal">
-    <h3><i data-lucide="file-input" class="icon"></i> テキストからインポート</h3>
-    <p>以下の形式のテキストを貼り付けると、タイムコードに合わせてコメントが追加されます。<br>
-       例）<code style="color:var(--accent)">00:32　テロップのフォントを変えてください</code></p>
-    <textarea id="importTextarea" placeholder="ここにテキストを貼り付けてください..."></textarea>
+    <h3>テキストから取り込む</h3>
+    <p>メールやチャットでもらった修正指示を貼り付けると、時間ごとに付箋になります。1行に1つ、時間のあとに内容を書いてください。</p>
+    <p class="import-example"><code>00:32　テロップのフォントを変えてください</code></p>
+    <textarea id="importTextarea" placeholder="00:12　冒頭のテロップを太く&#10;01:05　BGMを少し下げる"></textarea>
     <div class="modal-actions">
       <button class="btn-cancel" onclick="closeImportModal()">キャンセル</button>
-      <button class="btn-primary" onclick="confirmImport()">インポート</button>
+      <button class="btn-primary" onclick="confirmImport()">付箋にする</button>
     </div>
   </div>
 </div>
@@ -2432,11 +2545,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <!-- Offset modal -->
 <div class="overlay" id="offsetOverlay">
   <div class="modal">
-    <div class="modal-title"><i data-lucide="clock" class="icon"></i> タイムコードを一括調整</div>
-    <p style="font-size:12px;color:var(--text-muted);margin:6px 0 14px;line-height:1.7">
-      このバージョンの全コメントのタイムコードを一括でずらします。<br>
-      カット追加で動画が長くなった場合などに活用してください。
-    </p>
+    <div class="modal-title">付箋の時間をまとめてずらす</div>
+    <p class="modal-desc">この版のすべての付箋を、同じ秒数だけ前後にずらします。カットを足して動画が長くなったときなどに。</p>
     <div class="offset-row">
       <button class="tc-adj" onclick="changeOffsetInput(-10)">−10s</button>
       <button class="tc-adj" onclick="changeOffsetInput(-5)">−5s</button>
@@ -2444,7 +2554,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       <button class="tc-adj" onclick="changeOffsetInput(+5)">+5s</button>
       <button class="tc-adj" onclick="changeOffsetInput(+10)">+10s</button>
     </div>
-    <div class="modal-tip">例: +5 で全コメントを5秒後ろにずらします。マイナスで前にずらします。</div>
+    <div class="modal-tip">+5 なら5秒うしろへ、−5 なら5秒まえへ。</div>
     <div class="modal-actions">
       <button class="btn-cancel" onclick="closeOffsetModal()">キャンセル</button>
       <button class="btn-primary" onclick="applyOffset()">適用する</button>
@@ -2905,10 +3015,10 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       const url = `${location.origin}/${r.type === 'batch' ? 'batch' : 'project'}/${r.id}`;
       const d = new Date(r.createdAt);
       return `<li class="recent-item">
-        <span class="recent-kind">${r.type === 'batch' ? 'まとめ' : '動画'}</span>
+        <span class="recent-date">${d.getMonth() + 1}/${String(d.getDate()).padStart(2, '0')}</span>
         <a href="${esc(url)}">${esc(r.name)}</a>
-        <span class="recent-date">${d.getMonth() + 1}/${d.getDate()}</span>
-        <button class="recent-copy" onclick="writeClipboard('${esc(url)}');flashButton(this, '✓ コピー済み')">コピー</button>
+        <span class="recent-kind">${r.type === 'batch' ? 'まとめ' : ''}</span>
+        <button class="recent-copy" onclick="writeClipboard('${esc(url)}');flashButton(this, 'コピー済')">コピー</button>
       </li>`;
     }).join('');
   }
@@ -3429,14 +3539,13 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
           <div class="pin-actions">
             <button class="resolve-btn${p.resolved ? ' resolved' : ''}"
               onclick="event.stopPropagation();toggleResolved(${p.id})"
-              title="${p.resolved ? '未解決に戻す' : '修正済にする'}">✓</button>
+              title="${p.resolved ? '未解決に戻す' : '修正できたら剥がす（R）'}">${p.resolved ? '貼り直す' : '剥がす'}</button>
             <button class="reply-btn"
-              onclick="event.stopPropagation();openReplyForm(${p.id})"
-              title="返信">↩</button>
+              onclick="event.stopPropagation();openReplyForm(${p.id})">返信</button>
             <button class="edit-btn"
-              onclick="event.stopPropagation();openModal(${p.id})" title="編集">✎</button>
+              onclick="event.stopPropagation();openModal(${p.id})">書き換え</button>
             <button class="del-btn"
-              onclick="event.stopPropagation();deletePin(${p.id})" title="削除">✕</button>
+              onclick="event.stopPropagation();deletePin(${p.id})">捨てる</button>
           </div>` : ''}
         </div>`;
     }).join('');
@@ -4119,7 +4228,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
   // ─── コメントテキストコピー（サイドバーボタン用）──────────
   function copyPinsAsText() {
-    if (state.pins.length === 0) { toast('ピンがありません'); return; }
+    if (state.pins.length === 0) { toast('まだ付箋がありません'); return; }
     const filename = document.getElementById('fileNameLabel').textContent
                   || state.videoUrl || '動画';
     const lines = [
@@ -4135,7 +4244,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       })
     ];
     writeClipboard(lines.join('\n'));
-    toast('コメント一覧をコピーしました');
+    toast('付箋の一覧をテキストでコピーしました');
   }
 
   // ─── テキストからインポート ────────────────────────────────
@@ -4179,7 +4288,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     }
 
     if (newPins.length === 0) {
-      toast('タイムコード付きのコメントが見つかりませんでした');
+      toast('「00:32 内容」の形の行が見つかりませんでした');
       return;
     }
 
@@ -4187,7 +4296,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     renderPins();
     saveState();
     closeImportModal();
-    toast(`${newPins.length}件のコメントをインポートしました`);
+    toast(`${newPins.length}枚の付箋を貼りました`);
   }
 
   // ─── アップロード元ファイルの読み取りチェック ─────────────
@@ -4607,21 +4716,16 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 </script>
 
 <footer>
-  <a href="/usage">使い方</a>
-  &nbsp;|&nbsp;
-  <a href="/blog">ブログ</a>
-  &nbsp;|&nbsp;
-  <a href="/demo">デモ</a>
-  &nbsp;|&nbsp;
-  <a href="/faq">FAQ</a>
-  &nbsp;|&nbsp;
-  <a href="/about">運営者情報</a>
-  &nbsp;|&nbsp;
-  <a href="/contact">お問い合わせ</a>
-  &nbsp;|&nbsp;
-  <a href="/privacy">プライバシーポリシー</a>
-  &nbsp;|&nbsp;
-  &copy; 株式会社Webil
+  <nav class="footer-links">
+    <a href="/usage">使い方</a>
+    <a href="/blog">ブログ</a>
+    <a href="/demo">デモ</a>
+    <a href="/faq">よくある質問</a>
+    <a href="/about">運営者情報</a>
+    <a href="/contact">お問い合わせ</a>
+    <a href="/privacy">プライバシーポリシー</a>
+  </nav>
+  <span class="footer-copy">&copy; 株式会社Webil</span>
 </footer>
 
 </div><!-- /#app -->

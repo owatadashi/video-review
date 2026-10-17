@@ -18,10 +18,10 @@
   <meta property="og:site_name" content="Clippin">
   <meta property="og:title" content="まとめページ - Clippin">
   <meta property="og:description" content="複数の動画をまとめて確認できるページです。動画を選んで、タイムコード付きでコメントを残せます。">
-  <meta property="og:image" content="https://clippin.work/og-image.png">
+  <meta property="og:image" content="https://clippin.work/og-image.png?v=2">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700&family=JetBrains+Mono:wght@500&family=Inter+Tight:wght@700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700&family=Zen+Old+Mincho:wght@900&family=JetBrains+Mono:wght@500&family=Inter+Tight:wght@700&display=swap" rel="stylesheet">
   <style>
     :root {
       --paper: #f3efe6; --paper-2: #ebe5d8; --card: #fbf9f4;
@@ -47,10 +47,9 @@
     .header-nav a:hover { color: var(--ink); }
 
     main { flex: 1; max-width: 880px; width: 100%; margin: 0 auto; padding: 56px 28px 88px; }
-    .eyebrow { font-family: var(--mono); font-size: 12px; color: var(--ink-3); letter-spacing: .08em; margin-bottom: 16px; display: flex; align-items: center; gap: 10px; }
-    .eyebrow::before { content: ""; width: 24px; height: 1px; background: var(--ink-3); }
+    .eyebrow { font-size: 12px; color: var(--ink-3); margin-bottom: 10px; }
     .title-row { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; min-width: 0; }
-    h1 { font-size: 28px; font-weight: 700; letter-spacing: .01em; overflow-wrap: anywhere; }
+    h1 { font-family: 'Zen Old Mincho', 'Hiragino Mincho ProN', serif; font-weight: 900; font-size: 30px; letter-spacing: .02em; line-height: 1.4; overflow-wrap: anywhere; }
     .title-input { font: inherit; font-size: 28px; font-weight: 700; border: 1px solid var(--ink); box-shadow: 0 0 0 3px rgba(255,217,74,.35); border-radius: 4px; background: #fff; padding: 2px 10px; width: 100%; max-width: 600px; outline: none; color: var(--ink); }
     .icon-btn { background: none; border: 1px solid var(--line); border-radius: 3px; color: var(--ink-2); padding: 4px 10px; cursor: pointer; font-size: 12px; flex-shrink: 0; }
     .icon-btn:hover { border-color: var(--ink); color: var(--ink); }
@@ -84,8 +83,10 @@
 
     .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(20px); background: var(--ink); color: var(--paper); padding: 10px 18px; border-radius: 4px; font-size: 13px; opacity: 0; pointer-events: none; transition: all 0.2s; z-index: 50; max-width: calc(100vw - 32px); }
     .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-    footer { padding: 18px; text-align: center; color: var(--ink-3); font-size: 12px; border-top: 1px solid var(--line); }
+    footer { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px 24px; padding: 18px 28px; color: var(--ink-3); font-size: 12px; border-top: 1px solid var(--line); }
+    .footer-links { display: flex; flex-wrap: wrap; gap: 6px 20px; }
     footer a { color: var(--ink-2); text-decoration: none; }
+    footer a:hover { color: var(--ink); text-decoration: underline; }
 
     @media (max-width: 600px) {
       header { height: 52px; padding: 0 16px; }
@@ -108,7 +109,7 @@
 </header>
 
 <main>
-  <div class="eyebrow">COLLECTION</div>
+  <div class="eyebrow">まとめページ</div>
   <div class="title-row" id="titleRow">
     <h1 id="batchName">読み込み中...</h1>
     <button class="icon-btn" id="renameBtn" onclick="startRename()" title="名前を変更" style="display:none">名前を変更</button>
@@ -128,7 +129,8 @@
 </main>
 
 <footer>
-  <a href="/">Clippin</a> · <a href="/usage">使い方</a> · <a href="/privacy">プライバシーポリシー</a>
+  <nav class="footer-links"><a href="/usage">使い方</a><a href="/faq">よくある質問</a><a href="/privacy">プライバシーポリシー</a></nav>
+  <span>&copy; 株式会社Webil</span>
 </footer>
 
 <div class="toast" id="toast"></div>

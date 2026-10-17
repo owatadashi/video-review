@@ -7,154 +7,233 @@
   <meta name="description" content="Clippinのよくある質問をまとめました。料金、ログイン不要の理由、動画の保存期間、対応形式、セキュリティなど、利用前に気になるポイントをわかりやすく回答しています。">
   <meta name="keywords" content="Clippin,FAQ,よくある質問,動画レビュー,使い方,料金">
   <link rel="canonical" href="https://clippin.work/faq">
-  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg?v=3">
   <meta property="og:type" content="website">
   <meta property="og:title" content="よくある質問（FAQ）｜Clippin">
   <meta property="og:description" content="Clippinのよくある質問をまとめました。">
   <meta property="og:url" content="https://clippin.work/faq">
-  <meta property="og:image" content="https://clippin.work/og-image.png">
+  <meta property="og:image" content="https://clippin.work/og-image.png?v=2">
   <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "FAQPage",
-    "mainEntity": [
-      {"@type":"Question","name":"Clippinは無料で使えますか？","acceptedAnswer":{"@type":"Answer","text":"はい、Clippinは現在すべての機能を無料でご利用いただけます。アカウント登録も不要です。"}},
-      {"@type":"Question","name":"レビュアー（クライアント）もアカウント登録が必要ですか？","acceptedAnswer":{"@type":"Answer","text":"いいえ、共有URLを送るだけでアカウント登録なしでコメントが可能です。"}},
-      {"@type":"Question","name":"アップロードした動画はいつまで保存されますか？","acceptedAnswer":{"@type":"Answer","text":"アップロードから30日経過すると自動的に削除されます。"}},
-      {"@type":"Question","name":"対応している動画形式は？","acceptedAnswer":{"@type":"Answer","text":"MP4、MOV、WebM など、主要なブラウザで再生可能な動画形式に対応しています。"}},
-      {"@type":"Question","name":"動画の最大サイズは？","acceptedAnswer":{"@type":"Answer","text":"現在は1ファイル500MBまでアップロード可能です。"}}
-    ]
-  }
-  </script>
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {
+      "@type": "Question",
+      "name": "Clippinは無料で使えますか？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "はい。現在はすべての機能を無料でお使いいただけます。アカウント登録もいりません。大きな容量や長期保存が必要な方に向けた有料プランは、いま準備を進めています。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "将来的に有料化されますか？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "無料プランは続けて提供する予定です。プロ向け・チーム向けの上位プランは別に用意しますが、個人で気軽に使う分には無料プランで足りる設計を守ります。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "レビュアー（クライアント）もアカウント登録が必要ですか？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "いいえ、必要ありません。「リンクをコピー」で取得したURLを送るだけで、相手は登録なしで気になる場面に付箋を貼れます。クライアントに新しいツールを覚えてもらう手間はほとんどかかりません。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "対応している動画形式は？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "MP4、MOV、WebM など、主要なブラウザで再生できる形式に対応しています。もっとも確実なのは H.264 でエンコードしたMP4 です。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "動画の最大サイズは？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "1ファイル 500MBまで アップロードできます。超えてしまう場合は、ビットレートや解像度を下げて書き出すか、複数のファイルに分けてお使いください。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "修正版（バージョン）の管理はできますか？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "できます。同じ動画ページに「＋新しい版」から修正版を追加できます。前の版の付箋は新しい版に引き継がれ、前の版もそのまま残るので、どこをどう直したかを後から辿れます。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "アップロードした動画はいつまで保存されますか？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "アップロードから 30日 で自動的に削除されます。長く残しておきたい動画は、お手元にバックアップを保存してください。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "動画を手動で削除することはできますか？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "ひとつの動画に2つ以上の版がある場合は、動画ページ上部の版の「×」から、不要な版を削除できます。削除した版と、その版に貼られた付箋は元に戻せません。動画ページそのものは30日後に自動で削除されます。すぐに消したい場合はお問い合わせからご連絡ください。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "アップロードした動画は安全ですか？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "動画は暗号化された通信（HTTPS）でアップロードされ、Cloudflare R2 上に保管されます。共有URLを知っている人だけが見られる仕組みで、検索エンジンに載ることもありません。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "機密性の高い動画もアップロードして大丈夫ですか？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "URLを知っている人だけがアクセスできるため、URLをきちんと管理していただければ基本的には問題ありません。ただし、特に機密性の高い動画は、社内の運用方針に照らしてご判断ください。パスワード保護機能も追加する予定です。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "スマートフォンからも使えますか？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "はい。スマートフォンやタブレットのブラウザからも、動画の再生と付箋の貼り付けができます。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "他のツール（Frame.io等）と比べてどう違いますか？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "Clippin は、日本語で使えること、ログインがいらないこと、機能を絞って迷わないこと、無料であることを大事にしています。フリーランスや小さな制作チームでの使いやすさを優先した設計です。詳しくは Frame.io と Clippin の比較記事 をご覧ください。"
+      }
+    },
+    {
+      "@type": "Question",
+      "name": "サポート対応はありますか？",
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": "日本語でお問い合わせを受け付けています。お問い合わせフォームからご連絡ください。"
+      }
+    }
+  ]
+}
+</script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700&family=Zen+Old+Mincho:wght@900&family=JetBrains+Mono:wght@500&family=Inter+Tight:wght@700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/site.css">
   <style>
-    :root { --bg: #fafafa; --surface: #f1f1f4; --surface2: #e8e8ec; --border: #e0e0e6; --accent: #0891b2; --text: #0f0f12; --text-muted: #6a6a77; }
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Hiragino Sans', 'Yu Gothic', sans-serif; min-height: 100dvh; display: flex; flex-direction: column; }
-    header { background: var(--surface); border-bottom: 1px solid var(--border); padding: 10px 18px; display: flex; align-items: center; gap: 14px; flex-shrink: 0; }
-    .logo { font-size: 17px; font-weight: 700; color: var(--accent); text-decoration: none; letter-spacing: -0.3px; }
-    .header-nav { display: flex; gap: 16px; align-items: center; margin-left: auto; }
-    .header-nav a { font-size: 13px; color: var(--text-muted); text-decoration: none; }
-    .header-nav a:hover { color: var(--text); }
-    .header-cta { font-size: 13px; font-weight: 600; background: var(--accent); color: #fff !important; border: none; border-radius: 7px; padding: 7px 14px; cursor: pointer; text-decoration: none; }
-    main { flex: 1; max-width: 800px; width: 100%; margin: 0 auto; padding: 52px 24px 96px; }
-    h1 { font-size: 28px; font-weight: 700; letter-spacing: -0.5px; margin-bottom: 10px; }
-    .lead { font-size: 15px; line-height: 1.8; color: var(--text-muted); margin-bottom: 40px; max-width: 640px; }
-    .faq-cat { font-size: 12px; font-weight: 700; letter-spacing: 0.1em; color: var(--accent); margin: 40px 0 14px; }
-    .faq-item { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; margin-bottom: 10px; overflow: hidden; }
-    .faq-question { padding: 16px 20px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; font-size: 14px; font-weight: 700; }
-    .faq-question:hover { background: var(--surface2); }
-    .faq-toggle { color: var(--accent); font-size: 18px; transition: transform 0.2s; }
-    .faq-item.open .faq-toggle { transform: rotate(45deg); }
-    .faq-answer { padding: 0 20px 18px; font-size: 14px; line-height: 1.85; color: var(--text-muted); display: none; }
-    .faq-item.open .faq-answer { display: block; }
-    .faq-answer a { color: var(--accent); text-decoration: none; }
-    footer { padding: 24px; text-align: center; color: var(--text-muted); font-size: 12px; border-top: 1px solid var(--border); }
-    footer a { color: var(--text-muted); text-decoration: none; }
-    @media (max-width: 600px) { h1 { font-size: 23px; } main { padding: 32px 18px 64px; } }
+    .faq-cat:first-of-type { margin-top: 0; }
+    .faq-answer a { text-decoration-thickness: 1px; }
+    .faq-foot { margin-top: 64px; font-size: 14.5px; color: var(--ink-2); }
   </style>
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5000671630850248" crossorigin="anonymous"></script>
 </head>
 <body>
 
-<header>
-  <a class="logo" href="/">Clippin</a>
-  <nav class="header-nav">
+<header class="site-header">
+  <a class="logo" href="/" aria-label="Clippin トップへ"><span class="logo-mark" aria-hidden="true"></span><span class="logo-word">clippin</span></a>
+  <nav class="site-nav">
     <a href="/usage">使い方</a>
+    <a href="/demo">デモ</a>
     <a href="/blog">ブログ</a>
-    <a class="header-cta" href="/">無料で使う</a>
+    <a href="/faq" aria-current="page">よくある質問</a>
   </nav>
+  <a class="btn btn-sm" href="/">動画をアップロード</a>
 </header>
 
-<main>
-  <h1>よくある質問（FAQ）</h1>
-  <p class="lead">Clippin の利用前によくいただく質問をまとめました。お探しの内容が見つからない場合は、<a href="/contact" style="color:var(--accent);">お問い合わせフォーム</a> よりご連絡ください。</p>
+<main class="page">
+  <h1>よくある質問</h1>
+  <p class="lead">使いはじめる前によくいただく質問をまとめました。ここにない内容は、<a href="/contact">お問い合わせ</a>からお気軽にどうぞ。</p>
 
-  <div class="faq-cat">料金・プランについて</div>
-
-  <div class="faq-item">
-    <div class="faq-question">Clippinは無料で使えますか？<span class="faq-toggle">+</span></div>
-    <div class="faq-answer">はい、Clippin は現在すべての機能を無料でご利用いただけます。アカウント登録も不要です。今後、より大きな容量や長期保存などを必要とする方向けに有料プランを準備中です。</div>
+  <h2 class="faq-cat">料金について</h2>
+  <div class="faq-list">
+    <details class="faq-item">
+      <summary>Clippinは無料で使えますか？</summary>
+      <div class="faq-answer"><p>はい。現在はすべての機能を無料でお使いいただけます。アカウント登録もいりません。大きな容量や長期保存が必要な方に向けた有料プランは、いま準備を進めています。</p></div>
+    </details>
+    <details class="faq-item">
+      <summary>将来的に有料化されますか？</summary>
+      <div class="faq-answer"><p>無料プランは続けて提供する予定です。プロ向け・チーム向けの上位プランは別に用意しますが、個人で気軽に使う分には無料プランで足りる設計を守ります。</p></div>
+    </details>
   </div>
 
-  <div class="faq-item">
-    <div class="faq-question">将来的に有料化されますか？<span class="faq-toggle">+</span></div>
-    <div class="faq-answer">無料プランは継続して提供する予定です。プロ向け・チーム向けの上位プランを別途準備していますが、個人での軽い利用には無料プランで十分対応できる設計を維持します。</div>
+  <h2 class="faq-cat">機能・使い方について</h2>
+  <div class="faq-list">
+    <details class="faq-item">
+      <summary>レビュアー（クライアント）もアカウント登録が必要ですか？</summary>
+      <div class="faq-answer"><p>いいえ、必要ありません。「リンクをコピー」で取得したURLを送るだけで、相手は登録なしで気になる場面に付箋を貼れます。クライアントに新しいツールを覚えてもらう手間はほとんどかかりません。</p></div>
+    </details>
+    <details class="faq-item">
+      <summary>対応している動画形式は？</summary>
+      <div class="faq-answer"><p>MP4、MOV、WebM など、主要なブラウザで再生できる形式に対応しています。もっとも確実なのは <strong>H.264 でエンコードしたMP4</strong> です。</p></div>
+    </details>
+    <details class="faq-item">
+      <summary>動画の最大サイズは？</summary>
+      <div class="faq-answer"><p>1ファイル <strong>500MBまで</strong> アップロードできます。超えてしまう場合は、ビットレートや解像度を下げて書き出すか、複数のファイルに分けてお使いください。</p></div>
+    </details>
+    <details class="faq-item">
+      <summary>修正版（バージョン）の管理はできますか？</summary>
+      <div class="faq-answer"><p>できます。同じ動画ページに「＋新しい版」から修正版を追加できます。前の版の付箋は新しい版に引き継がれ、前の版もそのまま残るので、どこをどう直したかを後から辿れます。</p></div>
+    </details>
   </div>
 
-  <div class="faq-cat">機能・使い方について</div>
-
-  <div class="faq-item">
-    <div class="faq-question">レビュアー（クライアント）もアカウント登録が必要ですか？<span class="faq-toggle">+</span></div>
-    <div class="faq-answer">いいえ、Clippin の大きな特長は <strong>「ログイン不要」</strong> です。共有URLを送るだけで、相手はアカウント登録なしでコメントできます。クライアントへの導入負担がほぼゼロです。</div>
+  <h2 class="faq-cat">保存・削除について</h2>
+  <div class="faq-list">
+    <details class="faq-item">
+      <summary>アップロードした動画はいつまで保存されますか？</summary>
+      <div class="faq-answer"><p>アップロードから <strong>30日</strong> で自動的に削除されます。長く残しておきたい動画は、お手元にバックアップを保存してください。</p></div>
+    </details>
+    <details class="faq-item">
+      <summary>動画を手動で削除することはできますか？</summary>
+      <div class="faq-answer"><p>ひとつの動画に2つ以上の版がある場合は、動画ページ上部の版の「×」から、不要な版を削除できます。削除した版と、その版に貼られた付箋は元に戻せません。動画ページそのものは30日後に自動で削除されます。すぐに消したい場合は<a href="/contact">お問い合わせ</a>からご連絡ください。</p></div>
+    </details>
   </div>
 
-  <div class="faq-item">
-    <div class="faq-question">対応している動画形式は？<span class="faq-toggle">+</span></div>
-    <div class="faq-answer">MP4、MOV、WebM など、主要なブラウザで再生可能な動画形式に対応しています。最も互換性が高いのは <strong>H.264 でエンコードされたMP4</strong> です。</div>
+  <h2 class="faq-cat">セキュリティ・プライバシー</h2>
+  <div class="faq-list">
+    <details class="faq-item">
+      <summary>アップロードした動画は安全ですか？</summary>
+      <div class="faq-answer"><p>動画は暗号化された通信（HTTPS）でアップロードされ、Cloudflare R2 上に保管されます。共有URLを知っている人だけが見られる仕組みで、検索エンジンに載ることもありません。</p></div>
+    </details>
+    <details class="faq-item">
+      <summary>機密性の高い動画もアップロードして大丈夫ですか？</summary>
+      <div class="faq-answer"><p>URLを知っている人だけがアクセスできるため、URLをきちんと管理していただければ基本的には問題ありません。ただし、特に機密性の高い動画は、社内の運用方針に照らしてご判断ください。パスワード保護機能も追加する予定です。</p></div>
+    </details>
   </div>
 
-  <div class="faq-item">
-    <div class="faq-question">動画の最大サイズは？<span class="faq-toggle">+</span></div>
-    <div class="faq-answer">現在は1ファイル <strong>500MBまで</strong> アップロード可能です。容量を超える動画は、エンコード設定（ビットレート・解像度）を調整いただくか、複数に分割してご利用ください。</div>
+  <h2 class="faq-cat">その他</h2>
+  <div class="faq-list">
+    <details class="faq-item">
+      <summary>スマートフォンからも使えますか？</summary>
+      <div class="faq-answer"><p>はい。スマートフォンやタブレットのブラウザからも、動画の再生と付箋の貼り付けができます。</p></div>
+    </details>
+    <details class="faq-item">
+      <summary>他のツール（Frame.io等）と比べてどう違いますか？</summary>
+      <div class="faq-answer"><p>Clippin は、日本語で使えること、ログインがいらないこと、機能を絞って迷わないこと、無料であることを大事にしています。フリーランスや小さな制作チームでの使いやすさを優先した設計です。詳しくは <a href="/blog/frameio-vs-clippin">Frame.io と Clippin の比較記事</a> をご覧ください。</p></div>
+    </details>
+    <details class="faq-item">
+      <summary>サポート対応はありますか？</summary>
+      <div class="faq-answer"><p>日本語でお問い合わせを受け付けています。<a href="/contact">お問い合わせフォーム</a>からご連絡ください。</p></div>
+    </details>
   </div>
 
-  <div class="faq-item">
-    <div class="faq-question">バージョン管理はできますか？<span class="faq-toggle">+</span></div>
-    <div class="faq-answer">はい、同じプロジェクト内で新しいバージョンの動画をアップロードできます。前バージョンのコメントも保持されるため、修正履歴を辿りやすくなっています。</div>
-  </div>
-
-  <div class="faq-cat">保存・削除について</div>
-
-  <div class="faq-item">
-    <div class="faq-question">アップロードした動画はいつまで保存されますか？<span class="faq-toggle">+</span></div>
-    <div class="faq-answer">アップロードから <strong>30日経過</strong> すると自動的に削除されます。長期保存が必要な場合は、ローカルにダウンロードしてバックアップを取ってください。</div>
-  </div>
-
-  <div class="faq-item">
-    <div class="faq-question">動画を手動で削除することはできますか？<span class="faq-toggle">+</span></div>
-    <div class="faq-answer">プロジェクト管理画面から、いつでも手動で削除可能です。削除後の復元はできませんのでご注意ください。</div>
-  </div>
-
-  <div class="faq-cat">セキュリティ・プライバシー</div>
-
-  <div class="faq-item">
-    <div class="faq-question">アップロードした動画は安全ですか？<span class="faq-toggle">+</span></div>
-    <div class="faq-answer">動画は暗号化通信（HTTPS）でアップロードされ、Cloudflare R2 上で安全に保管されます。共有URLを知っている人のみがアクセス可能で、検索エンジン等にインデックスされることもありません。</div>
-  </div>
-
-  <div class="faq-item">
-    <div class="faq-question">機密性の高い動画もアップロードして大丈夫ですか？<span class="faq-toggle">+</span></div>
-    <div class="faq-answer">URLを知っている人のみアクセスできる仕組みのため、URL自体を厳重に管理いただければ問題ありません。ただし、機密性が非常に高い動画は、運用方針に応じてご判断ください。今後、パスワード保護機能の追加を予定しています。</div>
-  </div>
-
-  <div class="faq-cat">その他</div>
-
-  <div class="faq-item">
-    <div class="faq-question">スマートフォンからも使えますか？<span class="faq-toggle">+</span></div>
-    <div class="faq-answer">はい、レスポンシブデザインに対応しており、スマートフォン・タブレットからもご利用いただけます。動画の視聴・コメント投稿はもちろん可能です。</div>
-  </div>
-
-  <div class="faq-item">
-    <div class="faq-question">他のツール（Frame.io等）と比較してどんな違いがありますか？<span class="faq-toggle">+</span></div>
-    <div class="faq-answer">Clippin は <strong>「日本語UI × ログイン不要 × シンプル × 無料」</strong> という、日本のフリーランス・中小制作チーム向けに最適化された設計です。詳しくは <a href="/blog/frameio-vs-clippin">Frame.io vs Clippin の比較記事</a> をご覧ください。</div>
-  </div>
-
-  <div class="faq-item">
-    <div class="faq-question">サポート対応はありますか？<span class="faq-toggle">+</span></div>
-    <div class="faq-answer">日本語でお問い合わせを承っています。<a href="/contact">お問い合わせフォーム</a> よりご連絡ください。</div>
-  </div>
-
+  <p class="faq-foot">使い方の流れは <a href="/usage">使い方ガイド</a> で、実際の画面は <a href="/demo">デモ</a> で確かめられます。</p>
 </main>
 
-<footer>
-  <a href="/">トップ</a>　|　<a href="/usage">使い方</a>　|　<a href="/blog">ブログ</a>　|　<a href="/faq">FAQ</a>　|　<a href="/about">運営者情報</a>　|　<a href="/contact">お問い合わせ</a>　|　<a href="/privacy">プライバシーポリシー</a>　|　&copy; 株式会社Webil
+<footer class="site-footer">
+  <nav class="footer-links">
+    <a href="/usage">使い方</a><a href="/demo">デモ</a><a href="/blog">ブログ</a><a href="/faq">よくある質問</a><a href="/about">運営者情報</a><a href="/contact">お問い合わせ</a><a href="/privacy">プライバシーポリシー</a>
+  </nav>
+  <span>&copy; 株式会社Webil</span>
 </footer>
-
-<script>
-  document.querySelectorAll('.faq-question').forEach(q => {
-    q.addEventListener('click', () => q.parentElement.classList.toggle('open'));
-  });
-</script>
 
 </body>
 </html>
