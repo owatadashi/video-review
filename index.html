@@ -1867,6 +1867,406 @@
         letter-spacing: 0;
       }
     }
+
+    /* ════════════════════════════════════════════════════════
+       Design refresh — 配色・余白・角丸・階層をここで統一する
+       （上の個別スタイルを上書き。新しい見た目の調整はここで行う）
+       ════════════════════════════════════════════════════════ */
+    :root {
+      --bg: #f5f6f8;
+      --surface: #ffffff;
+      --surface2: #f0f2f5;
+      --border: #e4e7ec;
+      --text: #111827;
+      --text-muted: #6b7280;
+      --text-faint: #9ca3af;
+      --accent: #0891b2;
+      --accent-hover: #0e7490;
+      --accent-dim: rgba(8,145,178,0.08);
+      --stage: #0d0f12;
+      --radius: 8px;
+      --radius-lg: 12px;
+      --shadow: 0 1px 2px rgba(16,24,40,0.04), 0 1px 3px rgba(16,24,40,0.06);
+      --shadow-lg: 0 12px 32px rgba(16,24,40,0.14);
+    }
+    body { -webkit-font-smoothing: antialiased; }
+    button, input, select, textarea { font-family: inherit; }
+
+    /* ── Buttons (共通) ── */
+    .btn-primary, .btn-cancel, .btn-ghost {
+      border-radius: var(--radius);
+      font-size: 13px;
+      font-weight: 600;
+      padding: 8px 14px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      line-height: 1.2;
+      transition: background 0.15s, border-color 0.15s, color 0.15s;
+    }
+    .btn-primary { box-shadow: var(--shadow); }
+    .btn-primary:disabled { opacity: 0.45; cursor: not-allowed; box-shadow: none; }
+    .btn-cancel, .btn-ghost {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--text);
+      font-weight: 500;
+      cursor: pointer;
+    }
+    .btn-cancel:hover, .btn-ghost:hover { background: var(--surface2); color: var(--text); }
+    .btn-cancel:disabled { opacity: 0.45; cursor: not-allowed; }
+
+    /* ── Header ── */
+    header {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      height: 52px;
+      padding: 0 20px;
+      gap: 20px;
+    }
+    .logo { font-size: 18px; text-decoration: none; }
+    .header-nav { display: flex; gap: 18px; }
+    .header-nav a { font-size: 13px; color: var(--text-muted); text-decoration: none; }
+    .header-nav a:hover { color: var(--text); }
+    .header-project-name {
+      margin-left: 0;
+      font-size: 14px;
+      gap: 8px;
+      max-width: none;
+      flex: 1;
+      min-width: 0;
+    }
+    .header-project-name span#headerProjectNameText { font-weight: 600; color: var(--text); }
+    .header-crumb-sep { display: none; color: var(--text-faint); }
+    .header-project-name.has-batch .header-crumb-sep { display: inline; }
+    .header-batch-link { margin-right: 0; font-size: 14px; color: var(--text-muted); font-weight: 500; }
+    .header-batch-link:hover { color: var(--accent); text-decoration: none; }
+    .header-actions { margin-left: auto; display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+    .url-row { flex: none; }
+    .btn-share-main { display: none; }
+    body.in-project .btn-share-main { display: inline-flex; }
+    body.in-project .header-nav { display: none; }
+    body.in-project footer { display: none; }
+
+    /* ── Main layout ── */
+    main { background: var(--bg); }
+    .video-col { background: var(--bg); }
+    .video-wrap { background: var(--bg); }
+    body.in-project .video-wrap,
+    .video-wrap:has(video), .video-wrap:has(iframe) { background: var(--stage); }
+    .video-wrap video { background: var(--stage); }
+
+    /* ── Version bar ── */
+    .version-bar {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 8px 16px;
+      gap: 4px;
+    }
+    .version-tab-wrap {
+      border: none;
+      border-radius: 6px;
+      background: transparent;
+    }
+    .version-tab-wrap.active { background: var(--accent-dim); }
+    .version-tab-label { font-size: 12px; font-weight: 600; padding: 5px 4px 5px 10px; }
+    .version-tab-wrap:not(:has(.version-tab-del)) .version-tab-label { padding-right: 10px; }
+    .version-tab-wrap.active .version-tab-label { color: var(--accent); }
+    .version-tab-del { padding: 5px 8px 5px 2px; }
+    .version-tab.version-add {
+      border: 1px dashed var(--border);
+      border-radius: 6px;
+      font-size: 12px;
+      padding: 4px 10px;
+      margin-left: 6px;
+    }
+    .version-tab.version-add:hover { border-color: var(--accent); }
+
+    /* ── Banners under the video ── */
+    .file-banner {
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+      padding: 10px 16px;
+      font-size: 13px;
+      gap: 10px;
+      color: var(--text-muted);
+    }
+    .file-banner-cta { border-radius: var(--radius); padding: 7px 14px; font-size: 13px; }
+    .gdrive-banner { border-top: 1px solid var(--border); }
+
+    /* ── Timeline + controls: ひとつのプレイヤーバーとして見せる ── */
+    .pin-timeline { background: var(--surface); border-top: 1px solid var(--border); padding: 4px 20px 0; }
+    .pt-track-wrap { padding: 10px 0 6px; }
+    .pt-track { height: 4px; background: var(--surface2); }
+    .pt-marker { width: 10px; height: 10px; border: 2px solid var(--surface); box-sizing: content-box; }
+    .controls {
+      background: var(--surface);
+      border-top: none;
+      padding: 8px 20px 12px;
+      gap: 12px;
+    }
+    .pin-timeline[style*="none"] + .controls { border-top: 1px solid var(--border); padding-top: 12px; }
+    .sep { display: none; }
+    .timer-val { font-size: 18px; letter-spacing: 0.5px; min-width: 58px; }
+    .playback-btns { gap: 4px; }
+    .ctrl-btn {
+      background: transparent;
+      border: 1px solid transparent;
+      border-radius: var(--radius);
+      color: var(--text);
+      padding: 6px 10px;
+      font-size: 12px;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .ctrl-btn:hover { background: var(--surface2); }
+    .ctrl-btn.running { background: var(--accent-dim); border-color: transparent; }
+    .speed-select {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      color: var(--text);
+      padding: 5px 8px;
+    }
+    .r2-banner {
+      border: none;
+      padding: 0;
+      font-size: 12px;
+      color: var(--text-faint);
+      white-space: nowrap;
+    }
+
+    /* ── Sidebar ── */
+    .sidebar {
+      width: 340px;
+      min-width: 300px;
+      background: var(--surface);
+      border-left: 1px solid var(--border);
+    }
+    .sidebar-head { padding: 14px 16px 10px; border-bottom: none; }
+    .sidebar-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text);
+      text-transform: none;
+      letter-spacing: 0;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .badge {
+      background: var(--surface2);
+      color: var(--text-muted);
+      border-radius: 999px;
+      padding: 1px 8px;
+      font-size: 11px;
+    }
+    .btn-compare { border-radius: 6px; font-size: 12px; padding: 4px 10px; }
+    .pin-replies {
+      margin-top: 8px;
+      border-top: none;
+      border-left: 2px solid var(--border);
+      padding: 2px 0 2px 10px;
+      gap: 6px;
+    }
+    .pin-reply { font-size: 12.5px; color: var(--text-muted); }
+    .comment-add-bar { padding: 0 16px 12px; border-bottom: none; }
+    .btn-comment-add {
+      border-radius: var(--radius);
+      padding: 10px 14px;
+      justify-content: center;
+      box-shadow: var(--shadow);
+    }
+    .btn-comment-add .kbd {
+      background: rgba(255,255,255,0.2);
+      color: #fff;
+      border-radius: 4px;
+      margin-left: 8px;
+    }
+    .readonly-banner { border-radius: var(--radius); margin: 0 16px 10px; border: none; background: var(--surface2); padding: 7px 10px; }
+
+    .filter-tabs {
+      margin: 0 16px 8px;
+      padding: 3px;
+      background: var(--surface2);
+      border-radius: var(--radius);
+      border-bottom: none;
+      gap: 2px;
+    }
+    .filter-tab {
+      border: none;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 500;
+      padding: 6px 4px;
+    }
+    .filter-tab.active { background: var(--surface); color: var(--text); box-shadow: var(--shadow); }
+    .project-name-bar { display: none !important; }
+
+    .pins-scroll { padding: 0 8px 8px; }
+    .pin-card {
+      background: transparent;
+      border: none;
+      border-radius: var(--radius);
+      padding: 12px 10px;
+      margin-bottom: 2px;
+    }
+    .pin-card + .pin-card { box-shadow: 0 -1px 0 var(--border); }
+    .pin-card:hover { background: var(--surface2); border: none; }
+    .pin-card.active { background: var(--accent-dim); box-shadow: none; }
+    .pin-card.active + .pin-card { box-shadow: none; }
+    .pin-meta { margin-bottom: 6px; gap: 8px; }
+    .pin-time {
+      background: var(--accent-dim);
+      color: var(--accent);
+      border-radius: 999px;
+      padding: 2px 8px;
+      margin-bottom: 0;
+      font-size: 11px;
+    }
+    .pin-author { font-size: 12px; color: var(--text-muted); font-weight: 500; }
+    .pin-comment { font-size: 13.5px; line-height: 1.65; }
+    .pin-card.resolved { opacity: 0.55; }
+    .pin-card.resolved .pin-time { background: var(--surface2); }
+    .pin-actions {
+      top: 8px;
+      right: 8px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 2px;
+      box-shadow: var(--shadow);
+    }
+    .edit-btn, .del-btn, .resolve-btn, .reply-btn { border-radius: 6px; padding: 4px 6px; }
+
+    .sidebar-tools {
+      display: flex;
+      gap: 4px;
+      padding: 8px 12px;
+      border-top: 1px solid var(--border);
+      flex-shrink: 0;
+    }
+    .btn-copy-text {
+      flex: 1;
+      width: auto;
+      margin: 0;
+      background: transparent;
+      border: none;
+      border-radius: 6px;
+      padding: 7px 4px;
+      font-size: 12px;
+      color: var(--text-muted);
+      white-space: nowrap;
+    }
+    .btn-copy-text:hover { background: var(--surface2); color: var(--text); border: none; }
+
+    /* ── Upload placeholder ── */
+    /* 動画を選ぶ前は、アップロード以外（コメント欄・再生バー）を出さない */
+    body:not(.in-project):has(#placeholder) .sidebar,
+    body:not(.in-project):has(#placeholder) .controls,
+    body:not(.in-project):has(#placeholder) .pin-timeline { display: none !important; }
+    .placeholder { gap: 16px; }
+    .upload-zone { width: 100%; max-width: 520px; padding: 48px 24px !important; }
+    .upload-zone {
+      background: var(--surface);
+      border-radius: var(--radius-lg) !important;
+      box-shadow: var(--shadow);
+    }
+    .ph-privacy-note { color: var(--text-faint); font-size: 12px; }
+    .recent-box { max-width: 520px; border-radius: var(--radius-lg); background: var(--surface); box-shadow: var(--shadow); overflow: hidden; }
+    .ph-privacy-note { max-width: 520px; }
+    .recent-head { padding: 10px 14px; font-size: 12px; font-weight: 600; color: var(--text); }
+    .recent-item { padding: 9px 14px; font-size: 13px; }
+    .recent-kind { border-radius: 4px; border: none; background: var(--accent-dim); padding: 1px 6px; font-weight: 600; }
+    .recent-copy { border-radius: 6px; padding: 3px 9px; }
+
+    /* ── Modals ── */
+    .overlay { background: rgba(17,24,39,0.45); backdrop-filter: blur(2px); }
+    .modal {
+      background: var(--surface);
+      border: none;
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      box-shadow: var(--shadow-lg);
+    }
+    .modal-title { font-size: 16px; font-weight: 700; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+    .modal-actions { margin-top: 20px; gap: 8px; }
+    /* 入力欄はすべて同じ見た目に */
+    .modal textarea, .project-name-input, .tc-input, .url-input, .author-input,
+    #importTextarea, #newVersionUrl, .reply-form textarea, .reply-form input {
+      border-radius: var(--radius) !important;
+      background: var(--surface) !important;
+      border: 1px solid var(--border) !important;
+      padding: 9px 12px;
+      font-size: 14px;
+    }
+    .modal textarea:focus, .project-name-input:focus, .tc-input:focus, .url-input:focus, .author-input:focus,
+    #importTextarea:focus, #newVersionUrl:focus, .reply-form textarea:focus, .reply-form input:focus {
+      border-color: var(--accent) !important;
+      box-shadow: 0 0 0 3px var(--accent-dim);
+      outline: none;
+    }
+    .tc-input { font-size: 18px; color: var(--accent); background: var(--accent-dim) !important; border-color: transparent !important; }
+    .tc-adj { border-radius: var(--radius) !important; }
+    .annotation-btn { border-radius: var(--radius); }
+    .modal-tip { font-size: 12px; margin-top: 8px; }
+    .upload-box { border-radius: var(--radius-lg) !important; border: none !important; box-shadow: var(--shadow-lg); }
+    .progress-bar-wrap, .progress-bar { border-radius: 999px !important; }
+
+    /* Batch modal */
+    .batch-summary-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 10px; }
+    .batch-summary { margin: 0; font-size: 13px; }
+    .batch-copy-all {
+      display: inline-flex; align-items: center; gap: 5px;
+      background: none; border: none; color: var(--accent); font-size: 13px; font-weight: 600;
+      cursor: pointer; padding: 4px 6px; border-radius: 6px; white-space: nowrap;
+    }
+    .batch-copy-all:hover:not(:disabled) { background: var(--accent-dim); }
+    .batch-copy-all:disabled { color: var(--text-faint); cursor: default; }
+    .batch-list { border-radius: var(--radius); overflow-y: auto; background: var(--surface); }
+    .batch-item { padding: 11px 14px; align-items: center; }
+    .batch-name { color: var(--text); text-decoration: none; font-weight: 600; font-size: 13.5px; }
+    a.batch-name:hover { color: var(--accent); }
+    .batch-status { font-size: 12px; }
+    .batch-item.waiting .batch-status { color: var(--text-faint); }
+    .batch-copy {
+      display: inline-flex; align-items: center; gap: 4px;
+      background: none; border: 1px solid var(--border); border-radius: 6px;
+      color: var(--text-muted); font-size: 12px; padding: 3px 9px; cursor: pointer;
+    }
+    .batch-copy:hover { background: var(--surface2); color: var(--text); }
+    .batch-bar { height: 4px; border-radius: 999px; overflow: hidden; }
+    .batch-item.waiting .batch-bar { display: none; }
+    .batch-sub { grid-column: 1 / -1; font-size: 11px; color: var(--text-faint); }
+    .batch-page-link { margin: 12px 0 0; border-radius: var(--radius); border: none; background: var(--surface2); font-size: 12px; color: var(--text-muted); padding: 9px 12px; }
+    .batch-page-link a { color: var(--accent); }
+    .batch-actions .spacer { flex: 1; }
+
+    /* ── Toast ── */
+    .toast { background: var(--text); color: #fff; border: none; border-radius: var(--radius); box-shadow: var(--shadow-lg); }
+    .toast .toast-hint { color: rgba(255,255,255,0.7); }
+
+    /* ── Footer ── */
+    footer { background: var(--surface); padding: 14px 20px; font-size: 12px; }
+
+    @media (max-width: 768px) {
+      header { height: 48px; padding: 0 14px; gap: 12px; }
+      .header-nav { gap: 12px; }
+      .header-nav a:nth-child(n+2) { display: none; }
+      .header-project-name { font-size: 13px; }
+      .header-batch-link { font-size: 13px; }
+      .btn-share-main { padding: 6px 10px; font-size: 12px; }
+      .sidebar { width: 100%; min-width: 0; border-left: none; }
+      .controls { padding: 8px 14px 10px; }
+      .r2-banner { display: none !important; }
+      .pin-timeline { padding: 4px 14px 0; }
+      .pin-card { padding: 12px 6px; }
+      .pin-actions { background: none; border: none; box-shadow: none; padding: 0; margin-top: 4px; }
+      .sidebar-tools { padding: 8px; }
+    }
   </style>
 </head>
 <body>
@@ -1936,16 +2336,24 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
 <!-- Header -->
 <header>
-  <a class="logo" href="/" style="text-decoration:none">Clippin</a>
-  <a href="/usage" style="font-size:13px;color:var(--text-muted);text-decoration:none;margin-left:4px;">使い方</a>
-  <a href="/demo" style="font-size:13px;color:var(--text-muted);text-decoration:none;">デモ</a>
-  <a href="/blog" style="font-size:13px;color:var(--text-muted);text-decoration:none;">ブログ</a>
-  <div class="url-row" id="urlRow" style="display:none">
-    <button class="btn-primary" style="background:var(--surface2);border:1px solid var(--border);color:var(--text)" onclick="document.getElementById('fileInput').click()"><i data-lucide="folder-open" class="icon"></i> ファイルを変更</button>
-  </div>
+  <a class="logo" href="/">Clippin</a>
+  <nav class="header-nav">
+    <a href="/usage">使い方</a>
+    <a href="/demo">デモ</a>
+    <a href="/blog">ブログ</a>
+  </nav>
   <div class="header-project-name" id="headerProjectName">
-    <a class="header-batch-link" id="headerBatchLink" href="#">‹ 一覧に戻る</a>
-    <i data-lucide="folder" class="icon"></i> <span id="headerProjectNameText"></span>
+    <a class="header-batch-link" id="headerBatchLink" href="#">一覧</a>
+    <span class="header-crumb-sep">/</span>
+    <span id="headerProjectNameText"></span>
+  </div>
+  <div class="header-actions">
+    <div class="url-row" id="urlRow" style="display:none">
+      <button class="btn-ghost" onclick="document.getElementById('fileInput').click()"><i data-lucide="folder-open" class="icon"></i> ファイルを変更</button>
+    </div>
+    <button class="btn-primary btn-share-main" id="shareBtn" onclick="handleShare()">
+      <i data-lucide="share-2" class="icon"></i> 共有
+    </button>
   </div>
 </header>
 
@@ -1992,8 +2400,6 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       に設定してください。それでも表示されない場合はブラウザでドライブを開いて再生してください。
     </div>
 
-    <!-- R2 有効期限バナー -->
-    <div class="r2-banner" id="r2Banner" style="display:none"></div>
 
     <!-- Pin timeline bar -->
     <div class="pin-timeline" id="pinTimeline" style="display:none">
@@ -2021,6 +2427,9 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
       <div class="spacer"></div>
 
+      <!-- 閲覧期限 -->
+      <div class="r2-banner" id="r2Banner" style="display:none"></div>
+
       <select class="speed-select" id="speedSelect" onchange="changeSpeed(this.value)" title="再生速度">
         <option value="0.5">0.5x</option>
         <option value="1" selected>1x</option>
@@ -2036,18 +2445,14 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   <!-- Sidebar -->
   <div class="sidebar">
     <div class="sidebar-head">
-      <span class="sidebar-title">コメント一覧</span>
+      <span class="sidebar-title">コメント <span class="badge" id="badge">0</span></span>
       <button class="btn-compare" id="compareBtn" onclick="toggleCompare()">比較</button>
-      <span class="badge" id="badge">0</span>
     </div>
     <!-- Comment add / Share bar -->
     <div class="comment-add-bar">
       <button class="btn-comment-add" id="btnCommentAdd" onclick="openModal()">
         <i data-lucide="map-pin" class="icon"></i> コメントを追加
         <span class="kbd">P</span>
-      </button>
-      <button class="btn-sidebar-share" id="shareBtn" onclick="handleShare()">
-        <i data-lucide="share-2" class="icon"></i> 共有
       </button>
     </div>
     <!-- Read-only banner -->
@@ -2072,10 +2477,10 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <div>タイムコード付きのコメントが<br>ここに表示されます</div>
       </div>
     </div>
-    <div style="padding:8px;border-top:1px solid var(--border);flex-shrink:0">
-      <button class="btn-copy-text" onclick="copyPinsAsText()"><i data-lucide="clipboard" class="icon"></i> コメントをテキストでコピー</button>
-      <button class="btn-copy-text" onclick="openImportModal()"><i data-lucide="file-input" class="icon"></i> テキストからインポート</button>
-      <button class="btn-copy-text" id="btnOffset" onclick="openOffsetModal()" style="display:none;margin-bottom:0"><i data-lucide="clock" class="icon"></i> タイムコードを一括調整</button>
+    <div class="sidebar-tools">
+      <button class="btn-copy-text" onclick="copyPinsAsText()" title="コメントをテキストでコピー"><i data-lucide="clipboard" class="icon"></i> テキストでコピー</button>
+      <button class="btn-copy-text" onclick="openImportModal()" title="テキストからコメントを取り込む"><i data-lucide="file-input" class="icon"></i> 取り込み</button>
+      <button class="btn-copy-text" id="btnOffset" onclick="openOffsetModal()" style="display:none" title="タイムコードを一括調整"><i data-lucide="clock" class="icon"></i> 時間調整</button>
     </div>
   </div>
 
@@ -2226,17 +2631,20 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <div class="overlay" id="batchOverlay">
   <div class="modal">
     <div class="modal-title"><i data-lucide="files" class="icon"></i> まとめてアップロード</div>
-    <div class="batch-summary" id="batchSummary"></div>
-    <div class="batch-page-link" id="batchPageLink" style="display:none">
-      まとめページ：<a id="batchPageAnchor" href="#" target="_blank" rel="noopener"></a>
-      <span>完了した動画はここに残ります（閉じても大丈夫）</span>
+    <div class="batch-summary-row">
+      <div class="batch-summary" id="batchSummary"></div>
+      <button class="batch-copy-all" id="batchCopyBtn" onclick="copyBatchLinks()" disabled title="ファイル名順・改行区切りでコピー（スプレッドシートの列にそのまま貼れます）">
+        <i data-lucide="copy" class="icon"></i> リンクをすべてコピー
+      </button>
     </div>
     <ul class="batch-list" id="batchList"></ul>
-    <div class="modal-tip">リンクはファイル名順に並んでいます。「リンクをすべてコピー」でスプレッドシートの列にそのまま貼り付けられます。</div>
-    <div class="modal-actions">
+    <div class="batch-page-link" id="batchPageLink" style="display:none">
+      完了した動画は <a id="batchPageAnchor" href="#" target="_blank" rel="noopener">まとめページ</a> に保存されます。この画面を閉じても大丈夫です。
+    </div>
+    <div class="modal-actions batch-actions">
       <button class="btn-cancel" id="batchRetryBtn" style="display:none" onclick="retryBatchFailed()">失敗分を再試行</button>
+      <span class="spacer"></span>
       <button class="btn-cancel" id="batchCloseBtn" onclick="closeBatchModal()">閉じる</button>
-      <button class="btn-cancel" id="batchCopyBtn" onclick="copyBatchLinks()" disabled>リンクをすべてコピー</button>
       <button class="btn-primary" id="batchOpenBtn" onclick="openBatchPage()" style="display:none">まとめページを開く</button>
     </div>
   </div>
@@ -2547,18 +2955,22 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     const done   = batchItems.filter(it => it.status === 'done').length;
     const failed = batchItems.filter(it => it.status === 'error').length;
     document.getElementById('batchSummary').textContent = batchRunning
-      ? `${batchItems.length}本中 ${done}本完了 — アップロード中はこの画面を閉じないでください`
+      ? `${batchItems.length}本中 ${done}本完了・アップロード中…`
       : `${batchItems.length}本中 ${done}本完了${failed ? `・${failed}本失敗` : ''}`;
 
     document.getElementById('batchList').innerHTML = batchItems.map((it, i) => `
       <li class="batch-item ${it.status}" data-i="${i}">
-        <span class="batch-name" title="${esc(it.file.name)}">${esc(it.name)}</span>
-        <span class="batch-status">${esc(it.status === 'uploading' ? `${it.pct}%` : it.label)}</span>
+        ${it.url
+          ? `<a class="batch-name" href="${esc(it.url)}" target="_blank" rel="noopener" title="${esc(it.file.name)}">${esc(it.name)}</a>`
+          : `<span class="batch-name" title="${esc(it.file.name)}">${esc(it.name)}</span>`}
+        ${it.url
+          ? `<button class="batch-copy" onclick="writeClipboard('${esc(it.url)}');toast('リンクをコピーしました')"><i data-lucide="link" class="icon"></i> コピー</button>`
+          : `<span class="batch-status">${esc(it.status === 'uploading' ? `${it.pct}%` : it.label)}</span>`}
         <div class="batch-bar"><div style="width:${it.pct}%"></div></div>
-        ${it.status === 'uploading' ? `<div class="batch-error-msg" style="color:var(--text-muted)">${esc(it.label)}</div>` : ''}
-        ${it.url ? `<div class="batch-link"><a href="${esc(it.url)}" target="_blank" rel="noopener">${esc(it.url)}</a><button onclick="writeClipboard('${esc(it.url)}');toast('コピーしました')">コピー</button></div>` : ''}
+        ${it.status === 'uploading' ? `<div class="batch-sub">${esc(it.label)}</div>` : ''}
         ${it.error ? `<div class="batch-error-msg">${esc(it.error)}</div>` : ''}
       </li>`).join('');
+    lucide.createIcons({ els: document.querySelectorAll('#batchList [data-lucide]') });
 
     document.getElementById('batchCopyBtn').disabled  = batchRunning || !done;
     document.getElementById('batchCloseBtn').disabled = batchRunning;
@@ -2566,7 +2978,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     document.getElementById('batchPageLink').style.display = batchId ? '' : 'none';
     if (batchId) {
       const a = document.getElementById('batchPageAnchor');
-      a.href = a.textContent = batchPageUrl();
+      a.href = batchPageUrl();
     }
     document.getElementById('batchRetryBtn').style.display = !batchRunning && failed ? '' : 'none';
   }
@@ -2578,7 +2990,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     if (!li.classList.contains('uploading')) return renderBatch();
     li.querySelector('.batch-status').textContent = `${it.pct}%`;
     li.querySelector('.batch-bar > div').style.width = it.pct + '%';
-    const msg = li.querySelector('.batch-error-msg');
+    const msg = li.querySelector('.batch-sub');
     if (msg) msg.textContent = it.label;
   }
 
@@ -3108,7 +3520,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <div class="pin-replies">
           ${replies.map(r => `
             <div class="pin-reply">
-              <span class="pin-reply-text">↳ ${esc(r.text).replace(/\n/g, '<br>')}</span>
+              <span class="pin-reply-text">${esc(r.text).replace(/\n/g, '<br>')}</span>
               <button class="pin-reply-del"
                 onclick="event.stopPropagation();deleteReply(${p.id},${r.id})"
                 title="削除">✕</button>
@@ -3129,7 +3541,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <div class="pin-card${p.id === activePinId ? ' active' : ''}${p.resolved ? ' resolved' : ''}"
              onclick="seekToPin(${p.time}, ${p.id})">
           <div class="pin-meta">
-            <span class="pin-time">⏱ ${esc(fmtTime(p.time))}</span>
+            <span class="pin-time">${esc(fmtTime(p.time))}</span>
             ${p.author ? `<span class="pin-author">${esc(p.author)}</span>` : ''}
           </div>
           <div class="pin-comment">${esc(p.comment).replace(/\n/g, '<br>')}</div>
@@ -3330,6 +3742,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   // まとめページから来た動画には「一覧に戻る」を出す
   function showBatchBackLink(batchId, batchName) {
     const link = document.getElementById('headerBatchLink');
+    document.getElementById('headerProjectName').classList.toggle('has-batch', !!batchId);
     if (!batchId) { link.style.display = 'none'; return; }
     link.href = `/batch/${batchId}`;
     link.title = batchName ? `${batchName} に戻る` : '一覧に戻る';
@@ -3337,6 +3750,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   }
 
   function showProjectNameBar(name) {
+    document.body.classList.add('in-project');
     // サイドバー
     document.getElementById('projectNameDisplay').textContent = name;
     document.getElementById('projectNameBar').style.display = 'flex';
@@ -3345,7 +3759,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     document.getElementById('headerProjectName').style.display = 'flex';
     // 共有ボタン
     const shareBtn = document.getElementById('shareBtn');
-    shareBtn.innerHTML = '<i data-lucide="share-2" class="icon"></i> 共有';
+    shareBtn.innerHTML = '<i data-lucide="link" class="icon"></i> リンクをコピー';
     lucide.createIcons({ els: shareBtn.querySelectorAll('[data-lucide]') });
   }
 
