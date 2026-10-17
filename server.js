@@ -129,6 +129,10 @@ const PORT = process.env.PORT || 3000;
 app.use(express.json({ limit: '20mb' }));
 
 
+// サーバーのソースや設定・依存パッケージ・内部ドキュメントは配信しない
+const PRIVATE_PATH = /^\/(server\.js|package(-lock)?\.json|node_modules(\/|$)|[^/]+\.md$)/i;
+app.use((req, res, next) => (PRIVATE_PATH.test(req.path) ? res.status(404).end() : next()));
+
 app.use(express.static(path.join(__dirname)));
 
 // ─── GET /api/presign ──────────────────────────────────────

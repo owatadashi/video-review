@@ -553,6 +553,21 @@
       justify-content: center;
       gap: 6px;
     }
+    .recent-box { width: 100%; max-width: 480px; border: 1px solid var(--border); background: var(--bg); }
+    .recent-head {
+      display: flex; justify-content: space-between; align-items: center;
+      font-size: 11px; color: var(--text-muted); padding: 6px 10px; border-bottom: 1px solid var(--border);
+    }
+    .recent-clear { background: none; border: none; color: var(--text-muted); font-size: 11px; cursor: pointer; text-decoration: underline; }
+    .recent-list { list-style: none; max-height: 168px; overflow-y: auto; }
+    .recent-item { display: flex; align-items: center; gap: 8px; padding: 7px 10px; border-bottom: 1px solid var(--border); font-size: 12px; }
+    .recent-item:last-child { border-bottom: none; }
+    .recent-kind { font-size: 10px; color: var(--accent); border: 1px solid var(--accent); padding: 0 5px; flex-shrink: 0; }
+    .recent-item a { color: var(--text); text-decoration: none; font-weight: 600; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .recent-item a:hover { color: var(--accent); }
+    .recent-date { color: var(--text-muted); font-size: 11px; flex-shrink: 0; }
+    .recent-copy { background: transparent; border: 1px solid var(--border); color: var(--text-muted); font-size: 11px; padding: 1px 7px; cursor: pointer; flex-shrink: 0; }
+    .recent-copy:hover { background: var(--border); color: var(--text); }
     .ph-privacy-note {
       font-size: 11px;
       color: #7a7770;
@@ -1649,6 +1664,14 @@
       flex-shrink: 0;
     }
     .file-banner.show { display: flex; }
+    .file-banner-note { color: var(--text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+    .file-banner-cta {
+      margin-left: auto; flex-shrink: 0;
+      display: inline-flex; align-items: center; gap: 5px;
+      background: var(--accent); color: #fff; border: none;
+      font: inherit; font-size: 12px; font-weight: 600; padding: 5px 12px; cursor: pointer;
+    }
+    .file-banner-cta:hover { background: var(--accent-hover); }
     .file-banner .fname {
       font-weight: 600;
       color: var(--text);
@@ -1743,6 +1766,7 @@
 
       /* ── バナー ── */
       .file-banner { font-size: 11px; padding: 4px 12px; }
+      .file-banner-note { display: none; }
       .r2-banner   { font-size: 10px; padding: 4px 12px; }
 
       /* ── コントロールバー: 再生ボタン群を中央に ── */
@@ -1942,7 +1966,14 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
           <p class="upload-zone-sub">または動画をここにドロップ（複数可）</p>
           <p class="upload-zone-formats">MP4 · MOV · WebM · AVI など</p>
         </div>
-        <p class="ph-privacy-note"><i data-lucide="lock" class="icon" style="opacity:.5"></i> アップロードされた動画はCloudflare R2に保存されます。共有URLを知っている方のみ再生できます。30日後に自動削除されます。</p>
+        <p class="ph-privacy-note"><i data-lucide="lock" class="icon" style="opacity:.5"></i> アップロードした動画は、共有URLを知っている方のみ再生できます。30日後に自動削除されます。</p>
+        <div class="recent-box" id="recentBox" style="display:none">
+          <div class="recent-head">
+            <span>この端末で最近作成したリンク</span>
+            <button class="recent-clear" onclick="clearRecent()">履歴を消去</button>
+          </div>
+          <ul class="recent-list" id="recentList"></ul>
+        </div>
       </div>
       <div class="sync-hint" id="syncHint">再生と同時にタイマー開始</div>
     </div>
@@ -1950,6 +1981,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <!-- ローカルファイル使用中バナー -->
     <div class="file-banner" id="fileBanner">
       <i data-lucide="folder-open" class="icon"></i>&nbsp;<span class="fname" id="fileNameLabel"></span>
+      <span class="file-banner-note">まだ共有されていません（この端末でのみ再生中）</span>
+      <button class="file-banner-cta" onclick="handleShare()"><i data-lucide="link" class="icon"></i> 共有リンクを作成</button>
     </div>
 
     <!-- Google Drive 注意バナー -->
@@ -2421,6 +2454,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       });
       if (!res.ok) throw new Error(`HTTP ${res.status}`);
       batchId = (await res.json()).id;
+      addRecent({ type: 'batch', id: batchId, name });
     } catch (err) {
       console.error('[batch] create page error:', err);
       toast('まとめページを作成できませんでした', 'リンクはこの画面からコピーしてください');
@@ -2569,6 +2603,48 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   window.addEventListener('beforeunload', e => {
     if (batchRunning) { e.preventDefault(); e.returnValue = ''; }
   });
+
+  // ─── この端末で最近作成したリンク（localStorage）─────────
+  // 閉じたタブのリンクを探せるように、作成したプロジェクト/まとめページを端末に記録する
+  const RECENT_KEY = 'clippin.recent';
+  const RECENT_MAX = 30;
+  const RECENT_TTL_MS = 30 * 24 * 60 * 60 * 1000;   // 動画の保存期間と同じ
+
+  function readRecent() {
+    try {
+      const list = JSON.parse(localStorage.getItem(RECENT_KEY) || '[]');
+      return Array.isArray(list) ? list.filter(r => Date.now() - r.createdAt < RECENT_TTL_MS) : [];
+    } catch { return []; }
+  }
+  function addRecent(entry) {
+    try {
+      const list = readRecent().filter(r => !(r.type === entry.type && r.id === entry.id));
+      list.unshift({ ...entry, createdAt: Date.now() });
+      localStorage.setItem(RECENT_KEY, JSON.stringify(list.slice(0, RECENT_MAX)));
+    } catch {}
+    renderRecent();
+  }
+  function clearRecent() {
+    if (!confirm('この端末の履歴を消去しますか？\n（動画やリンク自体は消えません）')) return;
+    try { localStorage.removeItem(RECENT_KEY); } catch {}
+    renderRecent();
+  }
+  function renderRecent() {
+    const box = document.getElementById('recentBox');
+    if (!box) return;
+    const list = readRecent();
+    box.style.display = list.length ? '' : 'none';
+    document.getElementById('recentList').innerHTML = list.map(r => {
+      const url = `${location.origin}/${r.type === 'batch' ? 'batch' : 'project'}/${r.id}`;
+      const d = new Date(r.createdAt);
+      return `<li class="recent-item">
+        <span class="recent-kind">${r.type === 'batch' ? 'まとめ' : '動画'}</span>
+        <a href="${esc(url)}">${esc(r.name)}</a>
+        <span class="recent-date">${d.getMonth() + 1}/${d.getDate()}</span>
+        <button class="recent-copy" onclick="writeClipboard('${esc(url)}');toast('リンクをコピーしました')">コピー</button>
+      </li>`;
+    }).join('');
+  }
 
   // ─── Placeholder helpers ───────────────────────────────
   function showUrlRow() {
@@ -3185,9 +3261,15 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
   // ─── Project modal ─────────────────────────────────────
   function openProjectModal() {
-    document.getElementById('projectNameInput').value = '';
+    // ローカルファイルならファイル名（拡張子なし）を初期値に
+    document.getElementById('projectNameInput').value =
+      localFile ? localFile.name.replace(/\.[^.]+$/, '') : '';
     document.getElementById('projectOverlay').classList.add('open');
-    setTimeout(() => document.getElementById('projectNameInput').focus(), 60);
+    setTimeout(() => {
+      const input = document.getElementById('projectNameInput');
+      input.focus();
+      input.select();
+    }, 60);
   }
 
   function closeProjectModal() {
@@ -3232,6 +3314,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         fileId: state.fileId || '', createdAt: new Date().toISOString(),
       }];
       history.pushState(null, '', `/project/${data.id}`);
+      addRecent({ type: 'project', id: data.id, name });
       document.title = `${name} - Clippin`;
       showProjectNameBar(name);
       renderVersionTabs();
@@ -4149,6 +4232,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     });
     document.addEventListener('drop', () => zone.classList.remove('drag-over'));
 
+    renderRecent();
     lucide.createIcons();
     initPinTimeline();
 
