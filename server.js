@@ -78,6 +78,18 @@ async function initDB() {
     );
   `);
 
+  // ── まとめページ（複数アップロード） ──
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS batches (
+      id         VARCHAR(12)  PRIMARY KEY,
+      name       TEXT         NOT NULL,
+      created_at TIMESTAMPTZ  NOT NULL DEFAULT NOW()
+    );
+    ALTER TABLE projects ADD COLUMN IF NOT EXISTS batch_id  VARCHAR(12) REFERENCES batches(id) ON DELETE SET NULL;
+    ALTER TABLE projects ADD COLUMN IF NOT EXISTS batch_pos INTEGER;
+    CREATE INDEX IF NOT EXISTS projects_batch_id_idx ON projects(batch_id);
+  `);
+
   // ── マイグレーション: 既存 pins テーブルに新カラムを追加 ──
   await pool.query(`
     ALTER TABLE pins ADD COLUMN IF NOT EXISTS version_id INTEGER REFERENCES project_versions(id) ON DELETE SET NULL;
@@ -257,14 +269,15 @@ app.get('/api/stream-status/:uid', async (req, res) => {
 
 // ─── POST /api/projects ────────────────────────────────────
 app.post('/api/projects', async (req, res) => {
-  const { name, videoUrl, videoType, fileId, pins } = req.body;
+  const { name, videoUrl, videoType, fileId, pins, batchId, batchPos } = req.body;
   if (!name || !name.trim()) return res.status(400).json({ error: 'name が必要です' });
 
   try {
     const id = generateId();
     await pool.query(
-      'INSERT INTO projects (id, name, video_url, video_type, file_id) VALUES ($1, $2, $3, $4, $5)',
-      [id, name.trim(), videoUrl || '', videoType || 'direct', fileId || '']
+      'INSERT INTO projects (id, name, video_url, video_type, file_id, batch_id, batch_pos) VALUES ($1, $2, $3, $4, $5, $6, $7)',
+      [id, name.trim(), videoUrl || '', videoType || 'direct', fileId || '',
+       batchId || null, Number.isInteger(batchPos) ? batchPos : null]
     );
 
     // v1 を作成
@@ -302,7 +315,10 @@ app.get('/api/projects/:id', async (req, res) => {
     const { id } = req.params;
     const vParam = req.query.v ? parseInt(req.query.v) : null;
 
-    const proj = await pool.query('SELECT * FROM projects WHERE id = $1', [id]);
+    const proj = await pool.query(
+      'SELECT p.*, b.name AS batch_name FROM projects p LEFT JOIN batches b ON b.id = p.batch_id WHERE p.id = $1',
+      [id]
+    );
     if (proj.rows.length === 0) return res.status(404).json({ error: 'プロジェクトが見つかりません' });
 
     // 全バージョン取得
@@ -371,6 +387,8 @@ app.get('/api/projects/:id', async (req, res) => {
       videoType:        currentVersion?.video_type || proj.rows[0].video_type,
       fileId:           currentVersion?.file_id    || proj.rows[0].file_id || '',
       createdAt:        proj.rows[0].created_at,
+      batchId:          proj.rows[0].batch_id   || null,
+      batchName:        proj.rows[0].batch_name || null,
       currentVersionId:  currentVersion?.id || null,
       currentVersionNum: currentVersion?.version_num || 1,
       isLatestVersion,
@@ -387,6 +405,78 @@ app.get('/api/projects/:id', async (req, res) => {
   } catch (err) {
     console.error('[project] get error:', err);
     res.status(500).json({ error: 'プロジェクトの取得に失敗しました: ' + err.message });
+  }
+});
+
+// ─── まとめページ API ──────────────────────────────────────
+// POST /api/batches { name } → { id }
+app.post('/api/batches', async (req, res) => {
+  const name = String(req.body?.name || '').trim().slice(0, 100);
+  if (!name) return res.status(400).json({ error: 'name が必要です' });
+  try {
+    const id = generateId();
+    await pool.query('INSERT INTO batches (id, name) VALUES ($1, $2)', [id, name]);
+    console.log(`[batch] created id=${id} name="${name}"`);
+    res.json({ id });
+  } catch (err) {
+    console.error('[batch] create error:', err);
+    res.status(500).json({ error: 'まとめページの作成に失敗しました: ' + err.message });
+  }
+});
+
+// GET /api/batches/:id → まとめページの内容（動画一覧＋コメント数）
+app.get('/api/batches/:id', async (req, res) => {
+  try {
+    const b = await pool.query('SELECT * FROM batches WHERE id = $1', [req.params.id]);
+    if (!b.rows.length) return res.status(404).json({ error: 'まとめページが見つかりません' });
+
+    // 各プロジェクトの最新バージョンと、そのコメント数・未解決数
+    const items = await pool.query(`
+      SELECT p.id, p.name, p.created_at, p.batch_pos,
+             lv.version_num,
+             COUNT(pi.id)                              AS pin_count,
+             COUNT(pi.id) FILTER (WHERE NOT pi.resolved) AS open_count
+      FROM projects p
+      LEFT JOIN LATERAL (
+        SELECT id, version_num FROM project_versions
+        WHERE project_id = p.id ORDER BY version_num DESC LIMIT 1
+      ) lv ON TRUE
+      LEFT JOIN pins pi ON pi.version_id = lv.id
+      WHERE p.batch_id = $1
+      GROUP BY p.id, lv.version_num
+      ORDER BY p.batch_pos NULLS LAST, p.created_at
+    `, [req.params.id]);
+
+    res.json({
+      id:        b.rows[0].id,
+      name:      b.rows[0].name,
+      createdAt: b.rows[0].created_at,
+      projects:  items.rows.map(r => ({
+        id:         r.id,
+        name:       r.name,
+        createdAt:  r.created_at,
+        versionNum: r.version_num || 1,
+        pinCount:   Number(r.pin_count),
+        openCount:  Number(r.open_count),
+      })),
+    });
+  } catch (err) {
+    console.error('[batch] get error:', err);
+    res.status(500).json({ error: 'まとめページの取得に失敗しました: ' + err.message });
+  }
+});
+
+// PATCH /api/batches/:id { name } → 名前変更
+app.patch('/api/batches/:id', async (req, res) => {
+  const name = String(req.body?.name || '').trim().slice(0, 100);
+  if (!name) return res.status(400).json({ error: 'name が必要です' });
+  try {
+    const r = await pool.query('UPDATE batches SET name = $1 WHERE id = $2', [name, req.params.id]);
+    if (!r.rowCount) return res.status(404).json({ error: 'まとめページが見つかりません' });
+    res.json({ ok: true });
+  } catch (err) {
+    console.error('[batch] rename error:', err);
+    res.status(500).json({ error: '名前の変更に失敗しました: ' + err.message });
   }
 });
 
@@ -564,6 +654,23 @@ app.get('/blog/:slug', (req, res) => {
     return res.status(404).sendFile(path.join(__dirname, 'blog.html'));
   }
   res.sendFile(path.join(__dirname, 'blog', `${slug}.html`));
+});
+
+// ─── /batch/:id → batch.html（まとめページ + 動的タイトル）────────
+app.get('/batch/:id', async (req, res) => {
+  try {
+    const result = await pool.query('SELECT name FROM batches WHERE id = $1', [req.params.id]);
+    let html = fs.readFileSync(path.join(__dirname, 'batch.html'), 'utf8');
+    if (result.rows.length) {
+      const name = result.rows[0].name.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+      html = html
+        .replace(/(<title>)[^<]*(<\/title>)/, `$1${name} - Clippin$2`)
+        .replace(/(<meta property="og:title" content=")[^"]*(")/, `$1${name} - Clippin$2`);
+    }
+    res.send(html);
+  } catch (e) {
+    res.sendFile(path.join(__dirname, 'batch.html'));
+  }
 });
 
 // ─── SPA フォールバック（/project/:id → index.html + 動的タイトル）────────

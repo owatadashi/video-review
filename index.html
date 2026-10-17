@@ -430,7 +430,7 @@
       color: var(--text-muted);
       white-space: nowrap;
       overflow: hidden;
-      max-width: 280px;
+      max-width: 380px;
     }
     .header-project-name span {
       color: var(--text);
@@ -1024,6 +1024,8 @@
 
     /* ── Batch upload ── */
     #batchOverlay .modal { width: 560px; }
+    #batchOverlay .modal-actions { flex-wrap: wrap; }
+    #batchOverlay .modal-actions button { white-space: nowrap; }
     .batch-summary { font-size: 12px; color: var(--text-muted); margin: 4px 0 12px; }
     .batch-list {
       list-style: none;
@@ -1060,6 +1062,17 @@
     }
     .batch-link button:hover { background: var(--border); color: var(--text); }
     .batch-error-msg { grid-column: 1 / -1; font-size: 11px; color: var(--danger); }
+    .batch-page-link {
+      font-size: 12px; background: var(--accent-dim); border: 1px solid var(--border);
+      padding: 8px 12px; margin-bottom: 10px; line-height: 1.6; overflow-wrap: anywhere;
+    }
+    .batch-page-link a { color: var(--accent); font-weight: 600; }
+    .batch-page-link span { display: block; color: var(--text-muted); font-size: 11px; }
+    .header-batch-link {
+      display: none; align-items: center; gap: 4px; margin-right: 8px; flex-shrink: 0;
+      font-size: 12px; color: var(--accent); text-decoration: none; white-space: nowrap;
+    }
+    .header-batch-link:hover { text-decoration: underline; }
 
     /* ── Frame Annotation ── */
     .annotation-btn {
@@ -1907,6 +1920,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <button class="btn-primary" style="background:var(--surface2);border:1px solid var(--border);color:var(--text)" onclick="document.getElementById('fileInput').click()"><i data-lucide="folder-open" class="icon"></i> ファイルを変更</button>
   </div>
   <div class="header-project-name" id="headerProjectName">
+    <a class="header-batch-link" id="headerBatchLink" href="#">‹ 一覧に戻る</a>
     <i data-lucide="folder" class="icon"></i> <span id="headerProjectNameText"></span>
   </div>
 </header>
@@ -2180,12 +2194,17 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   <div class="modal">
     <div class="modal-title"><i data-lucide="files" class="icon"></i> まとめてアップロード</div>
     <div class="batch-summary" id="batchSummary"></div>
+    <div class="batch-page-link" id="batchPageLink" style="display:none">
+      まとめページ：<a id="batchPageAnchor" href="#" target="_blank" rel="noopener"></a>
+      <span>完了した動画はここに残ります（閉じても大丈夫）</span>
+    </div>
     <ul class="batch-list" id="batchList"></ul>
     <div class="modal-tip">リンクはファイル名順に並んでいます。「リンクをすべてコピー」でスプレッドシートの列にそのまま貼り付けられます。</div>
     <div class="modal-actions">
       <button class="btn-cancel" id="batchRetryBtn" style="display:none" onclick="retryBatchFailed()">失敗分を再試行</button>
       <button class="btn-cancel" id="batchCloseBtn" onclick="closeBatchModal()">閉じる</button>
-      <button class="btn-primary" id="batchCopyBtn" onclick="copyBatchLinks()" disabled>リンクをすべてコピー</button>
+      <button class="btn-cancel" id="batchCopyBtn" onclick="copyBatchLinks()" disabled>リンクをすべてコピー</button>
+      <button class="btn-primary" id="batchOpenBtn" onclick="openBatchPage()" style="display:none">まとめページを開く</button>
     </div>
   </div>
 </div>
@@ -2361,6 +2380,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   const BATCH_CONCURRENCY = 2;
   let batchItems   = [];
   let batchRunning = false;
+  let batchId      = null;   // まとめページID（作成に失敗した場合は null のまま続行）
 
   function startBatchUpload(files) {
     if (batchRunning) { toast('アップロード中です。完了までお待ちください'); return; }
@@ -2374,8 +2394,10 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
     // ファイル名順（「2」<「10」になる自然順）に並べる
     videos.sort((a, b) => a.name.localeCompare(b.name, 'ja', { numeric: true }));
-    batchItems = videos.map(file => ({
+    batchId = null;
+    batchItems = videos.map((file, pos) => ({
       file,
+      pos,
       name:   file.name.replace(/\.[^.]+$/, '') || file.name,
       status: 'waiting',   // waiting / uploading / done / error
       pct:    0,
@@ -2384,8 +2406,29 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       error:  '',
     }));
     document.getElementById('batchOverlay').classList.add('open');
-    runBatch();
+    createBatchPage(videos.length).then(runBatch);
   }
+
+  // 結果を残すためのまとめページを最初に作る（失敗しても個別リンクは作れるので続行）
+  async function createBatchPage(count) {
+    const d = new Date();
+    const name = `${d.getFullYear()}/${String(d.getMonth() + 1).padStart(2, '0')}/${String(d.getDate()).padStart(2, '0')} アップロード（${count}本）`;
+    try {
+      const res = await fetch('/api/batches', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name }),
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      batchId = (await res.json()).id;
+    } catch (err) {
+      console.error('[batch] create page error:', err);
+      toast('まとめページを作成できませんでした', 'リンクはこの画面からコピーしてください');
+    }
+  }
+
+  const batchPageUrl = () => `${location.origin}/batch/${batchId}`;
+  function openBatchPage() { if (batchId) location.href = batchPageUrl(); }
 
   async function runBatch() {
     batchRunning = true;
@@ -2401,6 +2444,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     toast(failed
       ? `${batchItems.length - failed}件作成、${failed}件失敗しました`
       : `${batchItems.length}件のリンクを作成しました`);
+    // 全部成功したら、結果が残るまとめページへ移動
+    if (!failed && batchId) setTimeout(openBatchPage, 1200);
   }
 
   async function processBatchItem(it) {
@@ -2417,7 +2462,10 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       const res = await fetch('/api/projects', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name: it.name, videoUrl, videoType: 'direct', fileId: '', pins: [] }),
+        body: JSON.stringify({
+          name: it.name, videoUrl, videoType: 'direct', fileId: '', pins: [],
+          batchId, batchPos: it.pos,
+        }),
       });
       if (!res.ok) throw new Error((await res.json().catch(() => ({}))).error || `HTTP ${res.status}`);
       const { id } = await res.json();
@@ -2480,6 +2528,12 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
     document.getElementById('batchCopyBtn').disabled  = batchRunning || !done;
     document.getElementById('batchCloseBtn').disabled = batchRunning;
+    document.getElementById('batchOpenBtn').style.display = !batchRunning && batchId ? '' : 'none';
+    document.getElementById('batchPageLink').style.display = batchId ? '' : 'none';
+    if (batchId) {
+      const a = document.getElementById('batchPageAnchor');
+      a.href = a.textContent = batchPageUrl();
+    }
     document.getElementById('batchRetryBtn').style.display = !batchRunning && failed ? '' : 'none';
   }
 
@@ -3190,6 +3244,15 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     }
   }
 
+  // まとめページから来た動画には「一覧に戻る」を出す
+  function showBatchBackLink(batchId, batchName) {
+    const link = document.getElementById('headerBatchLink');
+    if (!batchId) { link.style.display = 'none'; return; }
+    link.href = `/batch/${batchId}`;
+    link.title = batchName ? `${batchName} に戻る` : '一覧に戻る';
+    link.style.display = 'flex';
+  }
+
   function showProjectNameBar(name) {
     // サイドバー
     document.getElementById('projectNameDisplay').textContent = name;
@@ -3238,6 +3301,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
       document.title = `${data.name} - Clippin`;
       showProjectNameBar(data.name);
+      showBatchBackLink(data.batchId, data.batchName);
       loadVideoForState();
       renderVersionTabs();
       updateReadOnlyUI();

@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-LM27RL65BG"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-LM27RL65BG');
+  </script>
+  <title>まとめページ - Clippin</title>
+  <meta name="robots" content="noindex">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg?v=2">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Clippin">
+  <meta property="og:title" content="まとめページ - Clippin">
+  <meta property="og:description" content="複数の動画をまとめて確認できるページです。動画を選んで、タイムコード付きでコメントを残せます。">
+  <meta property="og:image" content="https://clippin.work/og-image.png">
+  <style>
+    :root { --bg: #fafafa; --surface: #f1f1f4; --surface2: #e8e8ec; --border: #e0e0e6; --accent: #0891b2; --accent-hover: #0e7490; --accent-dim: rgba(8,145,178,0.08); --text: #0f0f12; --text-muted: #6a6a77; --danger: #dc2626; --warn: #d97706; }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Hiragino Sans', 'Yu Gothic', sans-serif; min-height: 100dvh; display: flex; flex-direction: column; }
+    header { background: var(--surface); border-bottom: 1px solid var(--border); padding: 10px 18px; display: flex; align-items: center; gap: 14px; flex-shrink: 0; }
+    .logo { font-size: 17px; font-weight: 700; color: var(--accent); text-decoration: none; letter-spacing: -0.3px; }
+    .header-nav { display: flex; gap: 16px; align-items: center; margin-left: auto; }
+    .header-nav a { font-size: 13px; color: var(--text-muted); text-decoration: none; }
+    .header-nav a:hover { color: var(--text); }
+
+    main { flex: 1; max-width: 860px; width: 100%; margin: 0 auto; padding: 40px 24px 80px; }
+    .eyebrow { font-size: 12px; color: var(--text-muted); margin-bottom: 6px; display: flex; align-items: center; gap: 6px; }
+    .title-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; min-width: 0; }
+    h1 { font-size: 24px; font-weight: 700; letter-spacing: -0.4px; overflow-wrap: anywhere; }
+    .title-input { font: inherit; font-size: 24px; font-weight: 700; letter-spacing: -0.4px; border: 1px solid var(--accent); background: #fff; padding: 2px 8px; width: 100%; max-width: 560px; outline: none; color: var(--text); }
+    .icon-btn { background: transparent; border: 1px solid transparent; color: var(--text-muted); padding: 4px 6px; cursor: pointer; font-size: 12px; display: inline-flex; align-items: center; gap: 4px; flex-shrink: 0; }
+    .icon-btn:hover { border-color: var(--border); color: var(--text); background: var(--surface); }
+    .meta { font-size: 13px; color: var(--text-muted); display: flex; flex-wrap: wrap; gap: 4px 16px; margin-bottom: 24px; }
+
+    .actions { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; }
+    .btn { font: inherit; font-size: 13px; padding: 9px 16px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--border); background: var(--bg); color: var(--text); text-decoration: none; }
+    .btn:hover { background: var(--surface2); }
+    .btn-primary { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 600; }
+    .btn-primary:hover { background: var(--accent-hover); }
+
+    .list { list-style: none; border: 1px solid var(--border); background: #fff; }
+    .row { display: grid; grid-template-columns: 36px 1fr auto auto; align-items: center; gap: 12px; padding: 14px 16px; border-bottom: 1px solid var(--border); }
+    .row:last-child { border-bottom: none; }
+    .row:hover { background: var(--accent-dim); }
+    .num { font-size: 12px; color: var(--text-muted); font-variant-numeric: tabular-nums; text-align: right; }
+    .name { min-width: 0; }
+    .name a { color: var(--text); font-weight: 600; font-size: 14px; text-decoration: none; display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .name a:hover { color: var(--accent); }
+    .name .url { font-size: 12px; color: var(--text-muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .badges { display: flex; gap: 6px; align-items: center; }
+    .badge { font-size: 11px; padding: 2px 8px; border: 1px solid var(--border); color: var(--text-muted); white-space: nowrap; }
+    .badge.open { border-color: var(--warn); color: var(--warn); }
+    .badge.done { border-color: var(--accent); color: var(--accent); }
+    .empty, .error { padding: 40px 16px; text-align: center; color: var(--text-muted); font-size: 14px; line-height: 1.8; }
+    .error { color: var(--danger); }
+    .note { font-size: 12px; color: var(--text-muted); margin-top: 12px; line-height: 1.7; }
+
+    .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(20px); background: var(--text); color: #fff; padding: 10px 18px; font-size: 13px; opacity: 0; pointer-events: none; transition: all 0.2s; z-index: 50; max-width: calc(100vw - 32px); }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+    footer { padding: 24px; text-align: center; color: var(--text-muted); font-size: 12px; border-top: 1px solid var(--border); }
+    footer a { color: var(--text-muted); text-decoration: none; }
+
+    @media (max-width: 600px) {
+      main { padding: 28px 16px 64px; }
+      h1, .title-input { font-size: 20px; }
+      .row { grid-template-columns: 24px 1fr auto; padding: 12px; }
+      .badges { grid-column: 2 / -1; grid-row: 2; }
+      .header-nav a:not(:last-child) { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <a class="logo" href="/">Clippin</a>
+  <nav class="header-nav">
+    <a href="/usage">使い方</a>
+    <a href="/">新しくアップロード</a>
+  </nav>
+</header>
+
+<main>
+  <div class="eyebrow">まとめページ</div>
+  <div class="title-row" id="titleRow">
+    <h1 id="batchName">読み込み中...</h1>
+    <button class="icon-btn" id="renameBtn" onclick="startRename()" title="名前を変更" style="display:none">✎ 名前を変更</button>
+  </div>
+  <div class="meta" id="meta"></div>
+
+  <div class="actions" id="actions" style="display:none">
+    <button class="btn btn-primary" onclick="copyAllLinks()">動画リンクをすべてコピー</button>
+    <button class="btn" onclick="copyPageLink()">このページのリンクをコピー</button>
+  </div>
+
+  <ul class="list" id="list"></ul>
+  <p class="note" id="note" style="display:none">
+    「動画リンクをすべてコピー」は上から順に改行区切りでコピーします。スプレッドシートのセルを選んで貼り付けると、1行に1本ずつ入ります。<br>
+    このページのリンクを送れば、相手はここから全部の動画を確認できます。
+  </p>
+</main>
+
+<footer>
+  <a href="/">Clippin</a> · <a href="/usage">使い方</a> · <a href="/privacy">プライバシーポリシー</a>
+</footer>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  const RETENTION_DAYS = 30;
+  const batchId = location.pathname.split('/').filter(Boolean)[1] || '';
+  let batch = null;
+
+  function esc(s) {
+    return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+  function fmtDate(d) {
+    return `${d.getFullYear()}/${String(d.getMonth() + 1).padStart(2, '0')}/${String(d.getDate()).padStart(2, '0')}`;
+  }
+  function toast(msg) {
+    const el = document.getElementById('toast');
+    el.textContent = msg;
+    el.classList.add('show');
+    clearTimeout(toast._t);
+    toast._t = setTimeout(() => el.classList.remove('show'), 2600);
+  }
+  function writeClipboard(text) {
+    navigator.clipboard.writeText(text).catch(() => {
+      const el = document.createElement('textarea');
+      el.value = text;
+      document.body.appendChild(el);
+      el.select();
+      document.execCommand('copy');
+      el.remove();
+    });
+  }
+  const projectUrl = id => `${location.origin}/project/${id}`;
+
+  async function load() {
+    const list = document.getElementById('list');
+    try {
+      const res = await fetch(`/api/batches/${encodeURIComponent(batchId)}`);
+      if (!res.ok) throw new Error(res.status === 404 ? 'notfound' : `HTTP ${res.status}`);
+      batch = await res.json();
+    } catch (e) {
+      document.getElementById('batchName').textContent = 'まとめページが見つかりません';
+      list.innerHTML = `<li class="error">${e.message === 'notfound'
+        ? 'リンクが間違っているか、削除された可能性があります。'
+        : '読み込みに失敗しました。時間をおいて再読み込みしてください。'}</li>`;
+      return;
+    }
+    render();
+  }
+
+  function render() {
+    document.title = `${batch.name} - Clippin`;
+    document.getElementById('batchName').textContent = batch.name;
+    document.getElementById('renameBtn').style.display = '';
+
+    const created = new Date(batch.createdAt);
+    const expiry  = new Date(created.getTime() + RETENTION_DAYS * 24 * 60 * 60 * 1000);
+    const expired = Date.now() > expiry.getTime();
+    document.getElementById('meta').innerHTML = [
+      `${batch.projects.length}本の動画`,
+      `作成日：${fmtDate(created)}`,
+      expired
+        ? `<span style="color:var(--danger)">閲覧期限切れ（${fmtDate(expiry)}）— 動画は削除されています</span>`
+        : `閲覧期限：${fmtDate(expiry)}まで`,
+    ].map(s => `<span>${s}</span>`).join('');
+
+    const list = document.getElementById('list');
+    if (!batch.projects.length) {
+      list.innerHTML = '<li class="empty">まだ動画がありません。<br>アップロードが完了すると、ここに追加されます。</li>';
+      return;
+    }
+    document.getElementById('actions').style.display = '';
+    document.getElementById('note').style.display = '';
+    list.innerHTML = batch.projects.map((p, i) => {
+      const url = projectUrl(p.id);
+      const status = !p.pinCount
+        ? '<span class="badge">コメントなし</span>'
+        : p.openCount
+          ? `<span class="badge open">未解決 ${p.openCount}</span>`
+          : '<span class="badge done">すべて解決済</span>';
+      return `
+        <li class="row">
+          <span class="num">${i + 1}</span>
+          <div class="name">
+            <a href="${esc(url)}">${esc(p.name)}</a>
+            <div class="url">${esc(url)}</div>
+          </div>
+          <div class="badges">
+            ${p.versionNum > 1 ? `<span class="badge">v${p.versionNum}</span>` : ''}
+            ${status}
+          </div>
+          <button class="icon-btn" onclick="copyOne('${esc(p.id)}')">コピー</button>
+        </li>`;
+    }).join('');
+  }
+
+  function copyOne(id) {
+    writeClipboard(projectUrl(id));
+    toast('リンクをコピーしました');
+  }
+  function copyAllLinks() {
+    writeClipboard(batch.projects.map(p => projectUrl(p.id)).join('\n'));
+    toast(`${batch.projects.length}本のリンクをコピーしました`);
+  }
+  function copyPageLink() {
+    writeClipboard(location.origin + location.pathname);
+    toast('このページのリンクをコピーしました');
+  }
+
+  function startRename() {
+    const row = document.getElementById('titleRow');
+    row.innerHTML = `<input class="title-input" id="titleInput" maxlength="100" value="${esc(batch.name)}">`;
+    const input = document.getElementById('titleInput');
+    input.focus();
+    input.select();
+    let done = false;
+    const finish = async save => {
+      if (done) return;
+      done = true;
+      const name = input.value.trim();
+      if (save && name && name !== batch.name) {
+        const res = await fetch(`/api/batches/${encodeURIComponent(batchId)}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ name }),
+        }).catch(() => null);
+        if (res?.ok) { batch.name = name; toast('名前を変更しました'); }
+        else toast('名前の変更に失敗しました');
+      }
+      row.innerHTML = `<h1 id="batchName"></h1><button class="icon-btn" id="renameBtn" onclick="startRename()" title="名前を変更">✎ 名前を変更</button>`;
+      render();
+    };
+    input.addEventListener('keydown', e => {
+      if (e.isComposing) return;
+      if (e.key === 'Enter') finish(true);
+      if (e.key === 'Escape') finish(false);
+    });
+    input.addEventListener('blur', () => finish(true));
+  }
+
+  load();
+</script>
+</body>
+</html>
