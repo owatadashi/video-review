@@ -9,7 +9,7 @@
   <link rel="icon" type="image/svg+xml" href="/favicon.svg?v=3">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700&family=Zen+Old+Mincho:wght@900&family=JetBrains+Mono:wght@500&family=Inter+Tight:wght@700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700&family=JetBrains+Mono:wght@500&family=Inter+Tight:wght@700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/site.css">
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5000671630850248"
      crossorigin="anonymous"></script>
@@ -21,7 +21,7 @@
     .toc-title { font-size: 12px; font-weight: 700; color: var(--ink-3); margin-bottom: 8px; }
     .page .toc ol { list-style: none; margin: 0; padding: 0; counter-reset: toc; display: grid; gap: 2px; }
     .page .toc li { margin: 0; counter-increment: toc; display: flex; gap: 12px; align-items: baseline; }
-    .page .toc li::before { content: counter(toc, cjk-ideographic); font-family: var(--mincho); font-weight: 900; color: var(--ink-3); min-width: 1.2em; }
+    .page .toc li::before { content: counter(toc, decimal-leading-zero); font-family: var(--mono); font-size: 12px; color: var(--ink-3); min-width: 1.8em; }
     .toc a { text-decoration: none; font-size: 15px; }
     .toc a:hover { text-decoration: underline; }
 
@@ -106,15 +106,15 @@
   <section id="howto">
     <h2>基本的な使い方（5つの手順）</h2>
     <ol class="steps">
-      <li><b>一</b><strong>動画をアップロードする</strong>
+      <li><b>01</b><strong>動画をアップロードする</strong>
         <p><a href="/">clippin.work</a> を開き、動画ファイルを画面にドラッグ＆ドロップします。クリックしてファイルを選ぶこともでき、複数本をまとめて置くこともできます。MP4・MOV・WebM・AVI形式に対応しています。アップロードした動画はCloudflareのサーバーに保存され、30日間アクセスできます。</p></li>
-      <li><b>二</b><strong>付箋を貼りたい場面で止める</strong>
+      <li><b>02</b><strong>付箋を貼りたい場面で止める</strong>
         <p>動画を再生し、修正指示を入れたい場面で一時停止します。再生バーをクリックすれば特定の位置へ移動でき、「−5s」「+5s」ボタンで5秒ずつ前後の調整もできます。</p></li>
-      <li><b>三</b><strong>「この場面に付箋を貼る」を押す</strong>
+      <li><b>03</b><strong>「この場面に付箋を貼る」を押す</strong>
         <p>ボタンを押すと、その時点のタイムコードが記録された入力欄が開きます。修正内容を書き込み、必要なら「赤枠を追加」で画面のどの部分を指しているかを示せます。書き終えたら「保存する」を押します。</p></li>
-      <li><b>四</b><strong>必要な場面すべてに付箋を貼る</strong>
+      <li><b>04</b><strong>必要な場面すべてに付箋を貼る</strong>
         <p>手順二と三を繰り返し、修正が必要な場面すべてに付箋を貼ります。付箋は再生バーの上に印として表示され、クリックするとその場面へ移動します。「未解決」「解決済」で絞り込めば、進み具合も確認できます。</p></li>
-      <li><b>五</b><strong>リンクで共有する</strong>
+      <li><b>05</b><strong>リンクで共有する</strong>
         <p>「共有」を押してプロジェクト名を入れると、共有URLが発行されてクリップボードにコピーされます。2回目からは「リンクをコピー」で同じURLを取り出せます。あとはメールやチャットで送るだけで、相手はログインせずに付箋を確認できます。</p></li>
     </ol>
   </section>

@@ -18,7 +18,6 @@
   --shu: #d9442b;
   --stage: #141412;
   --jp: 'Zen Kaku Gothic New', 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', sans-serif;
-  --mincho: 'Zen Old Mincho', 'Hiragino Mincho ProN', serif;
   --mono: 'JetBrains Mono', ui-monospace, 'SF Mono', monospace;
   --latin: 'Inter Tight', var(--jp);
   --ease-stick: cubic-bezier(.2, .9, .25, 1.25);
@@ -88,8 +87,8 @@ img { max-width: 100%; height: auto; }
 
 /* 見出し: 「声」のある見出しは明朝 */
 .page h1, .page-title {
-  font-family: var(--mincho); font-weight: 900;
-  font-size: clamp(30px, 4vw, 44px); line-height: 1.35; letter-spacing: .02em;
+  font-family: var(--jp); font-weight: 700;
+  font-size: clamp(28px, 3.6vw, 40px); line-height: 1.4; letter-spacing: -.005em;
   margin-bottom: 20px;
 }
 .page h1 .mark, .mark {
@@ -98,7 +97,7 @@ img { max-width: 100%; height: auto; }
 }
 .lead, .page-lead, .intro { font-size: 16px; line-height: 2; color: var(--ink-2); margin-bottom: 48px; }
 .page h2 {
-  font-family: var(--mincho); font-weight: 900; font-size: 24px; line-height: 1.45; letter-spacing: .02em;
+  font-family: var(--jp); font-weight: 700; font-size: 22px; line-height: 1.5; letter-spacing: 0;
   margin: 64px 0 18px; padding-left: 16px; position: relative;
 }
 .page h2::before { content: ""; position: absolute; left: 0; top: .28em; bottom: .28em; width: 6px; background: var(--fusen); }
@@ -145,14 +144,14 @@ a.fusen-card:hover { transform: translateY(-2px) rotate(-.3deg); box-shadow: 0 1
 /* 番号つき手順: 漢数字 */
 .steps { list-style: none; margin: 28px 0; padding: 0; display: grid; gap: 14px; counter-reset: step; }
 .steps > li { margin: 0; display: grid; grid-template-columns: 44px 1fr; gap: 4px 14px; align-items: baseline; }
-.steps > li > b:first-child, .steps .num { font-family: var(--mincho); font-weight: 900; font-size: 22px; color: var(--ink); }
+.steps > li > b:first-child, .steps .num { font-family: var(--mono); font-weight: 500; font-size: 13px; color: var(--ink-3); }
 
 /* 記事末尾の誘導 */
 .cta-card {
   margin: 64px 0 0; padding: 28px 28px 26px; background: var(--card); border: 1px solid var(--line);
   border-left: 6px solid var(--fusen); border-radius: 2px 4px 4px 2px;
 }
-.cta-card h2, .cta-card h3, .cta-card .cta-title { font-family: var(--mincho); font-weight: 900; font-size: 21px; margin: 0 0 8px; padding: 0; }
+.cta-card h2, .cta-card h3, .cta-card .cta-title { font-family: var(--jp); font-weight: 700; font-size: 21px; margin: 0 0 8px; padding: 0; }
 .cta-card h2::before { display: none; }
 .cta-card p { font-size: 14px; color: var(--ink-2); margin-bottom: 18px; }
 .related { margin-top: 48px; }
@@ -163,7 +162,7 @@ a.fusen-card:hover { transform: translateY(-2px) rotate(-.3deg); box-shadow: 0 1
 .related a:hover { text-decoration: underline; }
 
 /* FAQ（details/summary 推奨） */
-.faq-cat { font-family: var(--mincho); font-weight: 900; font-size: 20px; margin: 56px 0 8px; }
+.faq-cat { font-family: var(--jp); font-weight: 700; font-size: 20px; margin: 56px 0 8px; }
 .faq-list { border-top: 2px solid var(--ink); }
 .faq-item { border-bottom: 1px solid var(--line); }
 .faq-item summary, .faq-question {
@@ -171,10 +170,9 @@ a.fusen-card:hover { transform: translateY(-2px) rotate(-.3deg); box-shadow: 0 1
   padding: 18px 2px; font-weight: 700; font-size: 15.5px; line-height: 1.7;
 }
 .faq-item summary::-webkit-details-marker { display: none; }
-.faq-item summary::before, .faq-question::before { content: "問"; font-family: var(--mincho); font-weight: 900; color: var(--ink-3); flex-shrink: 0; }
 .faq-item summary::after { content: "＋"; margin-left: auto; color: var(--ink-3); font-weight: 400; transition: transform .2s var(--ease-out); }
 .faq-item[open] summary::after { transform: rotate(45deg); }
-.faq-answer, .faq-item .answer { padding: 0 2px 20px 32px; font-size: 14.5px; line-height: 2; color: var(--ink-2); }
+.faq-answer, .faq-item .answer { padding: 0 32px 20px 2px; font-size: 14.5px; line-height: 2; color: var(--ink-2); }
 .faq-answer p:last-child { margin-bottom: 0; }
 
 /* フォーム */
@@ -214,7 +212,7 @@ a.fusen-card:hover { transform: translateY(-2px) rotate(-.3deg); box-shadow: 0 1
   .site-nav { gap: 14px; }
   .site-nav a:nth-child(n+3) { display: none; }
   .page { padding: 36px 18px 64px; }
-  .page h2 { font-size: 21px; margin-top: 48px; }
+  .page h2 { font-size: 20px; margin-top: 48px; }
   .site-footer { padding: 16px 18px; }
   .site-header .btn { padding: 6px 11px; font-size: 12px; }
 }
