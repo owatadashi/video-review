@@ -1991,6 +1991,146 @@
       .pin-card.active .pin-actions { background: none; }
       .sidebar-tools { padding: 12px 20px; }
     }
+
+    /* ════════════════════════════════════════════════════════
+       Motion — 付箋を「貼る・剥がす・捨てる」手触り
+       どれも 0.3〜0.5 秒。OS の「視差効果を減らす」設定では止める
+       ════════════════════════════════════════════════════════ */
+    :root {
+      --ease-stick: cubic-bezier(.2, .9, .25, 1.25);   /* 少し行き過ぎて止まる */
+      --ease-out: cubic-bezier(.2, .8, .2, 1);
+      --lift: 0 10px 22px rgba(60,48,20,.16), 0 2px 4px rgba(60,48,20,.08);
+    }
+
+    /* 貼る: 上から落ちてきて、少し傾いてから平らに貼りつく */
+    @keyframes fusen-stick {
+      0%   { opacity: 0; transform: translate(6px, -18px) rotate(-4deg) scale(1.04); box-shadow: var(--lift); }
+      55%  { opacity: 1; transform: translate(0, 2px) rotate(.6deg) scale(1); box-shadow: 0 2px 4px rgba(60,48,20,.10); }
+      100% { transform: none; box-shadow: none; }
+    }
+    /* 剥がす: 左上を支点に角がめくれて、右上へ持っていかれる */
+    @keyframes fusen-peel {
+      0%   { transform: none; }
+      35%  { transform: rotate(-2.5deg) translateY(-4px); box-shadow: var(--lift); }
+      100% { transform: translate(40px, -24px) rotate(9deg); opacity: 0; box-shadow: var(--lift); }
+    }
+    /* 剥がした跡: うっすら現れる */
+    @keyframes fusen-trace {
+      from { opacity: 0; transform: translateY(3px); }
+      to   { opacity: 1; transform: none; }
+    }
+    /* 捨てる: 丸めて下へ */
+    @keyframes fusen-toss {
+      0%   { transform: none; }
+      30%  { transform: scale(1.02) rotate(1deg); }
+      100% { transform: translateY(24px) scale(.7) rotate(-14deg); opacity: 0; }
+    }
+    /* タイムラインの印: ぴょこっと立つ */
+    @keyframes flag-pop {
+      0%   { transform: translateX(-50%) translateY(10px) scaleY(.2); opacity: 0; }
+      65%  { transform: translateX(-50%) translateY(-4px) scaleY(1.1); opacity: 1; }
+      100% { transform: translateX(-50%); }
+    }
+    @keyframes note-in {
+      from { opacity: 0; transform: translateY(-16px) rotate(var(--r, 0deg)) scale(1.04); }
+      to   { opacity: 1; transform: rotate(var(--r, 0deg)); }
+    }
+    @keyframes wiggle { 0%,100% { transform: rotate(0); } 25% { transform: rotate(-1.2deg); } 75% { transform: rotate(1.2deg); } }
+
+    .pin-card { transform-origin: left top; transition: transform .18s var(--ease-out), box-shadow .18s var(--ease-out), border-color .15s; }
+    .pin-card:hover { transform: translateY(-1px) rotate(-.25deg); box-shadow: 0 6px 14px rgba(60,48,20,.08); }
+    .pin-card.resolved:hover { transform: none; box-shadow: none; }
+    .pin-card.anim-stick { animation: fusen-stick .5s var(--ease-stick) both; }
+    .pin-card.anim-peel  { animation: fusen-peel .42s cubic-bezier(.5, 0, .75, .4) forwards; pointer-events: none; }
+    .pin-card.anim-trace { animation: fusen-trace .35s var(--ease-out) both; }
+    .pin-card.anim-toss  { animation: fusen-toss .32s cubic-bezier(.5, 0, .75, .4) forwards; pointer-events: none; }
+
+    /* 剥がした跡: 破線の枠だけ残す */
+    .pin-card.resolved { background: transparent; border-style: dashed; border-left-style: solid; }
+
+    /* タイムラインの印 */
+    .pt-marker { transform-origin: 50% 100%; transition: transform .15s var(--ease-out), height .15s; }
+    .pt-marker.active { height: 16px; background: var(--fusen); border-color: var(--ink); z-index: 3; }
+    .pt-marker.anim-pop { animation: flag-pop .45s var(--ease-stick) both; }
+
+    /* 空の付箋欄: 何も書いていない付箋 */
+    .pins-empty { gap: 18px; padding: 40px 16px; }
+    .pins-empty-note {
+      width: 72px; height: 64px; position: relative;
+      background: var(--fusen-soft); border-left: 5px solid var(--fusen);
+      transform: rotate(-3deg);
+      box-shadow: 0 6px 14px rgba(60,48,20,.08);
+      clip-path: polygon(0 0, 100% 0, 100% 78%, 82% 100%, 0 100%);
+    }
+    .pins-empty-note::after { content: ""; position: absolute; right: 0; bottom: 0; width: 18%; height: 22%; background: #f0d36a; clip-path: polygon(0 0, 100% 0, 0 100%); }
+    .pins-empty:hover .pins-empty-note { animation: wiggle .5s ease-in-out; }
+    .pins-empty-msg { font-size: 12.5px; line-height: 1.9; color: var(--ink-3); text-align: center; }
+    .pins-empty-msg strong { display: block; font-size: 14px; color: var(--ink); margin-bottom: 4px; }
+    .pins-empty-msg kbd { font-family: var(--mono); font-size: 11px; border: 1px solid var(--line); border-bottom-width: 2px; border-radius: 3px; padding: 0 5px; margin: 0 3px; color: var(--ink); background: var(--card); }
+
+    /* 「この場面に付箋を貼る」: 押した感 */
+    .btn-primary, .btn-comment-add, .file-banner-cta { transition: transform .12s var(--ease-out), background .15s; }
+    .btn-primary:active, .btn-comment-add:active, .file-banner-cta:active, .btn-cancel:active { transform: translateY(1px) scale(.98); }
+    .is-flashed { background: var(--fusen) !important; color: var(--ink) !important; border-color: var(--fusen-edge) !important; }
+
+    /* トースト: 小さな付箋として画面下に貼られる */
+    .toast {
+      background: var(--fusen-soft); color: var(--ink);
+      border-left: 6px solid var(--fusen); border-radius: 2px 4px 4px 2px;
+      box-shadow: 0 10px 24px rgba(60,48,20,.18);
+      font-weight: 500; padding: 11px 16px 11px 14px;
+      transform: translateX(-50%) translateY(16px) rotate(-1.5deg);
+      transition: opacity .25s, transform .35s var(--ease-stick);
+      max-width: min(420px, calc(100vw - 32px));
+    }
+    .toast.show { transform: translateX(-50%) translateY(0) rotate(-.6deg); }
+    .toast .toast-hint { color: var(--ink-2); font-weight: 400; }
+    .toast.has-action { pointer-events: auto; display: flex; align-items: center; gap: 14px; }
+    .toast-action { background: none; border: none; border-bottom: 2px solid var(--ink); color: var(--ink); font-weight: 700; font-size: 13px; cursor: pointer; padding: 0 0 1px; white-space: nowrap; }
+
+    /* アップロード欄: ドラッグ中は付箋色に、少し持ち上がる */
+    .upload-zone { transition: transform .2s var(--ease-out), background .2s, border-color .2s, box-shadow .2s; }
+    .upload-zone:hover { transform: translateY(-2px); box-shadow: 0 10px 22px rgba(60,48,20,.08); }
+    .upload-zone.drag-over { transform: scale(1.015) rotate(-.4deg); box-shadow: var(--lift); }
+    .upload-zone-drop { display: none; font-size: 17px; font-weight: 700; color: var(--ink); }
+    .upload-zone.drag-over .upload-zone-title, .upload-zone.drag-over .upload-zone-sub, .upload-zone.drag-over .upload-zone-formats { display: none; }
+    .upload-zone.drag-over .upload-zone-drop { display: block; }
+
+    /* ヒーロー: 読み込み時にマーカーが引かれ、付箋が順に貼られる */
+    .fv-catchcopy .mark {
+      background: linear-gradient(var(--fusen), var(--fusen)) no-repeat 0 72% / 100% 36%;
+      animation: marker-draw .7s var(--ease-out) .35s both;
+    }
+    @keyframes marker-draw { from { background-size: 0% 36%; } to { background-size: 100% 36%; } }
+    .fv-note-card { animation: note-in .55s var(--ease-stick) both; transition: transform .25s var(--ease-out), box-shadow .25s; }
+    .fv-note-card.n1 { --r: 1.2deg; animation-delay: .8s; }
+    .fv-note-card.n2 { --r: -1.4deg; animation-delay: 1.15s; }
+    .fv-note-card:hover { transform: rotate(var(--r)) translateY(-4px); box-shadow: 0 16px 28px rgba(60,48,20,.18); }
+    .fv-track i { animation: flag-pop-fv .45s var(--ease-stick) both; transform-origin: 50% 100%; }
+    .fv-track i:nth-child(1) { animation-delay: .9s; }
+    .fv-track i:nth-child(2) { animation-delay: 1.05s; }
+    .fv-track i:nth-child(3) { animation-delay: 1.2s; }
+    @keyframes flag-pop-fv { from { transform: translateY(8px) scaleY(.2); opacity: 0; } to { transform: none; opacity: 1; } }
+
+    /* まとめアップロード: 完了した行の左に付箋のタブがすっと出る */
+    .batch-item { position: relative; transition: background .2s; }
+    .batch-item.done::before {
+      content: ""; position: absolute; left: 0; top: 8px; bottom: 8px; width: 4px; background: var(--fusen);
+      animation: tab-in .35s var(--ease-stick) both; transform-origin: left center;
+    }
+    @keyframes tab-in { from { transform: scaleX(0); opacity: 0; } to { transform: none; opacity: 1; } }
+
+    /* ロゴ: ホバーで付箋がぺらっと */
+    .logo:hover .logo-mark { animation: wiggle .45s ease-in-out; }
+
+    /* ショートカットのヒント（PCのみ） */
+    .kbd-hints { display: flex; gap: 14px; font-size: 11px; color: var(--ink-3); white-space: nowrap; }
+    .kbd-hints kbd { font-family: var(--mono); font-size: 10.5px; border: 1px solid var(--line); border-bottom-width: 2px; border-radius: 3px; padding: 0 5px; margin-right: 5px; color: var(--ink-2); background: var(--card); }
+    @media (max-width: 1100px) { .kbd-hints { display: none; } }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: .01ms !important; animation-delay: 0s !important; transition-duration: .01ms !important; }
+    }
   </style>
 </head>
 <body>
@@ -2069,6 +2209,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <div class="upload-zone" id="uploadZone" onclick="document.getElementById('fileInput').click()">
           <div class="upload-icon"><i data-lucide="upload-cloud" class="icon-lg"></i></div>
           <p class="upload-zone-title">クリックしてファイルを選択</p>
+          <p class="upload-zone-drop" aria-hidden="true">ここで離すと読み込みます</p>
           <p class="upload-zone-sub">または動画をここにドロップ（複数可）</p>
           <p class="upload-zone-formats">MP4 · MOV · WebM · AVI など</p>
         </div>
@@ -2124,6 +2265,13 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       </div>
 
       <div class="spacer"></div>
+
+      <div class="kbd-hints" aria-label="キーボードショートカット">
+        <span><kbd>Space</kbd>再生</span>
+        <span><kbd>P</kbd>付箋を貼る</span>
+        <span><kbd>N</kbd>次の未解決</span>
+        <span><kbd>R</kbd>剥がす</span>
+      </div>
 
       <select class="speed-select" id="speedSelect" onchange="changeSpeed(this.value)" title="再生速度">
         <option value="0.5">0.5x</option>
@@ -2380,6 +2528,10 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   let capturedSec = 0;
   let editingPinId = null;   // null = 新規, number = 編集中のpin.id
   let activePinId = null;    // 最後にクリックしたピンのID
+  // 次の描画で一度だけ動かす付箋（貼る / 剥がした跡 / 貼り直し）
+  const pinAnim = { added: null, resolved: null, restuck: null };
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+  const wait = ms => new Promise(r => setTimeout(r, reduceMotion.matches ? 0 : ms));
   let replyingPinId = null;  // 返信フォームを開いているピンのID
 
   function pad(n) { return String(n).padStart(2, '0'); }
@@ -2659,7 +2811,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
           ? `<a class="batch-name" href="${esc(it.url)}" target="_blank" rel="noopener" title="${esc(it.file.name)}">${esc(it.name)}</a>`
           : `<span class="batch-name" title="${esc(it.file.name)}">${esc(it.name)}</span>`}
         ${it.url
-          ? `<button class="batch-copy" onclick="writeClipboard('${esc(it.url)}');toast('リンクをコピーしました')"><i data-lucide="link" class="icon"></i> コピー</button>`
+          ? `<button class="batch-copy" onclick="writeClipboard('${esc(it.url)}');flashButton(this, '✓ コピー済み')"><i data-lucide="link" class="icon"></i> コピー</button>`
           : `<span class="batch-status">${esc(it.status === 'uploading' ? `${it.pct}%` : it.label)}</span>`}
         <div class="batch-bar"><div style="width:${it.pct}%"></div></div>
         ${it.status === 'uploading' ? `<div class="batch-sub">${esc(it.label)}</div>` : ''}
@@ -2699,6 +2851,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   // スプレッドシートの列に貼れるよう、ファイル名順・改行区切りでコピー（失敗分は空行）
   function copyBatchLinks() {
     writeClipboard(batchItems.map(it => it.url).join('\n'));
+    flashButton(document.getElementById('batchCopyBtn'), '✓ コピーしました');
     toast('リンクをすべてコピーしました', 'スプレッドシートのセルを選んで貼り付けてください');
   }
 
@@ -2755,7 +2908,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
         <span class="recent-kind">${r.type === 'batch' ? 'まとめ' : '動画'}</span>
         <a href="${esc(url)}">${esc(r.name)}</a>
         <span class="recent-date">${d.getMonth() + 1}/${d.getDate()}</span>
-        <button class="recent-copy" onclick="writeClipboard('${esc(url)}');toast('リンクをコピーしました')">コピー</button>
+        <button class="recent-copy" onclick="writeClipboard('${esc(url)}');flashButton(this, '✓ コピー済み')">コピー</button>
       </li>`;
     }).join('');
   }
@@ -3139,7 +3292,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       document.getElementById('overlay').classList.remove('open');
       renderPins();
       saveState();
-      toast('ピンを更新しました');
+      toast('付箋を書き換えました');
     } else {
       // 新規追加
       const pin = { id: Date.now(), time: capturedSec, comment: text, author,
@@ -3148,19 +3301,35 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       state.pins.push(pin);
       state.pins.sort((a, b) => a.time - b.time);
       activePinId = pin.id;
+      pinAnim.added = pin.id;
       editingPinId = null;
       // overlay を直接閉じる（closeModal はタイマー再開も行うが保存後は再開しない）
       document.getElementById('overlay').classList.remove('open');
       renderPins();
       saveState();
-      toast('コメントしました');
+      toast('付箋を貼りました');
+      requestAnimationFrame(() => document.getElementById('pin-' + pin.id)?.scrollIntoView({ behavior: 'smooth', block: 'nearest' }));
     }
   }
 
-  function deletePin(id) {
-    state.pins = state.pins.filter(p => p.id !== id);
+  async function deletePin(id) {
+    const idx = state.pins.findIndex(p => p.id === id);
+    if (idx === -1) return;
+    const card = document.getElementById('pin-' + id);
+    if (card) { card.classList.add('anim-toss'); await wait(320); }
+    const [removed] = state.pins.splice(idx, 1);
     renderPins();
     saveState();
+    toast('付箋を捨てました', null, {
+      label: '元に戻す',
+      run: () => {
+        state.pins.push(removed);
+        state.pins.sort((a, b) => a.time - b.time);
+        pinAnim.restuck = removed.id;
+        renderPins();
+        saveState();
+      },
+    });
   }
 
   function seekToPin(time, pinId) {
@@ -3205,15 +3374,18 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
     if (visible.length === 0) {
       const msg = state.pins.length === 0
-        ? 'タイムコード付きのコメントが<br>ここに表示されます'
-        : pinFilter === 'unresolved' ? '未解決のコメントはありません' : '解決済のコメントはありません';
+        ? '<strong>まだ付箋はありません</strong>気になる場面で止めて<kbd>P</kbd>を押すと、<br>その時間に付箋を貼れます'
+        : pinFilter === 'unresolved'
+          ? '<strong>未解決の付箋はありません</strong>ぜんぶ剥がし終わりました'
+          : '<strong>解決済の付箋はありません</strong>';
       list.innerHTML = `
         <div class="pins-empty">
-          <div class="pins-empty-icon"><i data-lucide="map-pin" class="icon-lg"></i></div>
-          <div>${msg}</div>
+          <div class="pins-empty-note" aria-hidden="true"></div>
+          <div class="pins-empty-msg">${msg}</div>
         </div>`;
       lucide.createIcons({ els: list.querySelectorAll('[data-lucide]') });
       renderPinMarkers();
+      clearPinAnim();
       return;
     }
     list.innerHTML = visible.map(p => {
@@ -3240,7 +3412,9 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
           </div>
         </div>` : '';
       return `
-        <div class="pin-card${p.id === activePinId ? ' active' : ''}${p.resolved ? ' resolved' : ''}"
+        <div class="pin-card${p.id === activePinId ? ' active' : ''}${p.resolved ? ' resolved' : ''}${
+               p.id === pinAnim.added ? ' anim-stick' : p.id === pinAnim.resolved ? ' anim-trace' : p.id === pinAnim.restuck ? ' anim-stick' : ''}"
+             id="pin-${p.id}"
              onclick="seekToPin(${p.time}, ${p.id})">
           <div class="pin-meta">
             <span class="pin-time">${esc(fmtTime(p.time))}</span>
@@ -3268,13 +3442,35 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     }).join('');
     lucide.createIcons({ els: list.querySelectorAll('[data-lucide]') });
     renderPinMarkers();
+    clearPinAnim();
   }
 
+  // N / Shift+N: 再生位置から次（前）の未解決の付箋へ
+  function jumpToUnresolved(dir) {
+    const open = state.pins.filter(p => !p.resolved);
+    if (!open.length) { toast('未解決の付箋はありません'); return; }
+    const now = nativeVideoEl ? nativeVideoEl.currentTime : (open.find(p => p.id === activePinId)?.time ?? -1);
+    const target = dir > 0
+      ? (open.find(p => p.time > now + 0.05) || open[0])
+      : ([...open].reverse().find(p => p.time < now - 0.05) || open[open.length - 1]);
+    seekToPin(target.time, target.id);
+    document.getElementById('pin-' + target.id)?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+
+  function clearPinAnim() { pinAnim.added = pinAnim.resolved = pinAnim.restuck = null; }
+
   // ─── Resolved toggle ───────────────────────────────────
-  function toggleResolved(id) {
+  // 解決 = 付箋を剥がす（剥がした跡が残る）／未解決に戻す = 貼り直す
+  async function toggleResolved(id) {
     const pin = state.pins.find(p => p.id === id);
     if (!pin) return;
+    const card = document.getElementById('pin-' + id);
+    if (!pin.resolved && card) {
+      card.classList.add('anim-peel');
+      await wait(420);
+    }
     pin.resolved = !pin.resolved;
+    pinAnim[pin.resolved ? 'resolved' : 'restuck'] = id;
     renderPins();
     saveState();
   }
@@ -3364,7 +3560,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     // プロジェクト保存済み → URLをコピーするだけ
     if (state.projectId) {
       writeClipboard(location.href);
-      toast('共有URLをコピーしました', 'リンクを開くだけで、誰でもコメントを確認できます');
+      flashButton(document.getElementById('shareBtn'), '✓ コピーしました');
+      toast('共有URLをコピーしました', 'リンクを開くだけで、誰でも付箋を確認できます');
       return;
     }
     if (!state.videoUrl && !localFile) {
@@ -3902,13 +4099,15 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     state.pins.forEach(pin => {
       const pct    = Math.min(99.5, (pin.time / dur) * 100);
       const marker = document.createElement('div');
-      marker.className = 'pt-marker' + (pin.resolved ? ' resolved' : '');
+      marker.className = 'pt-marker' + (pin.resolved ? ' resolved' : '')
+        + (pin.id === activePinId ? ' active' : '')
+        + (pin.id === pinAnim.added || pin.id === pinAnim.restuck ? ' anim-pop' : '');
       marker.style.left = pct + '%';
       marker.title = `${fmtTime(pin.time)}　${pin.comment}`;
       marker.addEventListener('click', e => {
         e.stopPropagation();
-        if (nativeVideoEl) nativeVideoEl.currentTime = pin.time;
-        // サイドバーの対応コメントにスクロール
+        seekToPin(pin.time, pin.id);
+        // サイドバーの対応する付箋へスクロール
         const el = document.getElementById('pin-' + pin.id);
         if (el) el.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
       });
@@ -4190,13 +4389,38 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       .replace(/&/g,'&amp;').replace(/</g,'&lt;')
       .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
   }
-  function toast(msg, hint) {
+  // action: { label, run } を渡すと「元に戻す」などのボタン付きで表示
+  function toast(msg, hint, action) {
     const el = document.getElementById('toast');
-    el.innerHTML = hint
-      ? `${esc(msg)}<span class="toast-hint">${esc(hint)}</span>`
-      : esc(msg);
+    el.innerHTML = esc(msg)
+      + (hint ? `<span class="toast-hint">${esc(hint)}</span>` : '')
+      + (action ? `<button class="toast-action" type="button">${esc(action.label)}</button>` : '');
+    el.classList.toggle('has-action', !!action);
+    if (action) {
+      el.querySelector('.toast-action').onclick = () => {
+        el.classList.remove('show');
+        action.run();
+      };
+    }
+    el.classList.remove('show');
+    void el.offsetWidth;   // 連続表示でもアニメーションをやり直す
     el.classList.add('show');
-    setTimeout(() => el.classList.remove('show'), hint ? 3800 : 2600);
+    clearTimeout(toast._timer);
+    toast._timer = setTimeout(() => el.classList.remove('show'), action ? 5000 : hint ? 3800 : 2600);
+  }
+
+  // ボタンの表示を一瞬だけ切り替えて、押した手応えを返す
+  function flashButton(btn, html, ms = 1600) {
+    if (!btn) return;
+    if (!btn.dataset.orig) btn.dataset.orig = btn.innerHTML;
+    btn.innerHTML = html;
+    btn.classList.add('is-flashed');
+    clearTimeout(btn._flash);
+    btn._flash = setTimeout(() => {
+      btn.innerHTML = btn.dataset.orig;
+      delete btn.dataset.orig;
+      btn.classList.remove('is-flashed');
+    }, ms);
   }
 
   // ── バージョン比較 ──────────────────────────────────────────
@@ -4292,6 +4516,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       if (e.code === 'Space') { e.preventDefault(); toggleTimer(); return; }
       if (e.key === 'k' || e.key === 'K') { toggleTimer(); return; }
       if (e.key === 'p' || e.key === 'P') { openModal(); return; }
+      if (e.key === 'n' || e.key === 'N') { jumpToUnresolved(e.shiftKey ? -1 : 1); return; }
+      if ((e.key === 'r' || e.key === 'R') && activePinId !== null && state.isLatestVersion) { toggleResolved(activePinId); return; }
       if (e.key === 'ArrowLeft'  && nativeVideoEl) { e.preventDefault(); nativeVideoEl.currentTime = Math.max(0, nativeVideoEl.currentTime - 5); return; }
       if (e.key === 'ArrowRight' && nativeVideoEl) { e.preventDefault(); nativeVideoEl.currentTime = Math.min(nativeVideoEl.duration || 0, nativeVideoEl.currentTime + 5); return; }
     }
