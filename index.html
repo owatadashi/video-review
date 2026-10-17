@@ -43,7 +43,10 @@
   <meta name="twitter:description" content="動画の気になる場面に、タイムコードで直接コメントを残せる無料の動画レビューツール。ログイン不要・インストール不要で、URLを送るだけでチームやクライアントと即共有。アップロードした動画は30日間保存されます。">
   <meta name="twitter:image" content="https://clippin.work/og-image.png">
 
-  <link rel="icon" type="image/svg+xml" href="/favicon.svg?v=2">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg?v=3">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700&family=Zen+Old+Mincho:wght@900&family=JetBrains+Mono:wght@500&family=Inter+Tight:wght@700&display=swap" rel="stylesheet">
 
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-5000671630850248"
      crossorigin="anonymous"></script>
@@ -101,267 +104,43 @@
       overflow: hidden;
     }
 
-    /* ── FV ── */
-    #fv {
-      display: none;
-      height: 100dvh;
-      position: relative;
-      overflow: hidden;
-      align-items: center;
-      justify-content: center;
-      scroll-snap-align: start;
-      scroll-snap-stop: always;
-    }
-    #fv.show { display: flex; }
-
-    .fv-bg {
-      position: absolute;
-      inset: 0;
-      background: radial-gradient(ellipse at 65% 50%, #eaf5f8 0%, #fafafa 65%);
-    }
+    /* ── FV（トップのヒーロー）── */
+    #fv { display: none; min-height: 100dvh; background: var(--paper); }
+    #fv.show { display: flex; align-items: center; }
     .fv-inner {
-      position: relative;
-      z-index: 1;
-      display: flex;
-      align-items: center;
-      gap: 72px;
-      padding: 24px 72px;
-      max-width: 1200px;
-      width: 100%;
+      width: 100%; max-width: 1360px; margin: 0 auto;
+      display: grid; grid-template-columns: 1fr 1.1fr; gap: 64px; align-items: center;
+      padding: 48px 56px 72px;
     }
-    .fv-text { flex: 1; min-width: 0; }
-    .fv-catchcopy {
-      font-size: clamp(26px, 3vw, 44px);
-      font-weight: 500;
-      line-height: 1.8;
-      color: var(--text);
-      letter-spacing: 0.03em;
-      margin-bottom: 16px;
-      text-wrap: balance;
-    }
-    .fv-catchcopy span { color: var(--accent); }
-    .fv-desc {
-      font-size: 14px;
-      color: var(--text-muted);
-      line-height: 1.8;
-      margin-bottom: 28px;
-      text-wrap: balance;
-    }
-    .fv-line {
-      width: 40px;
-      height: 1px;
-      background: var(--accent);
-      opacity: 0.4;
-      margin-bottom: 20px;
-    }
-    .fv-brand {
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 4px;
-      color: var(--accent);
-      margin-bottom: 36px;
-      text-transform: uppercase;
-      opacity: 0.8;
-    }
-    .fv-cta {
-      display: inline-block;
-      background: var(--accent);
-      color: #ffffff;
-      border: none;
-      border-radius: 6px;
-      padding: 11px 28px;
-      font-size: 13px;
-      font-weight: 700;
-      cursor: pointer;
-      letter-spacing: 0.08em;
-      transition: background 0.15s;
-      font-family: inherit;
-    }
-    .fv-cta:hover { background: var(--accent-hover); }
+    .fv-eyebrow { font-family: var(--mono); font-size: 12px; color: var(--ink-3); letter-spacing: .08em; margin-bottom: 28px; display: flex; align-items: center; gap: 10px; }
+    .fv-eyebrow::before { content: ""; width: 24px; height: 1px; background: var(--ink-3); }
+    .fv-catchcopy { font-family: var(--mincho); font-weight: 900; font-size: clamp(40px, 4.8vw, 68px); line-height: 1.22; letter-spacing: .01em; }
+    .fv-catchcopy .mark { background: linear-gradient(transparent 58%, var(--fusen) 58%, var(--fusen) 92%, transparent 92%); padding: 0 2px; }
+    .fv-desc { margin-top: 28px; font-size: 16px; line-height: 2; color: var(--ink-2); max-width: 30em; }
+    .fv-ctas { margin-top: 40px; display: flex; gap: 12px; flex-wrap: wrap; }
+    .fv-note { margin-top: 18px; font-size: 12px; color: var(--ink-3); }
 
-    .fv-mockup-wrap {
-      flex: 1.3;
-      min-width: 0;
-      display: flex;
-      justify-content: center;
-    }
-    .fv-mockup {
-      width: 100%;
-      max-width: 520px;
-      background: #f1f1f4;
-      border: 1px solid #e0e0e6;
-      box-shadow: 0 32px 80px rgba(0,0,0,0.08), 0 0 0 1px rgba(0,0,0,0.03);
-      overflow: hidden;
-    }
-    .fv-browser-bar {
-      background: #e8e8ec;
-      padding: 10px 14px;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      border-bottom: 1px solid #e0e0e6;
-    }
-    .fv-dot {
-      width: 10px;
-      height: 10px;
-      border-radius: 50%;
-    }
-    .fv-dot-r { background: #ff5f57; }
-    .fv-dot-y { background: #febc2e; }
-    .fv-dot-g { background: #28c840; }
-    .fv-urlbar {
-      background: #d8d8e0;
-      padding: 3px 10px;
-      color: #999;
-      font-size: 11px;
-      margin-left: 10px;
-      flex: 1;
-      max-width: 180px;
-    }
-    .fv-tool-header {
-      background: #f1f1f4;
-      padding: 12px 18px;
-      border-bottom: 1px solid #e0e0e6;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-    .fv-logo-text {
-      color: var(--accent);
-      font-size: 15px;
-      font-weight: 700;
-      letter-spacing: 0.5px;
-    }
-    .fv-video-area {
-      background: #d4d4d8;
-      height: 130px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border-bottom: 1px solid #e0e0e6;
-      position: relative;
-    }
-    .fv-play-btn {
-      width: 42px;
-      height: 42px;
-      border: 1.5px solid var(--accent);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      opacity: 0.5;
-    }
-    .fv-play-icon {
-      width: 0;
-      height: 0;
-      border-top: 8px solid transparent;
-      border-bottom: 8px solid transparent;
-      border-left: 13px solid var(--accent);
-      margin-left: 3px;
-    }
-    .fv-timeline {
-      background: #f1f1f4;
-      padding: 8px 18px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      border-bottom: 1px solid #e0e0e6;
-    }
-    .fv-time {
-      color: var(--accent);
-      font-size: 11px;
-      font-weight: 700;
-      font-variant-numeric: tabular-nums;
-    }
-    .fv-time-dim { color: #c4c4cc; }
-    .fv-progress {
-      flex: 1;
-      height: 3px;
-      background: #e0e0e6;
-      position: relative;
-    }
-    .fv-fill { width: 35%; height: 100%; background: var(--accent); }
-    .fv-pin-mark {
-      position: absolute;
-      top: -4px;
-      left: 35%;
-      transform: translateX(-50%);
-      width: 10px;
-      height: 10px;
-      background: var(--accent);
-      clip-path: polygon(50% 0%,100% 50%,50% 100%,0% 50%);
-    }
-    .fv-comments {
-      padding: 10px 18px;
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-    .fv-comment {
-      background: #fafafa;
-      padding: 8px 12px;
-      border-left: 2px solid var(--accent);
-      display: flex;
-      gap: 10px;
-      align-items: flex-start;
-    }
-    .fv-ct {
-      color: var(--accent);
-      font-size: 11px;
-      font-weight: 700;
-      font-variant-numeric: tabular-nums;
-      white-space: nowrap;
-    }
-    .fv-cc { color: #6a6a77; font-size: 11px; line-height: 1.5; }
-    .fv-bottom-bar {
-      background: #f1f1f4;
-      padding: 8px 18px;
-      display: flex;
-      gap: 8px;
-      border-top: 1px solid #e0e0e6;
-    }
-    .fv-btn {
-      background: var(--accent);
-      color: #ffffff;
-      padding: 5px 12px;
-      font-size: 11px;
-      font-weight: 700;
-    }
-    .fv-btn-ghost {
-      background: transparent;
-      border: 1px solid #d8d8e0;
-      color: #9898a8;
-      padding: 5px 12px;
-      font-size: 11px;
-    }
+    .fv-visual { position: relative; padding-bottom: 44px; }
+    .fv-frame { background: var(--stage); border-radius: 6px 6px 0 0; aspect-ratio: 16/9; position: relative; overflow: hidden; }
+    .fv-frame::after { content: ""; position: absolute; inset: 0; background:
+        radial-gradient(120% 90% at 30% 20%, rgba(255,217,74,.10), transparent 60%),
+        linear-gradient(160deg, #2b2a26 0%, #141412 70%); }
+    .fv-scrub { position: absolute; left: 0; right: 0; bottom: 0; height: 44px; background: var(--card); border: 1px solid var(--line); border-top: none; border-radius: 0 0 6px 6px; display: flex; align-items: center; padding: 0 18px; gap: 14px; }
+    .fv-scrub .tc { font-family: var(--mono); font-size: 12px; }
+    .fv-scrub .tc.dim { color: var(--ink-3); }
+    .fv-track { flex: 1; height: 2px; background: var(--line); position: relative; }
+    .fv-track i { position: absolute; top: -9px; width: 8px; height: 10px; background: var(--fusen); border: 1px solid var(--fusen-edge); }
+    .fv-note-card { position: absolute; background: var(--fusen-soft); border-left: 6px solid var(--fusen); padding: 12px 16px 12px 14px; width: 230px; font-size: 13px; line-height: 1.6; box-shadow: 0 1px 0 rgba(0,0,0,.04), 0 8px 18px rgba(60,48,20,.10); }
+    .fv-note-card .tc { font-family: var(--mono); font-size: 11px; color: #8a6d00; display: block; margin-bottom: 4px; }
+    .fv-note-card.n1 { top: 16%; right: -24px; transform: rotate(1.2deg); }
+    .fv-note-card.n2 { top: 54%; left: -32px; transform: rotate(-1.4deg); }
 
-    @media (max-width: 768px) {
-      /* モバイルはスナップなし・自然なスクロール */
-      body.has-fv {
-        scroll-snap-type: none;
-        height: auto;
-      }
-      #fv {
-        height: auto;
-        min-height: 100dvh;
-        overflow: visible;
-        align-items: flex-start;
-        scroll-snap-align: none;
-      }
-      .fv-inner {
-        flex-direction: column;
-        align-items: stretch;
-        padding: 24px 24px 40px;
-        gap: 28px;
-        justify-content: flex-start;
-      }
-      .fv-text { text-align: left; width: 100%; }
-      .fv-catchcopy { font-size: clamp(24px, 6vw, 32px); margin-bottom: 12px; }
-      .fv-desc { font-size: 13px; margin-bottom: 20px; }
-      .fv-mockup-wrap { width: 100%; flex: none; display: flex; }
-      .fv-mockup { max-width: 100%; width: 100%; }
-      .fv-comments { padding: 8px 14px; }
-      .fv-comment:nth-child(n+2) { display: none; }
-      .fv-video-area { height: 90px; }
+    @media (max-width: 900px) {
+      .fv-inner { grid-template-columns: 1fr; gap: 48px; padding: 32px 20px 56px; }
+      .fv-visual { margin: 0 12px; }
+      .fv-note-card { width: 180px; font-size: 12px; }
+      .fv-note-card.n1 { right: -12px; }
+      .fv-note-card.n2 { left: -12px; }
       body.has-fv #app { scroll-snap-align: none; }
     }
 
@@ -1869,403 +1648,348 @@
     }
 
     /* ════════════════════════════════════════════════════════
-       Design refresh — 配色・余白・角丸・階層をここで統一する
-       （上の個別スタイルを上書き。新しい見た目の調整はここで行う）
+       Fusen design — 紙・墨・付箋の黄色。見た目の調整はこのブロックで行う
+       （上の個別スタイルを上書きする。旧変数名も新しい色に割り当て直している）
        ════════════════════════════════════════════════════════ */
     :root {
-      --bg: #f5f6f8;
-      --surface: #ffffff;
-      --surface2: #f0f2f5;
-      --border: #e4e7ec;
-      --text: #111827;
-      --text-muted: #6b7280;
-      --text-faint: #9ca3af;
-      --accent: #0891b2;
-      --accent-hover: #0e7490;
-      --accent-dim: rgba(8,145,178,0.08);
-      --stage: #0d0f12;
-      --radius: 8px;
-      --radius-lg: 12px;
-      --shadow: 0 1px 2px rgba(16,24,40,0.04), 0 1px 3px rgba(16,24,40,0.06);
-      --shadow-lg: 0 12px 32px rgba(16,24,40,0.14);
-    }
-    body { -webkit-font-smoothing: antialiased; }
-    button, input, select, textarea { font-family: inherit; }
+      --paper: #f3efe6;
+      --paper-2: #ebe5d8;
+      --card: #fbf9f4;
+      --ink: #1d1c1a;
+      --ink-2: #57534b;
+      --ink-3: #8f897d;
+      --line: #d9d2c3;
+      --fusen: #ffd94a;
+      --fusen-soft: #fff1b3;
+      --fusen-edge: #c9a51f;
+      --shu: #d9442b;
+      --stage: #141412;
+      --jp: 'Zen Kaku Gothic New', 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', sans-serif;
+      --mincho: 'Zen Old Mincho', 'Hiragino Mincho ProN', serif;
+      --mono: 'JetBrains Mono', ui-monospace, 'SF Mono', monospace;
+      --latin: 'Inter Tight', var(--jp);
 
-    /* ── Buttons (共通) ── */
+      /* 旧変数 → 新パレット */
+      --bg: var(--paper);
+      --surface: var(--card);
+      --surface2: var(--paper-2);
+      --border: var(--line);
+      --text: var(--ink);
+      --text-muted: var(--ink-3);
+      --accent: var(--ink);
+      --accent-hover: #000;
+      --accent-dim: rgba(255,217,74,0.28);
+      --danger: var(--shu);
+      --radius: 4px;
+    }
+    body { font-family: var(--jp); font-feature-settings: "palt"; -webkit-font-smoothing: antialiased; background: var(--paper); }
+    button, input, select, textarea { font-family: inherit; }
+    ::selection { background: var(--fusen); color: var(--ink); }
+
+    /* ── Logo ── */
+    .logo { display: inline-flex; align-items: center; gap: 9px; text-decoration: none; color: var(--ink); flex-shrink: 0; }
+    .logo-mark { position: relative; width: 18px; height: 20px; flex-shrink: 0; }
+    .logo-mark::before { content: ""; position: absolute; inset: 0; background: var(--fusen); clip-path: polygon(0 0, 100% 0, 100% 72%, 72% 100%, 0 100%); }
+    .logo-mark::after { content: ""; position: absolute; right: 0; bottom: 0; width: 28%; height: 28%; background: var(--fusen-edge); clip-path: polygon(0 0, 100% 0, 0 100%); }
+    .logo-word { font-family: var(--latin); font-weight: 700; font-size: 19px; letter-spacing: -0.04em; color: var(--ink); }
+
+    /* ── Buttons ── */
     .btn-primary, .btn-cancel, .btn-ghost {
+      font-family: var(--jp);
       border-radius: var(--radius);
       font-size: 13px;
-      font-weight: 600;
-      padding: 8px 14px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
+      font-weight: 700;
+      letter-spacing: .02em;
+      padding: 9px 16px;
+      display: inline-flex; align-items: center; justify-content: center; gap: 7px;
       line-height: 1.2;
-      transition: background 0.15s, border-color 0.15s, color 0.15s;
-    }
-    .btn-primary { box-shadow: var(--shadow); }
-    .btn-primary:disabled { opacity: 0.45; cursor: not-allowed; box-shadow: none; }
-    .btn-cancel, .btn-ghost {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      color: var(--text);
-      font-weight: 500;
+      text-decoration: none;
       cursor: pointer;
+      transition: background .15s, color .15s, border-color .15s;
     }
-    .btn-cancel:hover, .btn-ghost:hover { background: var(--surface2); color: var(--text); }
-    .btn-cancel:disabled { opacity: 0.45; cursor: not-allowed; }
+    .btn-primary { background: var(--ink); color: var(--paper); border: 1px solid var(--ink); box-shadow: none; }
+    .btn-primary:hover { background: #000; }
+    .btn-primary:disabled { opacity: .35; cursor: not-allowed; }
+    .btn-cancel, .btn-ghost { background: transparent; color: var(--ink); border: 1px solid var(--ink); }
+    .btn-cancel:hover, .btn-ghost:hover { background: var(--paper-2); color: var(--ink); }
+    .btn-cancel:disabled { opacity: .35; cursor: not-allowed; }
+    .btn-sm { padding: 7px 13px; font-size: 12.5px; }
+    .btn-lg { padding: 13px 22px; font-size: 14px; }
 
     /* ── Header ── */
     header {
-      background: var(--surface);
-      border-bottom: 1px solid var(--border);
-      height: 52px;
-      padding: 0 20px;
-      gap: 20px;
+      background: var(--paper);
+      border-bottom: 1px solid var(--line);
+      height: 60px;
+      padding: 0 28px;
+      gap: 24px;
     }
-    .logo { font-size: 18px; text-decoration: none; }
-    .header-nav { display: flex; gap: 18px; }
-    .header-nav a { font-size: 13px; color: var(--text-muted); text-decoration: none; }
-    .header-nav a:hover { color: var(--text); }
-    .header-project-name {
-      margin-left: 0;
-      font-size: 14px;
-      gap: 8px;
-      max-width: none;
-      flex: 1;
-      min-width: 0;
-    }
-    .header-project-name span#headerProjectNameText { font-weight: 600; color: var(--text); }
-    .header-crumb-sep { display: none; color: var(--text-faint); }
-    .header-project-name.has-batch .header-crumb-sep { display: inline; }
-    .header-batch-link { margin-right: 0; font-size: 14px; color: var(--text-muted); font-weight: 500; }
-    .header-batch-link:hover { color: var(--accent); text-decoration: none; }
-    .header-actions { margin-left: auto; display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+    body.has-fv header { background: rgba(243,239,230,.92); backdrop-filter: blur(6px); }
+    body.has-fv #fv, body.has-fv #app { padding-top: 60px; }
+    .header-nav { display: flex; gap: 24px; }
+    .header-nav a { font-size: 13px; color: var(--ink-2); text-decoration: none; }
+    .header-nav a:hover { color: var(--ink); }
+    .header-project-name { display: none; margin-left: 0; flex: 0 1 auto; min-width: 0; gap: 10px; font-size: 14px; max-width: none; }
+    .header-project-name span#headerProjectNameText { font-weight: 700; color: var(--ink); }
+    .header-crumb-sep { display: inline; color: var(--line); }
+    .header-batch-link { display: none; margin: 0; font-size: 14px; color: var(--ink-3); font-weight: 400; }
+    .header-batch-link:hover { color: var(--ink); text-decoration: none; }
+    .header-project-name:not(.has-batch) .crumb-batch { display: none; }
+    .header-batch-link { max-width: 220px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .header-actions { margin-left: auto; display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
     .url-row { flex: none; }
+    .header-upload { display: inline-flex; }
     .btn-share-main { display: none; }
+    body.in-project .header-upload, body.in-project .header-nav, body.in-project footer { display: none; }
     body.in-project .btn-share-main { display: inline-flex; }
-    body.in-project .header-nav { display: none; }
-    body.in-project footer { display: none; }
+    .r2-banner { border: none; padding: 0; font-size: 12px; color: var(--ink-3); white-space: nowrap; background: none; }
 
-    /* ── Main layout ── */
-    main { background: var(--bg); }
-    .video-col { background: var(--bg); }
-    .video-wrap { background: var(--bg); }
-    body.in-project .video-wrap,
-    .video-wrap:has(video), .video-wrap:has(iframe) { background: var(--stage); }
-    .video-wrap video { background: var(--stage); }
-
-    /* ── Version bar ── */
-    .version-bar {
-      background: var(--surface);
-      border-bottom: 1px solid var(--border);
-      padding: 8px 16px;
-      gap: 4px;
-    }
-    .version-tab-wrap {
-      border: none;
-      border-radius: 6px;
-      background: transparent;
-    }
-    .version-tab-wrap.active { background: var(--accent-dim); }
-    .version-tab-label { font-size: 12px; font-weight: 600; padding: 5px 4px 5px 10px; }
-    .version-tab-wrap:not(:has(.version-tab-del)) .version-tab-label { padding-right: 10px; }
-    .version-tab-wrap.active .version-tab-label { color: var(--accent); }
-    .version-tab-del { padding: 5px 8px 5px 2px; }
+    /* Version chips（ヘッダー内） */
+    .version-bar { background: none; border: none; padding: 0; gap: 2px; align-items: center; overflow: visible; }
+    .version-tab-wrap { border: none; border-radius: 3px; align-items: center; }
+    .version-tab-wrap.active { background: var(--ink); }
+    .version-tab-label { font-family: var(--mono); font-size: 12px; color: var(--ink-3); padding: 4px 4px 4px 8px; font-weight: 500; }
+    .version-tab-wrap:not(:has(.version-tab-del)) .version-tab-label { padding-right: 8px; }
+    .version-tab-wrap.active .version-tab-label { color: var(--paper); }
+    .version-tab-label:hover { color: var(--ink); }
+    .version-tab-wrap.active .version-tab-label:hover { color: var(--paper); }
+    .version-tab-del { font-size: 10px; padding: 4px 6px 4px 2px; color: var(--ink-3); }
+    .version-tab-wrap.active .version-tab-del { color: rgba(243,239,230,.6); }
     .version-tab.version-add {
-      border: 1px dashed var(--border);
-      border-radius: 6px;
-      font-size: 12px;
-      padding: 4px 10px;
-      margin-left: 6px;
+      margin-left: 6px; border: 1px dashed var(--line); border-radius: 3px;
+      color: var(--ink-2); font-weight: 400; font-size: 12px; padding: 3px 9px;
     }
-    .version-tab.version-add:hover { border-color: var(--accent); }
+    .version-tab.version-add:hover { background: var(--paper-2); border-color: var(--ink-3); }
+
+    /* ── Layout ── */
+    main { background: var(--paper); }
+    .video-col { background: var(--paper); }
+    .video-wrap { background: var(--paper); }
+    body.in-project .video-wrap, .video-wrap:has(video), .video-wrap:has(iframe) { background: var(--stage); }
+    .video-wrap video { background: var(--stage); }
 
     /* ── Banners under the video ── */
     .file-banner {
-      background: var(--surface);
-      border-top: 1px solid var(--border);
-      padding: 10px 16px;
-      font-size: 13px;
-      gap: 10px;
-      color: var(--text-muted);
+      background: var(--fusen-soft);
+      border-top: 1px solid #e7c84a;
+      padding: 10px 20px;
+      font-size: 13px; gap: 10px; color: var(--ink-2);
     }
-    .file-banner-cta { border-radius: var(--radius); padding: 7px 14px; font-size: 13px; }
-    .gdrive-banner { border-top: 1px solid var(--border); }
+    .file-banner .fname { color: var(--ink); }
+    .file-banner-cta { background: var(--ink); color: var(--paper); border-radius: var(--radius); padding: 7px 14px; font-size: 13px; font-weight: 700; }
+    .file-banner-cta:hover { background: #000; }
+    .gdrive-banner { border-top: 1px solid var(--line); }
 
-    /* ── Timeline + controls: ひとつのプレイヤーバーとして見せる ── */
-    .pin-timeline { background: var(--surface); border-top: 1px solid var(--border); padding: 4px 20px 0; }
-    .pt-track-wrap { padding: 10px 0 6px; }
-    .pt-track { height: 4px; background: var(--surface2); }
-    .pt-marker { width: 10px; height: 10px; border: 2px solid var(--surface); box-sizing: content-box; }
-    .controls {
-      background: var(--surface);
-      border-top: none;
-      padding: 8px 20px 12px;
-      gap: 12px;
+    /* ── Player bar（タイムライン＋操作）── */
+    .pin-timeline { background: var(--card); border-top: 1px solid var(--line); padding: 6px 24px 0; }
+    .pt-track-wrap { padding: 16px 0 6px; }
+    .pt-track { height: 3px; background: var(--paper-2); border-radius: 0; }
+    .pt-progress { background: var(--ink); border-radius: 0; }
+    .pt-head { width: 12px; height: 12px; background: var(--card); box-shadow: none; border: 2px solid var(--ink); }
+    .pt-marker {
+      top: auto; bottom: 6px; transform: translateX(-50%);
+      width: 10px; height: 12px; border-radius: 0;
+      background: var(--fusen); border: 1px solid var(--fusen-edge);
     }
-    .pin-timeline[style*="none"] + .controls { border-top: 1px solid var(--border); padding-top: 12px; }
+    .pt-marker.resolved { background: var(--paper-2); border-color: var(--line); }
+    .pt-marker:hover { transform: translateX(-50%) translateY(-2px); }
+    .controls { background: var(--card); border-top: none; padding: 8px 24px 14px; gap: 16px; }
+    .pin-timeline[style*="none"] + .controls { border-top: 1px solid var(--line); padding-top: 14px; }
     .sep { display: none; }
-    .timer-val { font-size: 18px; letter-spacing: 0.5px; min-width: 58px; }
-    .playback-btns { gap: 4px; }
+    .timer-val { font-family: var(--mono); font-size: 15px; font-weight: 500; letter-spacing: 0; min-width: 52px; }
+    .playback-btns { gap: 2px; }
     .ctrl-btn {
-      background: transparent;
-      border: 1px solid transparent;
-      border-radius: var(--radius);
-      color: var(--text);
-      padding: 6px 10px;
-      font-size: 12px;
-      font-weight: 600;
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
+      background: transparent; border: 1px solid transparent; border-radius: 3px;
+      color: var(--ink-2); padding: 6px 10px; font-family: var(--mono); font-size: 12px; font-weight: 500;
+      display: inline-flex; align-items: center; gap: 4px;
     }
-    .ctrl-btn:hover { background: var(--surface2); }
-    .ctrl-btn.running { background: var(--accent-dim); border-color: transparent; }
-    .speed-select {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      color: var(--text);
-      padding: 5px 8px;
-    }
-    .r2-banner {
-      border: none;
-      padding: 0;
-      font-size: 12px;
-      color: var(--text-faint);
-      white-space: nowrap;
-    }
+    .ctrl-btn:hover { background: var(--paper-2); color: var(--ink); }
+    #timerToggle { background: var(--ink); color: var(--paper); width: 34px; justify-content: center; padding: 6px 0; }
+    #timerToggle:hover { background: #000; }
+    #timerToggle .ctrl-label { display: none; }
+    .ctrl-btn.running { background: var(--ink); color: var(--paper); }
+    .speed-select { font-family: var(--mono); font-size: 12px; background: transparent; border: 1px solid var(--line); border-radius: 3px; color: var(--ink-2); padding: 5px 8px; }
 
-    /* ── Sidebar ── */
-    .sidebar {
-      width: 340px;
-      min-width: 300px;
-      background: var(--surface);
-      border-left: 1px solid var(--border);
-    }
-    .sidebar-head { padding: 14px 16px 10px; border-bottom: none; }
-    .sidebar-title {
-      font-size: 14px;
-      font-weight: 700;
-      color: var(--text);
-      text-transform: none;
-      letter-spacing: 0;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .badge {
-      background: var(--surface2);
-      color: var(--text-muted);
-      border-radius: 999px;
-      padding: 1px 8px;
-      font-size: 11px;
-    }
-    .btn-compare { border-radius: 6px; font-size: 12px; padding: 4px 10px; }
-    .pin-replies {
-      margin-top: 8px;
-      border-top: none;
-      border-left: 2px solid var(--border);
-      padding: 2px 0 2px 10px;
-      gap: 6px;
-    }
-    .pin-reply { font-size: 12.5px; color: var(--text-muted); }
-    .comment-add-bar { padding: 0 16px 12px; border-bottom: none; }
-    .btn-comment-add {
-      border-radius: var(--radius);
-      padding: 10px 14px;
-      justify-content: center;
-      box-shadow: var(--shadow);
-    }
-    .btn-comment-add .kbd {
-      background: rgba(255,255,255,0.2);
-      color: #fff;
-      border-radius: 4px;
-      margin-left: 8px;
-    }
-    .readonly-banner { border-radius: var(--radius); margin: 0 16px 10px; border: none; background: var(--surface2); padding: 7px 10px; }
+    /* ── 付箋（コメント）欄 ── */
+    .sidebar { width: 380px; min-width: 320px; background: var(--paper); border-left: 1px solid var(--line); }
+    .sidebar-head { padding: 20px 20px 14px; border-bottom: none; }
+    .sidebar-title { font-size: 15px; font-weight: 700; color: var(--ink); text-transform: none; letter-spacing: 0; display: flex; align-items: baseline; gap: 10px; }
+    .badge { background: none; color: var(--ink-3); border-radius: 0; padding: 0; font-family: var(--mono); font-size: 12px; font-weight: 500; }
+    .btn-compare { background: none; border: 1px solid var(--line); border-radius: 3px; color: var(--ink-2); font-size: 12px; padding: 3px 10px; }
+    .btn-compare:hover, .btn-compare.active { border-color: var(--ink); color: var(--ink); background: none; }
+    .comment-add-bar { padding: 0 20px 16px; border-bottom: none; }
+    .btn-comment-add { background: var(--ink); color: var(--paper); border-radius: var(--radius); padding: 11px 14px; justify-content: center; font-weight: 700; box-shadow: none; letter-spacing: .02em; }
+    .btn-comment-add:hover { background: #000; }
+    .btn-comment-add .kbd { background: none; border: 1px solid rgba(243,239,230,.35); color: var(--paper); border-radius: 3px; margin-left: 10px; font-family: var(--mono); }
+    .readonly-banner { margin: 0 20px 12px; border: 1px dashed var(--line); background: none; border-radius: var(--radius); padding: 7px 10px; }
 
-    .filter-tabs {
-      margin: 0 16px 8px;
-      padding: 3px;
-      background: var(--surface2);
-      border-radius: var(--radius);
-      border-bottom: none;
-      gap: 2px;
-    }
-    .filter-tab {
-      border: none;
-      border-radius: 6px;
-      font-size: 12px;
-      font-weight: 500;
-      padding: 6px 4px;
-    }
-    .filter-tab.active { background: var(--surface); color: var(--text); box-shadow: var(--shadow); }
+    .filter-tabs { margin: 0 20px 12px; padding: 0; background: none; border-bottom: 1px solid var(--line); gap: 18px; justify-content: flex-start; }
+    .filter-tab { flex: none; background: none; border: none; border-bottom: 2px solid transparent; margin-bottom: -1px; border-radius: 0; color: var(--ink-3); font-size: 12px; padding: 6px 0; box-shadow: none; }
+    .filter-tab:hover { color: var(--ink); }
+    .filter-tab.active { color: var(--ink); font-weight: 700; border-bottom-color: var(--fusen); background: none; box-shadow: none; }
     .project-name-bar { display: none !important; }
 
-    .pins-scroll { padding: 0 8px 8px; }
+    .pins-scroll { padding: 0 20px 20px; display: flex; flex-direction: column; gap: 10px; }
+    .pins-empty { color: var(--ink-3); }
     .pin-card {
-      background: transparent;
-      border: none;
-      border-radius: var(--radius);
-      padding: 12px 10px;
-      margin-bottom: 2px;
-    }
-    .pin-card + .pin-card { box-shadow: 0 -1px 0 var(--border); }
-    .pin-card:hover { background: var(--surface2); border: none; }
-    .pin-card.active { background: var(--accent-dim); box-shadow: none; }
-    .pin-card.active + .pin-card { box-shadow: none; }
-    .pin-meta { margin-bottom: 6px; gap: 8px; }
-    .pin-time {
-      background: var(--accent-dim);
-      color: var(--accent);
-      border-radius: 999px;
-      padding: 2px 8px;
-      margin-bottom: 0;
-      font-size: 11px;
-    }
-    .pin-author { font-size: 12px; color: var(--text-muted); font-weight: 500; }
-    .pin-comment { font-size: 13.5px; line-height: 1.65; }
-    .pin-card.resolved { opacity: 0.55; }
-    .pin-card.resolved .pin-time { background: var(--surface2); }
-    .pin-actions {
-      top: 8px;
-      right: 8px;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 2px;
-      box-shadow: var(--shadow);
-    }
-    .edit-btn, .del-btn, .resolve-btn, .reply-btn { border-radius: 6px; padding: 4px 6px; }
-
-    .sidebar-tools {
-      display: flex;
-      gap: 4px;
-      padding: 8px 12px;
-      border-top: 1px solid var(--border);
-      flex-shrink: 0;
-    }
-    .btn-copy-text {
-      flex: 1;
-      width: auto;
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-left: 6px solid var(--fusen);
+      border-radius: 2px 4px 4px 2px;
+      padding: 12px 14px;
       margin: 0;
-      background: transparent;
-      border: none;
-      border-radius: 6px;
-      padding: 7px 4px;
-      font-size: 12px;
-      color: var(--text-muted);
-      white-space: nowrap;
+      box-shadow: none;
     }
-    .btn-copy-text:hover { background: var(--surface2); color: var(--text); border: none; }
+    .pin-card + .pin-card { box-shadow: none; }
+    .pin-card:hover { border-color: var(--ink-3); border-left-color: var(--fusen); }
+    .pin-card.active { background: var(--fusen-soft); border-color: #e7c84a; border-left-color: var(--fusen); }
+    .pin-card.resolved { opacity: 1; border-left-color: var(--line); }
+    .pin-card.resolved .pin-comment { color: var(--ink-3); text-decoration: line-through; text-decoration-color: var(--ink-3); }
+    .pin-meta { gap: 10px; margin-bottom: 6px; }
+    .pin-time { background: none; color: var(--ink); border-radius: 0; padding: 0; font-family: var(--mono); font-size: 12px; font-weight: 500; }
+    .pin-card.resolved .pin-time { background: none; color: var(--ink-3); }
+    .pin-author { font-size: 12px; color: var(--ink-3); font-weight: 400; }
+    .pin-status { margin-left: auto; font-size: 11px; color: var(--shu); display: inline-flex; align-items: center; gap: 5px; }
+    .pin-status::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--shu); }
+    .pin-card.resolved .pin-status { color: var(--ink-3); }
+    .pin-card.resolved .pin-status::before { background: var(--ink-3); }
+    .pin-comment { font-size: 14px; line-height: 1.75; color: var(--ink); }
+    .pin-replies { margin-top: 8px; border-top: none; border-left: 1px solid var(--line); padding: 0 0 0 10px; gap: 6px; }
+    .pin-reply { font-size: 13px; color: var(--ink-2); }
+    /* 操作ボタンはカード右上に。ステータス表示と重ならないようホバー時のみ */
+    .pin-actions { top: 8px; right: 8px; background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 2px; box-shadow: 0 4px 12px rgba(60,48,20,.08); }
+    .pin-card.active .pin-actions { background: var(--fusen-soft); }
+    .edit-btn, .del-btn, .resolve-btn, .reply-btn { border-radius: 3px; padding: 4px 6px; color: var(--ink-2); }
+    .edit-btn:hover, .reply-btn:hover { color: var(--ink); background: var(--paper-2); }
+    .resolve-btn:hover, .resolve-btn.resolved { color: var(--ink); background: var(--fusen-soft); }
+    .del-btn:hover { color: var(--shu); background: rgba(217,68,43,.08); }
 
-    /* ── Upload placeholder ── */
-    /* 動画を選ぶ前は、アップロード以外（コメント欄・再生バー）を出さない */
+    .sidebar-tools { display: flex; gap: 18px; padding: 12px 20px; border-top: 1px solid var(--line); flex-shrink: 0; }
+    .btn-copy-text { flex: none; width: auto; margin: 0; background: none; border: none; border-radius: 0; padding: 0; font-size: 12px; color: var(--ink-2); white-space: nowrap; }
+    .btn-copy-text:hover { background: none; color: var(--ink); text-decoration: underline; border: none; }
+    .btn-copy-text .icon { display: none; }
+
+    /* ── アップロード欄（トップ） ── */
     body:not(.in-project):has(#placeholder) .sidebar,
     body:not(.in-project):has(#placeholder) .controls,
     body:not(.in-project):has(#placeholder) .pin-timeline { display: none !important; }
-    .placeholder { gap: 16px; }
-    .upload-zone { width: 100%; max-width: 520px; padding: 48px 24px !important; }
+    .placeholder { gap: 18px; }
     .upload-zone {
-      background: var(--surface);
-      border-radius: var(--radius-lg) !important;
-      box-shadow: var(--shadow);
+      width: 100%; max-width: 560px;
+      background: var(--card);
+      border: 1.5px dashed var(--ink-3) !important;
+      border-radius: 6px !important;
+      padding: 56px 24px !important;
+      box-shadow: none;
+      gap: 8px;
     }
-    .ph-privacy-note { color: var(--text-faint); font-size: 12px; }
-    .recent-box { max-width: 520px; border-radius: var(--radius-lg); background: var(--surface); box-shadow: var(--shadow); overflow: hidden; }
-    .ph-privacy-note { max-width: 520px; }
-    .recent-head { padding: 10px 14px; font-size: 12px; font-weight: 600; color: var(--text); }
-    .recent-item { padding: 9px 14px; font-size: 13px; }
-    .recent-kind { border-radius: 4px; border: none; background: var(--accent-dim); padding: 1px 6px; font-weight: 600; }
-    .recent-copy { border-radius: 6px; padding: 3px 9px; }
+    .upload-zone:hover, .upload-zone.drag-over { border-color: var(--ink) !important; background: var(--fusen-soft); }
+    .upload-icon { display: none; }
+    .upload-zone-title { font-size: 17px; font-weight: 700; color: var(--ink); }
+    .upload-zone-sub { font-size: 13px; color: var(--ink-2); }
+    .upload-zone-formats { font-family: var(--mono); font-size: 11px; color: var(--ink-3); margin-top: 6px; }
+    .ph-privacy-note { max-width: 560px; color: var(--ink-3); font-size: 12px; }
+    .ph-privacy-note .icon { display: none; }
+    .recent-box { max-width: 560px; border: 1px solid var(--line); border-radius: 6px; background: var(--card); box-shadow: none; overflow: hidden; }
+    .recent-head { padding: 12px 16px; font-size: 12px; font-weight: 700; color: var(--ink); border-bottom: 1px solid var(--line); }
+    .recent-clear { color: var(--ink-3); }
+    .recent-item { padding: 10px 16px; font-size: 13px; border-bottom: 1px solid var(--paper-2); }
+    .recent-kind { border: none; border-radius: 2px; background: var(--fusen-soft); color: #7a5e00; padding: 1px 6px; font-size: 10px; font-weight: 700; }
+    .recent-item a { color: var(--ink); font-weight: 500; }
+    .recent-item a:hover { color: var(--ink); text-decoration: underline; }
+    .recent-date { font-family: var(--mono); color: var(--ink-3); }
+    .recent-copy { border: 1px solid var(--line); border-radius: 3px; color: var(--ink-2); padding: 3px 9px; background: none; }
+    .recent-copy:hover { border-color: var(--ink); color: var(--ink); background: none; }
 
     /* ── Modals ── */
-    .overlay { background: rgba(17,24,39,0.45); backdrop-filter: blur(2px); }
+    .overlay, #importOverlay { background: rgba(29,28,26,.45); backdrop-filter: none; }
     .modal {
-      background: var(--surface);
-      border: none;
-      border-radius: var(--radius-lg);
-      padding: 24px;
-      box-shadow: var(--shadow-lg);
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 26px 26px 22px;
+      box-shadow: 0 24px 48px rgba(29,28,26,.18);
     }
-    .modal-title { font-size: 16px; font-weight: 700; margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
-    .modal-actions { margin-top: 20px; gap: 8px; }
-    /* 入力欄はすべて同じ見た目に */
+    .modal-title, .modal h3 { font-size: 17px; font-weight: 700; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; color: var(--ink); }
+    .modal-title .icon, .modal h3 .icon { display: none; }
+    .modal-actions { margin-top: 22px; gap: 8px; }
+    .modal-tip { font-size: 12px; color: var(--ink-3); margin-top: 8px; }
     .modal textarea, .project-name-input, .tc-input, .url-input, .author-input,
     #importTextarea, #newVersionUrl, .reply-form textarea, .reply-form input {
       border-radius: var(--radius) !important;
-      background: var(--surface) !important;
-      border: 1px solid var(--border) !important;
-      padding: 9px 12px;
+      background: #fff !important;
+      border: 1px solid var(--line) !important;
+      color: var(--ink);
+      padding: 10px 12px;
       font-size: 14px;
     }
     .modal textarea:focus, .project-name-input:focus, .tc-input:focus, .url-input:focus, .author-input:focus,
     #importTextarea:focus, #newVersionUrl:focus, .reply-form textarea:focus, .reply-form input:focus {
-      border-color: var(--accent) !important;
+      border-color: var(--ink) !important;
       box-shadow: 0 0 0 3px var(--accent-dim);
       outline: none;
     }
-    .tc-input { font-size: 18px; color: var(--accent); background: var(--accent-dim) !important; border-color: transparent !important; }
-    .tc-adj { border-radius: var(--radius) !important; }
-    .annotation-btn { border-radius: var(--radius); }
-    .modal-tip { font-size: 12px; margin-top: 8px; }
-    .upload-box { border-radius: var(--radius-lg) !important; border: none !important; box-shadow: var(--shadow-lg); }
-    .progress-bar-wrap, .progress-bar { border-radius: 999px !important; }
+    .tc-input { font-family: var(--mono); font-size: 18px; font-weight: 500; color: var(--ink); background: var(--fusen-soft) !important; border-color: #e7c84a !important; }
+    .tc-adj { border-radius: 3px !important; font-family: var(--mono); }
+    .annotation-btn { border-radius: var(--radius); border-color: var(--line); color: var(--ink-2); }
+    .upload-box { background: var(--card) !important; border: 1px solid var(--line) !important; border-radius: 6px !important; box-shadow: 0 24px 48px rgba(29,28,26,.18); }
+    .progress-bar-wrap { background: var(--paper-2) !important; border-radius: 0 !important; height: 4px !important; }
+    .progress-bar { background: var(--ink) !important; border-radius: 0 !important; }
+    .progress-label { font-family: var(--mono); }
 
     /* Batch modal */
-    .batch-summary-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 10px; }
-    .batch-summary { margin: 0; font-size: 13px; }
-    .batch-copy-all {
-      display: inline-flex; align-items: center; gap: 5px;
-      background: none; border: none; color: var(--accent); font-size: 13px; font-weight: 600;
-      cursor: pointer; padding: 4px 6px; border-radius: 6px; white-space: nowrap;
-    }
-    .batch-copy-all:hover:not(:disabled) { background: var(--accent-dim); }
-    .batch-copy-all:disabled { color: var(--text-faint); cursor: default; }
-    .batch-list { border-radius: var(--radius); overflow-y: auto; background: var(--surface); }
-    .batch-item { padding: 11px 14px; align-items: center; }
-    .batch-name { color: var(--text); text-decoration: none; font-weight: 600; font-size: 13.5px; }
-    a.batch-name:hover { color: var(--accent); }
-    .batch-status { font-size: 12px; }
-    .batch-item.waiting .batch-status { color: var(--text-faint); }
-    .batch-copy {
-      display: inline-flex; align-items: center; gap: 4px;
-      background: none; border: 1px solid var(--border); border-radius: 6px;
-      color: var(--text-muted); font-size: 12px; padding: 3px 9px; cursor: pointer;
-    }
-    .batch-copy:hover { background: var(--surface2); color: var(--text); }
-    .batch-bar { height: 4px; border-radius: 999px; overflow: hidden; }
+    .batch-summary-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
+    .batch-summary { margin: 0; font-size: 13px; color: var(--ink-2); }
+    .batch-copy-all { display: inline-flex; align-items: center; gap: 5px; background: none; border: none; color: var(--ink); font-size: 13px; font-weight: 700; cursor: pointer; padding: 2px 0; border-bottom: 2px solid var(--fusen); border-radius: 0; white-space: nowrap; }
+    .batch-copy-all:hover:not(:disabled) { background: var(--fusen-soft); }
+    .batch-copy-all:disabled { color: var(--ink-3); border-bottom-color: var(--line); cursor: default; }
+    .batch-copy-all .icon { display: none; }
+    .batch-list { border: 1px solid var(--line); border-radius: var(--radius); background: #fff; overflow-y: auto; }
+    .batch-item { padding: 12px 14px; align-items: center; border-bottom: 1px solid var(--paper-2); }
+    .batch-name { color: var(--ink); text-decoration: none; font-weight: 500; font-size: 14px; }
+    a.batch-name:hover { text-decoration: underline; }
+    .batch-status { font-family: var(--mono); font-size: 12px; color: var(--ink-2); }
+    .batch-item.waiting .batch-status { color: var(--ink-3); font-family: var(--jp); }
+    .batch-item.error .batch-status { color: var(--shu); font-family: var(--jp); }
+    .batch-copy { display: inline-flex; align-items: center; gap: 4px; background: none; border: 1px solid var(--line); border-radius: 3px; color: var(--ink-2); font-size: 12px; padding: 3px 9px; cursor: pointer; }
+    .batch-copy:hover { border-color: var(--ink); color: var(--ink); }
+    .batch-copy .icon { display: none; }
+    .batch-bar { height: 3px; border-radius: 0; background: var(--paper-2); overflow: hidden; }
+    .batch-bar > div { background: var(--ink); }
     .batch-item.waiting .batch-bar { display: none; }
-    .batch-sub { grid-column: 1 / -1; font-size: 11px; color: var(--text-faint); }
-    .batch-page-link { margin: 12px 0 0; border-radius: var(--radius); border: none; background: var(--surface2); font-size: 12px; color: var(--text-muted); padding: 9px 12px; }
-    .batch-page-link a { color: var(--accent); }
+    .batch-sub { grid-column: 1 / -1; font-family: var(--mono); font-size: 11px; color: var(--ink-3); }
+    .batch-error-msg { color: var(--shu); font-size: 12px; line-height: 1.6; }
+    .batch-page-link { margin: 14px 0 0; border: none; border-left: 4px solid var(--fusen); border-radius: 0; background: var(--fusen-soft); font-size: 12px; color: var(--ink-2); padding: 9px 12px; }
+    .batch-page-link a { color: var(--ink); font-weight: 700; }
     .batch-actions .spacer { flex: 1; }
 
     /* ── Toast ── */
-    .toast { background: var(--text); color: #fff; border: none; border-radius: var(--radius); box-shadow: var(--shadow-lg); }
-    .toast .toast-hint { color: rgba(255,255,255,0.7); }
+    .toast { background: var(--ink); color: var(--paper); border: none; border-radius: var(--radius); box-shadow: 0 12px 28px rgba(29,28,26,.25); }
+    .toast .toast-hint { color: rgba(243,239,230,.7); }
 
     /* ── Footer ── */
-    footer { background: var(--surface); padding: 14px 20px; font-size: 12px; }
+    footer { background: var(--paper); border-top: 1px solid var(--line); padding: 16px 20px; font-size: 12px; color: var(--ink-3); }
+    footer a { color: var(--ink-2); }
 
     @media (max-width: 768px) {
-      header { height: 48px; padding: 0 14px; gap: 12px; }
-      .header-nav { gap: 12px; }
+      header { height: auto; min-height: 52px; padding: 8px 14px; gap: 10px 12px; flex-wrap: wrap; }
+      body.has-fv #fv, body.has-fv #app { padding-top: 52px; }
+      .logo-word { font-size: 17px; }
+      body.in-project .logo-word { display: none; }
+      .header-nav { gap: 14px; }
       .header-nav a:nth-child(n+2) { display: none; }
-      .header-project-name { font-size: 13px; }
+      .header-project-name { flex: 1; font-size: 13px; }
+      .header-project-name span#headerProjectNameText { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
       .header-batch-link { font-size: 13px; }
-      .btn-share-main { padding: 6px 10px; font-size: 12px; }
-      .sidebar { width: 100%; min-width: 0; border-left: none; }
-      .controls { padding: 8px 14px 10px; }
+      .version-bar { order: 10; width: 100%; }
       .r2-banner { display: none !important; }
-      .pin-timeline { padding: 4px 14px 0; }
-      .pin-card { padding: 12px 6px; }
-      .pin-actions { background: none; border: none; box-shadow: none; padding: 0; margin-top: 4px; }
-      .sidebar-tools { padding: 8px; }
+      .header-upload { padding: 6px 10px; }
+      .sidebar { width: 100%; min-width: 0; border-left: none; border-top: 1px solid var(--line); }
+      .pin-timeline { padding: 6px 14px 0; }
+      .controls { padding: 8px 14px 12px; }
+      .pin-actions { position: static; background: none; border: none; box-shadow: none; padding: 0; margin-top: 6px; justify-content: flex-end; }
+      .pin-card.active .pin-actions { background: none; }
+      .sidebar-tools { padding: 12px 20px; }
     }
   </style>
 </head>
@@ -2277,51 +2001,22 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
 <!-- FV -->
 <section id="fv">
-  <div class="fv-bg"></div>
   <div class="fv-inner">
     <div class="fv-text">
-      <h1 class="fv-catchcopy">動画に<span>付箋を挟む</span>ように、<br>指示を届ける。</h1>
-      <p class="fv-desc">動画の特定の場面にタイムコードでコメントを付けて、<br>チームと共有できる動画レビューツール。<br>ログイン不要。リンクで手軽に共有。</p>
-      <div class="fv-line"></div>
-      <button class="fv-cta" onclick="document.getElementById('app').scrollIntoView({behavior:'smooth'})">使ってみる ↓</button>
-    </div>
-    <div class="fv-mockup-wrap">
-      <div class="fv-mockup">
-        <div class="fv-browser-bar">
-          <span class="fv-dot fv-dot-r"></span>
-          <span class="fv-dot fv-dot-y"></span>
-          <span class="fv-dot fv-dot-g"></span>
-          <span class="fv-urlbar">clippin.work</span>
-        </div>
-        <div class="fv-tool-header">
-          <span class="fv-logo-text">Clippin</span>
-        </div>
-        <div class="fv-video-area">
-          <div class="fv-play-btn"><div class="fv-play-icon"></div></div>
-        </div>
-        <div class="fv-timeline">
-          <span class="fv-time">00:32</span>
-          <div class="fv-progress">
-            <div class="fv-fill"></div>
-            <div class="fv-pin-mark"></div>
-          </div>
-          <span class="fv-time fv-time-dim">02:14</span>
-        </div>
-        <div class="fv-comments">
-          <div class="fv-comment">
-            <span class="fv-ct">00:32</span>
-            <span class="fv-cc">テロップのフォントを変えてください</span>
-          </div>
-          <div class="fv-comment">
-            <span class="fv-ct">01:15</span>
-            <span class="fv-cc">このカット、もう少し短くして</span>
-          </div>
-        </div>
-        <div class="fv-bottom-bar">
-          <span class="fv-btn">コメント</span>
-          <span class="fv-btn-ghost">共有</span>
-        </div>
+      <div class="fv-eyebrow">VIDEO REVIEW TOOL</div>
+      <h1 class="fv-catchcopy">動画に、<br><span class="mark">付箋</span>を貼るように<br>修正を伝える。</h1>
+      <p class="fv-desc">気になった場面で止めて、そのまま書き込むだけ。タイムコード付きのコメントが、リンクひとつで相手に届きます。ログインもインストールもいりません。</p>
+      <div class="fv-ctas">
+        <button class="btn-primary btn-lg" onclick="goToUpload()">動画をアップロード</button>
+        <a class="btn-cancel btn-lg" href="/demo">デモを見る</a>
       </div>
+      <p class="fv-note">無料・登録不要｜複数本まとめてアップロードもOK｜動画は30日後に自動で削除されます</p>
+    </div>
+    <div class="fv-visual" aria-hidden="true">
+      <div class="fv-frame"></div>
+      <div class="fv-scrub"><span class="tc">00:48</span><div class="fv-track"><i style="left:12%"></i><i style="left:34%"></i><i style="left:71%"></i></div><span class="tc dim">02:14</span></div>
+      <div class="fv-note-card n1"><span class="tc">00:12</span>テロップ、もう少し太い書体にできますか？</div>
+      <div class="fv-note-card n2"><span class="tc">01:36</span>ここのBGMを2割くらい下げてください</div>
     </div>
   </div>
 </section>
@@ -2336,22 +2031,28 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
 <!-- Header -->
 <header>
-  <a class="logo" href="/">Clippin</a>
+  <a class="logo" href="/" aria-label="Clippin トップへ"><span class="logo-mark" aria-hidden="true"></span><span class="logo-word">clippin</span></a>
   <nav class="header-nav">
     <a href="/usage">使い方</a>
     <a href="/demo">デモ</a>
     <a href="/blog">ブログ</a>
   </nav>
   <div class="header-project-name" id="headerProjectName">
+    <span class="header-crumb-sep crumb-batch">/</span>
     <a class="header-batch-link" id="headerBatchLink" href="#">一覧</a>
     <span class="header-crumb-sep">/</span>
     <span id="headerProjectNameText"></span>
   </div>
+  <!-- Version tabs（動画ページのみ表示） -->
+  <div class="version-bar" id="versionBar"></div>
   <div class="header-actions">
+    <!-- 閲覧期限 -->
+    <div class="r2-banner" id="r2Banner" style="display:none"></div>
     <div class="url-row" id="urlRow" style="display:none">
       <button class="btn-ghost" onclick="document.getElementById('fileInput').click()"><i data-lucide="folder-open" class="icon"></i> ファイルを変更</button>
     </div>
-    <button class="btn-primary btn-share-main" id="shareBtn" onclick="handleShare()">
+    <button class="btn-primary btn-sm header-upload" onclick="goToUpload()">動画をアップロード</button>
+    <button class="btn-primary btn-sm btn-share-main" id="shareBtn" onclick="handleShare()">
       <i data-lucide="share-2" class="icon"></i> 共有
     </button>
   </div>
@@ -2362,9 +2063,6 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
   <!-- Video column -->
   <div class="video-col">
-
-    <!-- Version bar (動画上帯) -->
-    <div class="version-bar" id="versionBar"></div>
 
     <div class="video-wrap" id="videoWrap">
       <div class="placeholder" id="placeholder">
@@ -2427,9 +2125,6 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
       <div class="spacer"></div>
 
-      <!-- 閲覧期限 -->
-      <div class="r2-banner" id="r2Banner" style="display:none"></div>
-
       <select class="speed-select" id="speedSelect" onchange="changeSpeed(this.value)" title="再生速度">
         <option value="0.5">0.5x</option>
         <option value="1" selected>1x</option>
@@ -2445,13 +2140,13 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   <!-- Sidebar -->
   <div class="sidebar">
     <div class="sidebar-head">
-      <span class="sidebar-title">コメント <span class="badge" id="badge">0</span></span>
+      <span class="sidebar-title">付箋 <span class="badge" id="badge">0</span></span>
       <button class="btn-compare" id="compareBtn" onclick="toggleCompare()">比較</button>
     </div>
     <!-- Comment add / Share bar -->
     <div class="comment-add-bar">
       <button class="btn-comment-add" id="btnCommentAdd" onclick="openModal()">
-        <i data-lucide="map-pin" class="icon"></i> コメントを追加
+        この場面に付箋を貼る
         <span class="kbd">P</span>
       </button>
     </div>
@@ -2489,7 +2184,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <!-- Pin Modal -->
 <div class="overlay" id="overlay">
   <div class="modal">
-    <div class="modal-title" id="modalTitle"><i data-lucide="map-pin" class="icon"></i> コメントを追加</div>
+    <div class="modal-title" id="modalTitle">付箋を貼る</div>
     <div class="timecode-row">
       <input type="text" class="tc-input" id="tcInput" value="00:00"
              oninput="onTcInput(this.value)">
@@ -2563,7 +2258,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 <!-- New version modal -->
 <div class="overlay" id="newVersionOverlay">
   <div class="modal">
-    <div class="modal-title"><i data-lucide="layers" class="icon"></i> 新しいバージョンを追加</div>
+    <div class="modal-title"><i data-lucide="layers" class="icon"></i> 新しい版を追加</div>
     <p style="font-size:12px;color:var(--text-muted);margin:6px 0 14px;line-height:1.7">
       前バージョンのコメントをコピーして新バージョンを作成します。<br>新しい動画を指定してください。
     </p>
@@ -2581,7 +2276,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     <div id="newVersionFileLabel" style="font-size:12px;color:var(--accent);margin-top:6px;display:none"></div>
     <div class="modal-actions">
       <button class="btn-cancel" onclick="closeNewVersionModal()">キャンセル</button>
-      <button class="btn-primary" onclick="confirmNewVersion()">バージョンを追加</button>
+      <button class="btn-primary" onclick="confirmNewVersion()">この版を追加</button>
     </div>
   </div>
 </div>
@@ -3016,6 +2711,13 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     if (batchRunning) { e.preventDefault(); e.returnValue = ''; }
   });
 
+  // ヒーローやヘッダーの「動画をアップロード」: アップロード欄へ移動してファイル選択を開く
+  function goToUpload() {
+    if (location.pathname !== '/') { location.href = '/#upload'; return; }
+    document.getElementById('app').scrollIntoView({ behavior: 'smooth' });
+    document.getElementById('fileInput').click();
+  }
+
   // ─── この端末で最近作成したリンク（localStorage）─────────
   // 閉じたタブのリンクを探せるように、作成したプロジェクト/まとめページを端末に記録する
   const RECENT_KEY = 'clippin.recent';
@@ -3264,13 +2966,13 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       } else {
         clearPendingAnnotation();
       }
-      document.getElementById('modalTitle').innerHTML = '<i data-lucide="pencil" class="icon"></i> コメントを編集';
+      document.getElementById('modalTitle').textContent = '付箋を編集';
       lucide.createIcons({ els: document.getElementById('modalTitle').querySelectorAll('[data-lucide]') });
     } else {
       // 新規モード
       capturedSec = currentSec();
       document.getElementById('commentInput').value = '';
-      document.getElementById('modalTitle').innerHTML = '<i data-lucide="map-pin" class="icon"></i> コメントを追加';
+      document.getElementById('modalTitle').textContent = '付箋を貼る';
       lucide.createIcons({ els: document.getElementById('modalTitle').querySelectorAll('[data-lucide]') });
       clearPendingAnnotation();
     }
@@ -3543,6 +3245,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
           <div class="pin-meta">
             <span class="pin-time">${esc(fmtTime(p.time))}</span>
             ${p.author ? `<span class="pin-author">${esc(p.author)}</span>` : ''}
+            <span class="pin-status">${p.resolved ? '解決済' : '未解決'}</span>
           </div>
           <div class="pin-comment">${esc(p.comment).replace(/\n/g, '<br>')}</div>
           ${p.annotation ? `<div class="pin-annotation"><img src="${p.annotation}" alt="annotation"></div>` : ''}
@@ -3745,7 +3448,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
     document.getElementById('headerProjectName').classList.toggle('has-batch', !!batchId);
     if (!batchId) { link.style.display = 'none'; return; }
     link.href = `/batch/${batchId}`;
-    link.title = batchName ? `${batchName} に戻る` : '一覧に戻る';
+    link.textContent = batchName || '一覧';
+    link.title = '一覧に戻る';
     link.style.display = 'flex';
   }
 
@@ -3770,10 +3474,11 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   }
 
   function showR2Banner(fromDate) {
-    const expiry = calcExpiryDate(fromDate || new Date());
+    const d = new Date(fromDate || new Date());
+    d.setDate(d.getDate() + 30);
     const el = document.getElementById('r2Banner');
-    el.innerHTML = `<i data-lucide="clock" class="icon"></i> 閲覧可能期間：${expiry}まで`;
-    lucide.createIcons({ els: el.querySelectorAll('[data-lucide]') });
+    el.textContent = `${d.getMonth() + 1}/${d.getDate()}まで閲覧可`;
+    el.title = `${calcExpiryDate(fromDate || new Date())}に動画は自動で削除されます`;
     el.style.display = '';
   }
 
@@ -3884,7 +3589,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       </div>`).join('') + `
       <button class="version-tab version-add" onclick="openNewVersionModal()"
               ${state.isLatestVersion ? '' : 'style="display:none"'}>
-        + 追加
+        + 新しい版
       </button>`;
   }
 

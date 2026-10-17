@@ -13,64 +13,85 @@
   </script>
   <title>まとめページ - Clippin</title>
   <meta name="robots" content="noindex">
-  <link rel="icon" type="image/svg+xml" href="/favicon.svg?v=2">
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg?v=3">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="Clippin">
   <meta property="og:title" content="まとめページ - Clippin">
   <meta property="og:description" content="複数の動画をまとめて確認できるページです。動画を選んで、タイムコード付きでコメントを残せます。">
   <meta property="og:image" content="https://clippin.work/og-image.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700&family=JetBrains+Mono:wght@500&family=Inter+Tight:wght@700&display=swap" rel="stylesheet">
   <style>
-    :root { --bg: #f5f6f8; --surface: #ffffff; --surface2: #f0f2f5; --border: #e4e7ec; --accent: #0891b2; --accent-hover: #0e7490; --accent-dim: rgba(8,145,178,0.08); --text: #111827; --text-muted: #6b7280; --text-faint: #9ca3af; --danger: #dc2626; --warn: #d97706; --radius: 8px; --radius-lg: 12px; --shadow: 0 1px 2px rgba(16,24,40,0.04), 0 1px 3px rgba(16,24,40,0.06); }
+    :root {
+      --paper: #f3efe6; --paper-2: #ebe5d8; --card: #fbf9f4;
+      --ink: #1d1c1a; --ink-2: #57534b; --ink-3: #8f897d; --line: #d9d2c3;
+      --fusen: #ffd94a; --fusen-soft: #fff1b3; --fusen-edge: #c9a51f; --shu: #d9442b;
+      --jp: 'Zen Kaku Gothic New', 'Hiragino Sans', sans-serif;
+      --mono: 'JetBrains Mono', ui-monospace, monospace;
+      --latin: 'Inter Tight', var(--jp);
+    }
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Hiragino Sans', 'Yu Gothic', sans-serif; min-height: 100dvh; display: flex; flex-direction: column; -webkit-font-smoothing: antialiased; }
+    body { background: var(--paper); color: var(--ink); font-family: var(--jp); font-feature-settings: "palt"; -webkit-font-smoothing: antialiased; min-height: 100dvh; display: flex; flex-direction: column; }
     button { font-family: inherit; }
-    header { background: var(--surface); border-bottom: 1px solid var(--border); height: 52px; padding: 0 20px; display: flex; align-items: center; gap: 14px; flex-shrink: 0; }
-    .logo { font-size: 18px; font-weight: 700; color: var(--accent); text-decoration: none; letter-spacing: -0.3px; }
-    .header-nav { display: flex; gap: 16px; align-items: center; margin-left: auto; }
-    .header-nav a { font-size: 13px; color: var(--text-muted); text-decoration: none; }
-    .header-nav a:hover { color: var(--text); }
+    ::selection { background: var(--fusen); }
 
-    main { flex: 1; max-width: 860px; width: 100%; margin: 0 auto; padding: 40px 24px 80px; }
-    .eyebrow { font-size: 12px; color: var(--text-muted); margin-bottom: 6px; display: flex; align-items: center; gap: 6px; }
-    .title-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; min-width: 0; }
-    h1 { font-size: 24px; font-weight: 700; letter-spacing: -0.4px; overflow-wrap: anywhere; }
-    .title-input { font: inherit; font-size: 24px; font-weight: 700; letter-spacing: -0.4px; border: 1px solid var(--accent); box-shadow: 0 0 0 3px var(--accent-dim); border-radius: var(--radius); background: #fff; padding: 2px 10px; width: 100%; max-width: 560px; outline: none; color: var(--text); }
-    .icon-btn { background: transparent; border: 1px solid transparent; border-radius: 6px; color: var(--text-muted); padding: 5px 8px; cursor: pointer; font-size: 12px; display: inline-flex; align-items: center; gap: 4px; flex-shrink: 0; }
-    .icon-btn:hover { border-color: var(--border); color: var(--text); background: var(--surface); }
-    .meta { font-size: 13px; color: var(--text-muted); display: flex; flex-wrap: wrap; gap: 4px 16px; margin-bottom: 24px; }
+    header { height: 60px; padding: 0 28px; display: flex; align-items: center; gap: 24px; border-bottom: 1px solid var(--line); }
+    .logo { display: inline-flex; align-items: center; gap: 9px; text-decoration: none; color: var(--ink); }
+    .logo-mark { position: relative; width: 18px; height: 20px; }
+    .logo-mark::before { content: ""; position: absolute; inset: 0; background: var(--fusen); clip-path: polygon(0 0, 100% 0, 100% 72%, 72% 100%, 0 100%); }
+    .logo-mark::after { content: ""; position: absolute; right: 0; bottom: 0; width: 28%; height: 28%; background: var(--fusen-edge); clip-path: polygon(0 0, 100% 0, 0 100%); }
+    .logo-word { font-family: var(--latin); font-weight: 700; font-size: 19px; letter-spacing: -0.04em; }
+    .header-nav { display: flex; gap: 20px; align-items: center; margin-left: auto; }
+    .header-nav a { font-size: 13px; color: var(--ink-2); text-decoration: none; }
+    .header-nav a:hover { color: var(--ink); }
 
-    .actions { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; }
-    .btn { font: inherit; font-size: 13px; font-weight: 500; padding: 9px 16px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); color: var(--text); text-decoration: none; }
-    .btn:hover { background: var(--surface2); }
-    .btn-primary { background: var(--accent); border-color: var(--accent); color: #fff; font-weight: 600; box-shadow: var(--shadow); }
-    .btn-primary:hover { background: var(--accent-hover); }
+    main { flex: 1; max-width: 880px; width: 100%; margin: 0 auto; padding: 56px 28px 88px; }
+    .eyebrow { font-family: var(--mono); font-size: 12px; color: var(--ink-3); letter-spacing: .08em; margin-bottom: 16px; display: flex; align-items: center; gap: 10px; }
+    .eyebrow::before { content: ""; width: 24px; height: 1px; background: var(--ink-3); }
+    .title-row { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; min-width: 0; }
+    h1 { font-size: 28px; font-weight: 700; letter-spacing: .01em; overflow-wrap: anywhere; }
+    .title-input { font: inherit; font-size: 28px; font-weight: 700; border: 1px solid var(--ink); box-shadow: 0 0 0 3px rgba(255,217,74,.35); border-radius: 4px; background: #fff; padding: 2px 10px; width: 100%; max-width: 600px; outline: none; color: var(--ink); }
+    .icon-btn { background: none; border: 1px solid var(--line); border-radius: 3px; color: var(--ink-2); padding: 4px 10px; cursor: pointer; font-size: 12px; flex-shrink: 0; }
+    .icon-btn:hover { border-color: var(--ink); color: var(--ink); }
+    .meta { font-size: 13px; color: var(--ink-3); display: flex; flex-wrap: wrap; gap: 4px 20px; margin-bottom: 32px; }
+    .meta span:first-child { font-family: var(--mono); }
 
-    .list { list-style: none; border: 1px solid var(--border); border-radius: var(--radius-lg); background: var(--surface); box-shadow: var(--shadow); overflow: hidden; }
-    .row { display: grid; grid-template-columns: 36px 1fr auto auto; align-items: center; gap: 12px; padding: 14px 16px; border-bottom: 1px solid var(--border); }
-    .row:last-child { border-bottom: none; }
-    .row:hover { background: var(--surface2); }
-    .num { font-size: 12px; color: var(--text-muted); font-variant-numeric: tabular-nums; text-align: right; }
+    .actions { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 24px; }
+    .btn { font: inherit; font-size: 13px; font-weight: 700; letter-spacing: .02em; padding: 10px 18px; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; border: 1px solid var(--ink); border-radius: 4px; background: transparent; color: var(--ink); text-decoration: none; }
+    .btn:hover { background: var(--paper-2); }
+    .btn-primary { background: var(--ink); color: var(--paper); }
+    .btn-primary:hover { background: #000; }
+
+    .list { list-style: none; border-top: 1px solid var(--ink); }
+    .row { display: grid; grid-template-columns: 40px 1fr auto auto; align-items: center; gap: 16px; padding: 16px 4px; border-bottom: 1px solid var(--line); }
+    .row:hover { background: var(--card); }
+    .num { font-family: var(--mono); font-size: 12px; color: var(--ink-3); }
     .name { min-width: 0; }
-    .name a { color: var(--text); font-weight: 600; font-size: 14px; text-decoration: none; display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .name a:hover { color: var(--accent); }
-    .name .url { font-size: 12px; color: var(--text-faint); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .badges { display: flex; gap: 6px; align-items: center; }
-    .badge { font-size: 11px; font-weight: 600; padding: 2px 9px; border-radius: 999px; background: var(--surface2); color: var(--text-muted); white-space: nowrap; }
-    .badge.open { background: rgba(217,119,6,0.1); color: var(--warn); }
-    .badge.done { background: var(--accent-dim); color: var(--accent); }
-    .empty, .error { padding: 40px 16px; text-align: center; color: var(--text-muted); font-size: 14px; line-height: 1.8; }
-    .error { color: var(--danger); }
-    .note { font-size: 12px; color: var(--text-muted); margin-top: 12px; line-height: 1.7; }
+    .name a { color: var(--ink); font-weight: 700; font-size: 15px; text-decoration: none; display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .name a:hover { text-decoration: underline; text-decoration-color: var(--fusen); text-decoration-thickness: 3px; text-underline-offset: 3px; }
+    .name .url { font-family: var(--mono); font-size: 11px; color: var(--ink-3); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin-top: 2px; }
+    .badges { display: flex; gap: 8px; align-items: center; }
+    .badge { font-size: 12px; color: var(--ink-3); white-space: nowrap; display: inline-flex; align-items: center; gap: 5px; }
+    .badge.ver { font-family: var(--mono); border: 1px solid var(--line); border-radius: 3px; padding: 1px 6px; }
+    .badge.open { color: var(--shu); }
+    .badge.open::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--shu); }
+    .badge.done { color: var(--ink-2); }
+    .badge.done::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--ink-3); }
+    .empty, .error { padding: 48px 16px; text-align: center; color: var(--ink-3); font-size: 14px; line-height: 1.9; border-bottom: 1px solid var(--line); }
+    .error { color: var(--shu); }
+    .note { font-size: 12px; color: var(--ink-3); margin-top: 18px; line-height: 1.8; padding-left: 12px; border-left: 3px solid var(--fusen); }
 
-    .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(20px); background: var(--text); color: #fff; padding: 10px 18px; border-radius: var(--radius); font-size: 13px; opacity: 0; pointer-events: none; transition: all 0.2s; z-index: 50; max-width: calc(100vw - 32px); }
+    .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(20px); background: var(--ink); color: var(--paper); padding: 10px 18px; border-radius: 4px; font-size: 13px; opacity: 0; pointer-events: none; transition: all 0.2s; z-index: 50; max-width: calc(100vw - 32px); }
     .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-    footer { padding: 24px; text-align: center; color: var(--text-muted); font-size: 12px; border-top: 1px solid var(--border); }
-    footer a { color: var(--text-muted); text-decoration: none; }
+    footer { padding: 18px; text-align: center; color: var(--ink-3); font-size: 12px; border-top: 1px solid var(--line); }
+    footer a { color: var(--ink-2); text-decoration: none; }
 
     @media (max-width: 600px) {
-      main { padding: 28px 16px 64px; }
-      h1, .title-input { font-size: 20px; }
-      .row { grid-template-columns: 24px 1fr auto; padding: 12px; }
+      header { height: 52px; padding: 0 16px; }
+      main { padding: 32px 16px 64px; }
+      h1, .title-input { font-size: 22px; }
+      .row { grid-template-columns: 24px 1fr auto; gap: 6px 12px; padding: 14px 2px; }
       .badges { grid-column: 2 / -1; grid-row: 2; }
       .header-nav a:not(:last-child) { display: none; }
     }
@@ -79,7 +100,7 @@
 <body>
 
 <header>
-  <a class="logo" href="/">Clippin</a>
+  <a class="logo" href="/" aria-label="Clippin トップへ"><span class="logo-mark" aria-hidden="true"></span><span class="logo-word">clippin</span></a>
   <nav class="header-nav">
     <a href="/usage">使い方</a>
     <a href="/">新しくアップロード</a>
@@ -87,10 +108,10 @@
 </header>
 
 <main>
-  <div class="eyebrow">まとめページ</div>
+  <div class="eyebrow">COLLECTION</div>
   <div class="title-row" id="titleRow">
     <h1 id="batchName">読み込み中...</h1>
-    <button class="icon-btn" id="renameBtn" onclick="startRename()" title="名前を変更" style="display:none">✎ 名前を変更</button>
+    <button class="icon-btn" id="renameBtn" onclick="startRename()" title="名前を変更" style="display:none">名前を変更</button>
   </div>
   <div class="meta" id="meta"></div>
 
@@ -184,7 +205,7 @@
     list.innerHTML = batch.projects.map((p, i) => {
       const url = projectUrl(p.id);
       const status = !p.pinCount
-        ? '<span class="badge">コメントなし</span>'
+        ? '<span class="badge">付箋なし</span>'
         : p.openCount
           ? `<span class="badge open">未解決 ${p.openCount}</span>`
           : '<span class="badge done">すべて解決済</span>';
@@ -196,7 +217,7 @@
             <div class="url">${esc(url)}</div>
           </div>
           <div class="badges">
-            ${p.versionNum > 1 ? `<span class="badge">v${p.versionNum}</span>` : ''}
+            ${p.versionNum > 1 ? `<span class="badge ver">v${p.versionNum}</span>` : ''}
             ${status}
           </div>
           <button class="icon-btn" onclick="copyOne('${esc(p.id)}')">コピー</button>
@@ -237,7 +258,7 @@
         if (res?.ok) { batch.name = name; toast('名前を変更しました'); }
         else toast('名前の変更に失敗しました');
       }
-      row.innerHTML = `<h1 id="batchName"></h1><button class="icon-btn" id="renameBtn" onclick="startRename()" title="名前を変更">✎ 名前を変更</button>`;
+      row.innerHTML = `<h1 id="batchName"></h1><button class="icon-btn" id="renameBtn" onclick="startRename()" title="名前を変更">名前を変更</button>`;
       render();
     };
     input.addEventListener('keydown', e => {
