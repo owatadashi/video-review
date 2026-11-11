@@ -3622,6 +3622,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
 
   // ─── URL Hash sharing ──────────────────────────────────
   function saveHash() {
+    // 保存済みの動画ページでは中身はサーバーにあるので、URLに埋め込まない
+    if (state.projectId) { stripHash(); return; }
     const payload = JSON.stringify({
       fileId: state.fileId,
       videoUrl: state.videoUrl,
@@ -3629,6 +3631,10 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
       pins: state.pins
     });
     history.replaceState(null, '', `#v=${btoa(unescape(encodeURIComponent(payload)))}`);
+  }
+
+  function stripHash() {
+    if (location.hash) history.replaceState(null, '', location.pathname + location.search);
   }
 
   function loadHash() {
@@ -3667,7 +3673,8 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   function handleShare() {
     // プロジェクト保存済み → URLをコピーするだけ
     if (state.projectId) {
-      writeClipboard(location.href);
+      stripHash();
+      writeClipboard(location.origin + location.pathname);
       flashButton(document.getElementById('shareBtn'), '✓ コピーしました');
       toast('共有URLをコピーしました', 'リンクを開くだけで、誰でも付箋を確認できます');
       return;
@@ -4707,6 +4714,7 @@ height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
   (function init() {
     const projectMatch = location.pathname.match(/^\/project\/([a-z0-9]+)$/);
     if (projectMatch) {
+      stripHash();
       loadProjectFromDB(projectMatch[1]);
     } else {
       loadHash();
